@@ -649,6 +649,23 @@ ins {
   background-color: #335a30;
 }
 
+.copy-to-designer-btn {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 20px;
+  padding: 5px 10px;
+  background-color: #44835a;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.copy-to-designer-btn:hover {
+  background-color: #335a30;
+}
+
 #diff-results {
   border: 1px solid #ccc;
   padding: 10px;
