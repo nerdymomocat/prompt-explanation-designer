@@ -430,13 +430,15 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .plus-button-container {
- visibility: hidden;
- position: absolute;
- top: 0;
- left: 50%;
- transform: translateX(-50%);
- padding: 5px;
- pointer-events: none
+  display: flex;
+  justify-content: center;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px;
+  pointer-events: none;
 }
 
 .sidebar:hover .plus-button-container {
@@ -460,6 +462,25 @@ input[type="color"]::-webkit-color-swatch {
 .plus-button: focus {
  outline: none
 }
+
+.settings-button {
+  background-color: transparent;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-left: 5px;
+}
+
+.sidebar:hover .settings-button {
+  opacity: 1;
+}
+
+.settings-button:focus {
+  outline: none;
+}
+
 .sidebar-content {
  padding-top: 40px
 }
@@ -745,4 +766,72 @@ ins {
  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
  transition: all 0.3s ease-in-out;
  margin-right: 5px
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 10px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.modal-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px; /* Reduced font size */
+  margin-right: 8px;
+  padding: 0;
+  color: #888;
+  width: 24px; /* Set width and height */
+  height: 24px;
+  display: flex; /* Align the icon in the center */
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-button:hover {
+  color: #444;
+}
+
+.save-icon {
+  fill: #678967;
+}
+
+#optionsTextarea {
+  width: 100%;
+  resize: none;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  border-radius: 5px;
+  line-height: 1.6;
+  padding: 10px
+}
+.modal-title {
+  flex-grow: 1; 
+  text-align: center; 
+  margin: 0;
+  font-size: 14px
 }
