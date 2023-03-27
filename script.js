@@ -51,7 +51,10 @@ const lowerLightnessThreshold = 0.5; // You can adjust this value to change the 
 const upperLightnessThreshold = 0.8; // You can adjust this value to change the upper lightness constraint
 
 const generateRandomColor = () => {
-  const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+  let randomColor = '#';
+  for (let i = 0; i < 6; i++) {
+    randomColor += ('0' + Math.floor(Math.random() * 16).toString(16)).slice(-1);
+  }
   return randomColor;
 };
 
