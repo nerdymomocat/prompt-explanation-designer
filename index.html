@@ -21,6 +21,20 @@
     </div>
   </header>
   <main>
+<div id="optionsModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button id="saveOptions" class="modal-button" title="Save">
+        <svg width="800" height="800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" class="save-icon">
+          <path d="m20.71 9.29-6-6a1 1 0 0 0-.32-.21A1.09 1.09 0 0 0 14 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a1 1 0 0 0-.29-.71ZM9 5h4v2H9Zm6 14H9v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1Zm4-1a1 1 0 0 1-1 1h-1v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.41l4 4Z"/>
+        </svg>
+      </button>
+      <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
+      <h3 class="modal-title">Edit Explanation Categories</h3>
+    </div>
+    <textarea id="optionsTextarea" rows="5"></textarea>
+  </div>
+</div>
   <div class="collapsible-container">
     <button class="collapsible"><span class="text-border">Prompt Compare</span></button>
     <div class="content">
@@ -50,6 +64,9 @@
           <div id="sidebar" class="sidebar">
             <div class="plus-button-container">
               <button class="plus-button">— + —</button>
+              <button class="settings-button">
+  <i class="fas fa-cog"></i>
+</button>
             </div>
             <div class="sidebar-content">
               <div class="item-container">
