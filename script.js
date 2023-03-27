@@ -200,7 +200,59 @@ document.addEventListener('click', (event) => {
 });
 
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
+
+function editDropdownOptions() {
+  const optionsModal = document.getElementById("optionsModal");
+
+  // Show the modal.
+  optionsModal.style.display = "block";
+
+  // Load saved options or use defaults.
+  let savedOptions = JSON.parse(localStorage.getItem("dropdownOptions"));
+  if (!savedOptions) {
+    savedOptions = ["", "Logical", "Spatial", "Material"];
+  }
+
+  // Ensure there is at least one empty option.
+  if (!savedOptions.includes("")) {
+    savedOptions.unshift("");
+  }
+
+  // Populate the textarea.
+  const optionsTextarea = document.getElementById("optionsTextarea");
+  optionsTextarea.value = savedOptions.join("\n");
+}
+  document.getElementById("saveOptions").addEventListener("click", () => {
+  const optionsTextarea = document.getElementById("optionsTextarea");
+  const updatedOptions = optionsTextarea.value.split("\n").map(option => option.trim());
+
+  // Save the updated options to localStorage.
+  localStorage.setItem("dropdownOptions", JSON.stringify(updatedOptions));
+
+  // Hide the modal.
+  document.getElementById("optionsModal").style.display = "none";
+});
+
+document.getElementById("closeModal").addEventListener("click", () => {
+  // Hide the modal without saving changes.
+  document.getElementById("optionsModal").style.display = "none";
+});
+
+// Event listener for clicking outside the modal.
+document.getElementById("optionsModal").addEventListener("click", (event) => {
+  if (event.target === event.currentTarget) {
+    // Trigger the saveOptions click event to save and close the modal.
+    document.getElementById("saveOptions").click();
+  }
+});
+
+// Event listener for the settings button.
+document.querySelector(".settings-button").addEventListener("click", () => {
+  editDropdownOptions();
+});
 
 function compareTextAreas() {
   console.log('compareTextAreas called'); // Debugging line
@@ -708,16 +760,38 @@ inputWrapper.onmouseover = () => {
 inputWrapper.onmouseout = () => {
     deleteInputButton.style.visibility = "hidden";
   };
-      const dropdown = document.createElement("select");
-      dropdown.classList.add("description-dropdown");
 
-      dropdownOptions.forEach((optionText) => {
-        const option = document.createElement("option");
-        option.value = optionText;
-        option.text = optionText;
-        dropdown.add(option);
-      });
+      function initDropdown() {
+  let dropdownOptions = JSON.parse(localStorage.getItem('dropdownOptions'));
 
+  if (!dropdownOptions) {
+    dropdownOptions = ["", "Logical", "Spatial", "Material"];
+    localStorage.setItem('dropdownOptions', JSON.stringify(dropdownOptions));
+  }
+
+  return dropdownOptions;
+}
+
+
+      function updateDropdown(dropdownOptions) {
+  const dropdown = document.createElement("select");
+  dropdown.classList.add("description-dropdown");
+
+  dropdownOptions.forEach((optionText) => {
+    const option = document.createElement("option");
+    option.value = optionText;
+    option.text = optionText;
+    dropdown.add(option);
+  });
+
+  return dropdown;
+}
+
+
+
+const dropdownOptions = initDropdown();
+const dropdown = updateDropdown(dropdownOptions);
+ 
       // Add more options as needed
 
       const descriptionInputBox = document.createElement("input");
