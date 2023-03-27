@@ -1,192 +1,8 @@
-const dropdownOptions = ["", "Logical", "Spatial", "Material"];
-
-const collapsibles = document.querySelectorAll('.collapsible');
-
-// Function to set the maxHeight based on content size
-function setContentHeight(content) {
-  content.style.maxHeight = content.scrollHeight + 'px';
-}
-// Loop through all the collapsible elements and add a click event listener
-collapsibles.forEach((collapsible) => {
-  collapsible.addEventListener('click', function () {
-    // Toggle the current collapsible
-    this.classList.toggle('active');
-    const content = this.nextElementSibling;
-    if (content.style.maxHeight) {
-      content.style.maxHeight = null;
-    } else {
-      setContentHeight(content);
-    }
-
-    // Close other collapsibles
-    collapsibles.forEach((otherCollapsible) => {
-      if (otherCollapsible !== collapsible) {
-        otherCollapsible.classList.remove('active');
-        const otherContent = otherCollapsible.nextElementSibling;
-        otherContent.style.maxHeight = null;
-      }
-    });
-  });
-
-  // Create a MutationObserver to observe changes in content
-  const content = collapsible.nextElementSibling;
-  const observer = new MutationObserver(function () {
-    setContentHeight(content);
-  });
-
-  // Observe changes in the content's childList and subtree
-  observer.observe(content, { childList: true, subtree: true });
-});
-
-collapsibles[1].classList.add('active');
-const secondContent = collapsibles[1].nextElementSibling;
-setContentHeight(secondContent);
-
-document.querySelector('.text-input').setAttribute('tabindex', '0');
-
-
 rangy.init();
-
-const lowerLightnessThreshold = 0.5; // You can adjust this value to change the lower lightness constraint
-const upperLightnessThreshold = 0.8; // You can adjust this value to change the upper lightness constraint
-
-const generateRandomColor = () => {
-  let randomColor = '#';
-  for (let i = 0; i < 6; i++) {
-    randomColor += ('0' + Math.floor(Math.random() * 16).toString(16)).slice(-1);
-  }
-  return randomColor;
-};
-
-const isColorUsedInSidebar = (color) => {
-  const colorItems = document.querySelectorAll('.sidebar .color-item');
-  let isUsed = false;
-  const deltaEThreshold = 5; // You can adjust this value to change the sensitivity of the color comparison
-
-  colorItems.forEach((item) => {
-    const itemColor = item.style.backgroundColor;
-    const deltaE = chroma.deltaE(color, itemColor, 2);
-    if (deltaE < deltaEThreshold) {
-      isUsed = true;
-    }
-  });
-
-  return isUsed;
-};
-
-// New helper function to get a unique random color not used in the sidebar
-const getUniqueRandomColor = () => {
-  let randomColor;
-  let lightness;
-  do {
-    randomColor = generateRandomColor();
-    lightness = chroma(randomColor).get('hsl.l');
-  } while (
-    isColorUsedInSidebar(randomColor) ||
-    lightness <= lowerLightnessThreshold || // Avoid colors close to black
-    lightness >= upperLightnessThreshold // Avoid colors close to white
-  );
-  return randomColor;
-};
+import { getUniqueRandomColor } from './module_color.js'
+import { wordDiff } from './module_diff.js'
 
 
-function findLongestCommonSubsequence(tokens1, tokens2) {
-  const lengths = Array(tokens1.length + 1)
-    .fill(0)
-    .map(() => Array(tokens2.length + 1).fill(0));
-
-  for (let i = 0; i < tokens1.length; i++) {
-    for (let j = 0; j < tokens2.length; j++) {
-      if (tokens1[i] === tokens2[j]) {
-        lengths[i + 1][j + 1] = lengths[i][j] + 1;
-      } else {
-        lengths[i + 1][j + 1] = Math.max(lengths[i + 1][j], lengths[i][j + 1]);
-      }
-    }
-  }
-
-  let result = [];
-  let i = tokens1.length,
-    j = tokens2.length;
-  while (i > 0 && j > 0) {
-    if (lengths[i][j] === lengths[i - 1][j]) {
-      i--;
-    } else if (lengths[i][j] === lengths[i][j - 1]) {
-      j--;
-    } else {
-      result.unshift(tokens1[i - 1]);
-      i--;
-      j--;
-    }
-  }
-
-  return result;
-}
-function groupContinuousDiffs(diffs) {
-  const groupedDiffs = [];
-
-  for (const [op, text] of diffs) {
-    if (groupedDiffs.length === 0 || groupedDiffs[groupedDiffs.length - 1][0] !== op) {
-      groupedDiffs.push([op, text]);
-    } else {
-      groupedDiffs[groupedDiffs.length - 1][1] += " " + text;
-    }
-  }
-
-  return groupedDiffs;
-}
-
-function wordDiff(text1, text2) {
-  const tokens1 = text1.split(/\s+/);
-  const tokens2 = text2.split(/\s+/);
-  const lcs = findLongestCommonSubsequence(tokens1, tokens2);
-
-  const diffs = [];
-  let i1 = 0,
-    i2 = 0,
-    iLcs = 0;
-  let deletions = [];
-  let additions = [];
-
-  while (i1 < tokens1.length || i2 < tokens2.length) {
-    let token1 = i1 < tokens1.length ? tokens1[i1] : null;
-    let token2 = i2 < tokens2.length ? tokens2[i2] : null;
-    let lcsToken = iLcs < lcs.length ? lcs[iLcs] : null;
-
-    if (token1 === lcsToken && token2 === lcsToken) {
-      if (deletions.length > 0) {
-        diffs.push([-1, deletions.join(' ')]);
-        deletions = [];
-      }
-      if (additions.length > 0) {
-        diffs.push([1, additions.join(' ')]);
-        additions = [];
-      }
-      diffs.push([0, token1]);
-      i1++;
-      i2++;
-      iLcs++;
-    } else {
-      if (token1 !== lcsToken) {
-        deletions.push(token1);
-        i1++;
-      }
-      if (token2 !== lcsToken) {
-        additions.push(token2);
-        i2++;
-      }
-    }
-  }
-
-  if (deletions.length > 0) {
-    diffs.push([-1, deletions.join(' ')]);
-  }
-  if (additions.length > 0) {
-    diffs.push([1, additions.join(' ')]);
-  }
-
-  return diffs;
-}
 
 const textInput = document.querySelector('.text-input');
 
@@ -207,149 +23,201 @@ document.addEventListener('click', (event) => {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-function editDropdownOptions() {
-  const optionsModal = document.getElementById("optionsModal");
 
-  // Show the modal.
-  optionsModal.style.display = "block";
 
-  // Load saved options or use defaults.
-  let savedOptions = JSON.parse(localStorage.getItem("dropdownOptions"));
-  if (!savedOptions) {
-    savedOptions = ["", "Logical", "Spatial", "Material"];
+  exportCanvasBtn.addEventListener('click', (event) => {
+    const contenteditableDiv =
+      document.querySelector('.text-input');
+    const innerHTML = contenteditableDiv.innerHTML;
+  });
+
+  const collapsibles = document.querySelectorAll('.collapsible');
+
+  // Function to set the maxHeight based on content size
+  function setContentHeight(content) {
+    content.style.maxHeight = content.scrollHeight + 'px';
   }
+  // Loop through all the collapsible elements and add a click event listener
+  collapsibles.forEach((collapsible) => {
+    collapsible.addEventListener('click', function() {
+      // Toggle the current collapsible
+      this.classList.toggle('active');
+      const content = this.nextElementSibling;
+      if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+      } else {
+        setContentHeight(content);
+      }
 
-  // Ensure there is at least one empty option.
-  if (!savedOptions.includes("")) {
-    savedOptions.unshift("");
+      // Close other collapsibles
+      collapsibles.forEach((otherCollapsible) => {
+        if (otherCollapsible !== collapsible) {
+          otherCollapsible.classList.remove('active');
+          const otherContent = otherCollapsible.nextElementSibling;
+          otherContent.style.maxHeight = null;
+        }
+      });
+    });
+
+    // Create a MutationObserver to observe changes in content
+    const content = collapsible.nextElementSibling;
+    const observer = new MutationObserver(function() {
+      setContentHeight(content);
+    });
+
+    // Observe changes in the content's childList and subtree
+    observer.observe(content, { childList: true, subtree: true });
+  });
+
+  collapsibles[1].classList.add('active');
+  const secondContent = collapsibles[1].nextElementSibling;
+  setContentHeight(secondContent);
+
+  document.querySelector('.text-input').setAttribute('tabindex', '0');
+
+  function editDropdownOptions() {
+    const optionsModal = document.getElementById("optionsModal");
+
+    // Show the modal.
+    optionsModal.style.display = "block";
+
+    // Load saved options or use defaults.
+    let savedOptions = JSON.parse(localStorage.getItem("dropdownOptions"));
+    if (!savedOptions) {
+      savedOptions = ["", "Logical", "Spatial", "Material"];
+    }
+
+    // Ensure there is at least one empty option.
+    if (!savedOptions.includes("")) {
+      savedOptions.unshift("");
+    }
+
+    // Populate the textarea.
+    const optionsTextarea = document.getElementById("optionsTextarea");
+    optionsTextarea.value = savedOptions.join("\n");
   }
-
-  // Populate the textarea.
-  const optionsTextarea = document.getElementById("optionsTextarea");
-  optionsTextarea.value = savedOptions.join("\n");
-}
   document.getElementById("saveOptions").addEventListener("click", () => {
-  const optionsTextarea = document.getElementById("optionsTextarea");
-  const updatedOptions = optionsTextarea.value.split("\n").map(option => option.trim());
+    const optionsTextarea = document.getElementById("optionsTextarea");
+    const updatedOptions = optionsTextarea.value.split("\n").map(option => option.trim());
 
-  // Save the updated options to localStorage.
-  localStorage.setItem("dropdownOptions", JSON.stringify(updatedOptions));
+    // Save the updated options to localStorage.
+    localStorage.setItem("dropdownOptions", JSON.stringify(updatedOptions));
 
-  // Hide the modal.
-  document.getElementById("optionsModal").style.display = "none";
-});
+    // Hide the modal.
+    document.getElementById("optionsModal").style.display = "none";
+  });
 
-document.getElementById("closeModal").addEventListener("click", () => {
-  // Hide the modal without saving changes.
-  document.getElementById("optionsModal").style.display = "none";
-});
+  document.getElementById("closeModal").addEventListener("click", () => {
+    // Hide the modal without saving changes.
+    document.getElementById("optionsModal").style.display = "none";
+  });
 
-// Event listener for clicking outside the modal.
-document.getElementById("optionsModal").addEventListener("click", (event) => {
-  if (event.target === event.currentTarget) {
-    // Trigger the saveOptions click event to save and close the modal.
-    document.getElementById("saveOptions").click();
+  // Event listener for clicking outside the modal.
+  document.getElementById("optionsModal").addEventListener("click", (event) => {
+    if (event.target === event.currentTarget) {
+      // Trigger the saveOptions click event to save and close the modal.
+      document.getElementById("saveOptions").click();
+    }
+  });
+
+  // Event listener for the settings button.
+  document.querySelector(".settings-button").addEventListener("click", () => {
+    editDropdownOptions();
+  });
+
+  function compareTextAreas() {
+    console.log('compareTextAreas called'); // Debugging line
+
+    const textArea1 = document.getElementById('text-area-1');
+    const textArea2 = document.getElementById('text-area-2');
+    const diffResults = document.getElementById('diff-results');
+    const resultsContainer = document.getElementById('results-container'); // Add this line
+
+    const diffs = wordDiff(textArea1.value, textArea2.value);
+
+    console.log('Diffs:', diffs); // Debugging line
+
+    const diffHTML = diffs
+      .map(([op, text]) => {
+        if (op === -1) return `<del>${text}</del>`;
+        if (op === 1) return `<ins>${text}</ins>`;
+        return text;
+      })
+      .join(' ');
+
+    diffResults.innerHTML = diffHTML;
   }
-});
 
-// Event listener for the settings button.
-document.querySelector(".settings-button").addEventListener("click", () => {
-  editDropdownOptions();
-});
-
-function compareTextAreas() {
-  console.log('compareTextAreas called'); // Debugging line
-
-  const textArea1 = document.getElementById('text-area-1');
-  const textArea2 = document.getElementById('text-area-2');
-  const diffResults = document.getElementById('diff-results');
-  const resultsContainer = document.getElementById('results-container'); // Add this line
-
-  const diffs = wordDiff(textArea1.value, textArea2.value);
-
-  console.log('Diffs:', diffs); // Debugging line
-
-  const diffHTML = diffs
-    .map(([op, text]) => {
-      if (op === -1) return `<del>${text}</del>`;
-      if (op === 1) return `<ins>${text}</ins>`;
-      return text;
-    })
-    .join(' ');
-
-  diffResults.innerHTML = diffHTML;
-}
-
-const applyColorWithRanges = (color, ranges) => {
-  const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
-  const style = document.createElement("style");
-  style.textContent = `
+  const applyColorWithRanges = (color, ranges) => {
+    const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
+    const style = document.createElement("style");
+    style.textContent = `
     .${className} {
       background-color: ${color};
       border-radius: 3px;
       padding: 1px 1px;
     }
   `;
-  document.head.appendChild(style);
+    document.head.appendChild(style);
 
-  const classApplier = rangy.createClassApplier(className, { normalize: true });
+    const classApplier = rangy.createClassApplier(className, { normalize: true });
 
-  ranges.forEach((range) => {
-    // Remove the temporary highlight
-    tempHighlightClassApplier.undoToRange(range);
+    ranges.forEach((range) => {
+      // Remove the temporary highlight
+      tempHighlightClassApplier.undoToRange(range);
 
-    // Apply the new color highlight
-    classApplier.toggleRange(range);
-  });
+      // Apply the new color highlight
+      classApplier.toggleRange(range);
+    });
 
-  // Update the sidebar with color indexes
-  updateSidebar(color);
-};
+    // Update the sidebar with color indexes
+    updateSidebar(color);
+  };
 
-function removeAllItemsFromSidebar() {
-  const deleteButtons = document.querySelectorAll(".delete-button, .horizontal-line-delete-button");
+  function removeAllItemsFromSidebar() {
+    const deleteButtons = document.querySelectorAll(".delete-button, .horizontal-line-delete-button");
 
-  deleteButtons.forEach((deleteButton) => {
-    deleteButton.onclick();
-  });
-}
+    deleteButtons.forEach((deleteButton) => {
+      deleteButton.onclick();
+    });
+  }
 
-const copyToDesignerBtn = document.querySelector(".copy-to-designer-btn");
+  const copyToDesignerBtn = document.querySelector(".copy-to-designer-btn");
 
   copyToDesignerBtn.addEventListener("click", copyToDesigner);
 
-function copyToDesigner() {
-   console.log('copyToDesigner called'); // 
-  removeAllItemsFromSidebar(); // Call the removeAllItemsFromSidebar function to remove all items in the sidebar
-  // Get the input text
-  const diffResults = document.getElementById('diff-results');
-  const inputText = diffResults.innerHTML;
+  function copyToDesigner() {
+    console.log('copyToDesigner called'); // 
+    removeAllItemsFromSidebar(); // Call the removeAllItemsFromSidebar function to remove all items in the sidebar
+    // Get the input text
+    const diffResults = document.getElementById('diff-results');
+    const inputText = diffResults.innerHTML;
 
-  // Create a temporary DOM element to parse the input text
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = inputText;
+    // Create a temporary DOM element to parse the input text
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = inputText;
 
-  // Handle <del> elements
-  const delElements = tempDiv.querySelectorAll("del");
-  delElements.forEach((delElement) => {
-    const selectedRange = rangy.createRange();
-    selectedRange.selectNodeContents(delElement);
-    applyStrikethrough([selectedRange]);
-  });
+    // Handle <del> elements
+    const delElements = tempDiv.querySelectorAll("del");
+    delElements.forEach((delElement) => {
+      const selectedRange = rangy.createRange();
+      selectedRange.selectNodeContents(delElement);
+      applyStrikethrough([selectedRange]);
+    });
 
-  // Handle <ins> elements
-  const insElements = tempDiv.querySelectorAll("ins");
-  insElements.forEach((insElement) => {
-    const selectedRange = rangy.createRange();
-    selectedRange.selectNodeContents(insElement);
-    const randomColor = getUniqueRandomColor();
-    applyColorWithRanges(randomColor, [selectedRange]);
-  });
+    // Handle <ins> elements
+    const insElements = tempDiv.querySelectorAll("ins");
+    insElements.forEach((insElement) => {
+      const selectedRange = rangy.createRange();
+      selectedRange.selectNodeContents(insElement);
+      const randomColor = getUniqueRandomColor();
+      applyColorWithRanges(randomColor, [selectedRange]);
+    });
 
-  // Add the formatted text to the text-input area in the next collapsible
-  const outputTextArea = document.querySelector(".text-input");
-  outputTextArea.innerHTML = tempDiv.innerHTML;
-}
+    // Add the formatted text to the text-input area in the next collapsible
+    const outputTextArea = document.querySelector(".text-input");
+    outputTextArea.innerHTML = tempDiv.innerHTML;
+  }
 
   const compareButton = document.querySelector(".compare-btn");
   compareButton.addEventListener("click", compareTextAreas);
@@ -625,22 +493,22 @@ const addHorizontalLine = () => {
   line.classList.add("horizontal-line");
 
   // Add a delete button for the horizontal line
-const deleteButton = document.createElement("button");
-deleteButton.textContent = "X";
-deleteButton.classList.add("delete-button", "horizontal-line-delete");
-deleteButton.style.visibility = 'hidden';
-deleteButton.onclick = () => wrapper.remove();
-
-// Assuming `wrapper` is the element that wraps the content and the delete button
-wrapper.addEventListener('mouseover', () => {
-  deleteButton.style.visibility = 'visible';
-});
-
-wrapper.addEventListener('mouseout', () => {
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "X";
+  deleteButton.classList.add("delete-button", "horizontal-line-delete");
   deleteButton.style.visibility = 'hidden';
-});
+  deleteButton.onclick = () => wrapper.remove();
 
-  
+  // Assuming `wrapper` is the element that wraps the content and the delete button
+  wrapper.addEventListener('mouseover', () => {
+    deleteButton.style.visibility = 'visible';
+  });
+
+  wrapper.addEventListener('mouseout', () => {
+    deleteButton.style.visibility = 'hidden';
+  });
+
+
   const lineText = document.createElement("input");
   lineText.type = "text";
   lineText.placeholder = "Text";
@@ -754,47 +622,47 @@ function updateSidebar(color, isStrikethrough = false) {
         updateDeleteInputButtons();
       };
 
-inputWrapper.onmouseover = () => {
-    if (descriptionInputsContainer.children.length > 1) {
-      deleteInputButton.style.visibility = "visible";
-    }
-  };
+      inputWrapper.onmouseover = () => {
+        if (descriptionInputsContainer.children.length > 1) {
+          deleteInputButton.style.visibility = "visible";
+        }
+      };
 
-inputWrapper.onmouseout = () => {
-    deleteInputButton.style.visibility = "hidden";
-  };
+      inputWrapper.onmouseout = () => {
+        deleteInputButton.style.visibility = "hidden";
+      };
 
       function initDropdown() {
-  let dropdownOptions = JSON.parse(localStorage.getItem('dropdownOptions'));
+        let dropdownOptions = JSON.parse(localStorage.getItem('dropdownOptions'));
 
-  if (!dropdownOptions) {
-    dropdownOptions = ["", "Logical", "Spatial", "Material"];
-    localStorage.setItem('dropdownOptions', JSON.stringify(dropdownOptions));
-  }
+        if (!dropdownOptions) {
+          dropdownOptions = ["", "Logical", "Spatial", "Material"];
+          localStorage.setItem('dropdownOptions', JSON.stringify(dropdownOptions));
+        }
 
-  return dropdownOptions;
-}
+        return dropdownOptions;
+      }
 
 
       function updateDropdown(dropdownOptions) {
-  const dropdown = document.createElement("select");
-  dropdown.classList.add("description-dropdown");
+        const dropdown = document.createElement("select");
+        dropdown.classList.add("description-dropdown");
 
-  dropdownOptions.forEach((optionText) => {
-    const option = document.createElement("option");
-    option.value = optionText;
-    option.text = optionText;
-    dropdown.add(option);
-  });
+        dropdownOptions.forEach((optionText) => {
+          const option = document.createElement("option");
+          option.value = optionText;
+          option.text = optionText;
+          dropdown.add(option);
+        });
 
-  return dropdown;
-}
+        return dropdown;
+      }
 
 
 
-const dropdownOptions = initDropdown();
-const dropdown = updateDropdown(dropdownOptions);
- 
+      const dropdownOptions = initDropdown();
+      const dropdown = updateDropdown(dropdownOptions);
+
       // Add more options as needed
 
       const descriptionInputBox = document.createElement("input");
@@ -810,20 +678,20 @@ const dropdown = updateDropdown(dropdownOptions);
     }
 
 
-function updateDeleteInputButtons() {
-    const inputWrappers = descriptionInputsContainer.querySelectorAll(".color-description-input").length;
-    const deleteButtons = descriptionInputsContainer.querySelectorAll(".delete-input-button");
+    function updateDeleteInputButtons() {
+      const inputWrappers = descriptionInputsContainer.querySelectorAll(".color-description-input").length;
+      const deleteButtons = descriptionInputsContainer.querySelectorAll(".delete-input-button");
 
-    if (inputWrappers > 1) {
-      deleteButtons.forEach((button) => {
-        button.style.visibility = "visible";
-      });
-    } else {
-      deleteButtons.forEach((button) => {
-        button.style.visibility = "hidden";
-      });
+      if (inputWrappers > 1) {
+        deleteButtons.forEach((button) => {
+          button.style.visibility = "visible";
+        });
+      } else {
+        deleteButtons.forEach((button) => {
+          button.style.visibility = "hidden";
+        });
+      }
     }
-  }
 
     function addDescriptionInput(event) {
       event.preventDefault();
@@ -849,43 +717,43 @@ function updateDeleteInputButtons() {
     wrapper.addEventListener("dragover", onDragOver);
     wrapper.addEventListener("drop", onDrop);
 
-    
-  
+
+
     colorIndexContainer.appendChild(colorBox);
     colorIndexContainer.appendChild(deleteButton);
-        colorIndexContainer.appendChild(addButton);
+    colorIndexContainer.appendChild(addButton);
     colorIndexContainer.appendChild(descriptionInputsContainer);
 
     wrapper.appendChild(colorIndexContainer);
     const itemContainer = document.querySelector(".item-container");
     itemContainer.appendChild(wrapper);
 
-function handleMouseOver() {
-    deleteButton.style.visibility = "visible";
-    addButton.style.visibility = "visible";
+    function handleMouseOver() {
+      deleteButton.style.visibility = "visible";
+      addButton.style.visibility = "visible";
 
-    const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
-    if (inputWrappers.length > 1) {
+      const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
+      if (inputWrappers.length > 1) {
+        inputWrappers.forEach((inputWrapper) => {
+          const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
+          deleteInputButton.style.visibility = "visible";
+        });
+      }
+    }
+
+    function handleMouseOut() {
+      deleteButton.style.visibility = "hidden";
+      addButton.style.visibility = "hidden";
+
+      const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
       inputWrappers.forEach((inputWrapper) => {
         const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
-        deleteInputButton.style.visibility = "visible";
+        deleteInputButton.style.visibility = "hidden";
       });
     }
-  }
 
-function handleMouseOut() {
-    deleteButton.style.visibility = "hidden";
-    addButton.style.visibility = "hidden";
-
-    const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
-    inputWrappers.forEach((inputWrapper) => {
-      const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
-      deleteInputButton.style.visibility = "hidden";
-    });
-  }
-
-wrapper.addEventListener("mouseover", handleMouseOver);
-  wrapper.addEventListener("mouseout", handleMouseOut);
+    wrapper.addEventListener("mouseover", handleMouseOver);
+    wrapper.addEventListener("mouseout", handleMouseOut);
   }
 }
 
@@ -964,3 +832,54 @@ const deleteColor = (color, isStrikethrough = false) => {
 const sidebar = document.querySelector(".sidebar");
 sidebar.addEventListener("dragover", onDragOver);
 sidebar.addEventListener("drop", onDrop);
+
+const exportCanvasBtn = document.querySelector('.export-canvas-btn');
+
+
+
+exportCanvasBtn.addEventListener('click', (event) => {
+  const contenteditableDiv =
+    document.querySelector('.text-input');
+  const innerHTML = contenteditableDiv.innerHTML;
+});
+
+const data1 = [
+  { text: 'This', annotation: 'Subject' },
+  { text: 'is', annotation: 'Verb' },
+  { text: 'a', annotation: 'Article' },
+  { text: 'sentence' },
+  { text: 'with', annotation: 'Preposition' },
+  { text: 'annotations' }
+];
+
+const svg = d3.select('#visualization');
+const padding = 10;
+
+let xPos = 0;
+const yPos = 50;
+
+data1.forEach((d, i) => {
+  const text = svg.append('text')
+    .text(d.text)
+    .attr('x', xPos)
+    .attr('y', yPos);
+
+  const textWidth = text.node().getBBox().width;
+
+  if (d.annotation) {
+    const annotation = svg.append('text')
+      .text(d.annotation)
+      .attr('class', 'annotation')
+      .attr('x', xPos + textWidth / 2)
+      .attr('y', yPos - 20);
+
+    svg.append('line')
+      .attr('x1', xPos + textWidth / 2)
+      .attr('y1', yPos - 5)
+      .attr('x2', xPos + textWidth / 2)
+      .attr('y2', yPos - 15)
+      .attr('stroke', 'red');
+  }
+
+  xPos += textWidth + padding;
+});
