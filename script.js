@@ -1,6 +1,7 @@
 rangy.init();
 import { getUniqueRandomColor } from './module_color.js'
 import { wordDiff } from './module_diff.js'
+import { create_viz } from './module_viz.js'
 
 
 
@@ -22,13 +23,9 @@ document.addEventListener('click', (event) => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
-
-
-  exportCanvasBtn.addEventListener('click', (event) => {
-    const contenteditableDiv =
-      document.querySelector('.text-input');
-    const innerHTML = contenteditableDiv.innerHTML;
+  const visualizeBtn = document.querySelector('.export-canvas-btn');
+  visualizeBtn.addEventListener("click", () => {
+    create_viz();
   });
 
   const collapsibles = document.querySelectorAll('.collapsible');
@@ -841,45 +838,4 @@ exportCanvasBtn.addEventListener('click', (event) => {
   const contenteditableDiv =
     document.querySelector('.text-input');
   const innerHTML = contenteditableDiv.innerHTML;
-});
-
-const data1 = [
-  { text: 'This', annotation: 'Subject' },
-  { text: 'is', annotation: 'Verb' },
-  { text: 'a', annotation: 'Article' },
-  { text: 'sentence' },
-  { text: 'with', annotation: 'Preposition' },
-  { text: 'annotations' }
-];
-
-const svg = d3.select('#visualization');
-const padding = 10;
-
-let xPos = 0;
-const yPos = 50;
-
-data1.forEach((d, i) => {
-  const text = svg.append('text')
-    .text(d.text)
-    .attr('x', xPos)
-    .attr('y', yPos);
-
-  const textWidth = text.node().getBBox().width;
-
-  if (d.annotation) {
-    const annotation = svg.append('text')
-      .text(d.annotation)
-      .attr('class', 'annotation')
-      .attr('x', xPos + textWidth / 2)
-      .attr('y', yPos - 20);
-
-    svg.append('line')
-      .attr('x1', xPos + textWidth / 2)
-      .attr('y1', yPos - 5)
-      .attr('x2', xPos + textWidth / 2)
-      .attr('y2', yPos - 15)
-      .attr('stroke', 'red');
-  }
-
-  xPos += textWidth + padding;
 });
