@@ -47,7 +47,7 @@ document.querySelector('.text-input').setAttribute('tabindex', '0');
 
 rangy.init();
 
-const lowerLightnessThreshold = 0.2; // You can adjust this value to change the lower lightness constraint
+const lowerLightnessThreshold = 0.5; // You can adjust this value to change the lower lightness constraint
 const upperLightnessThreshold = 0.8; // You can adjust this value to change the upper lightness constraint
 
 const generateRandomColor = () => {
@@ -55,16 +55,15 @@ const generateRandomColor = () => {
   return randomColor;
 };
 
-// New helper function to check if a color is already used in the sidebar
 const isColorUsedInSidebar = (color) => {
   const colorItems = document.querySelectorAll('.sidebar .color-item');
   let isUsed = false;
-  const colorHue = chroma(color).get('hsl.h');
-  const hueThreshold = 20; // You can adjust this value to change the sensitivity of the hue comparison
+  const deltaEThreshold = 5; // You can adjust this value to change the sensitivity of the color comparison
 
   colorItems.forEach((item) => {
-    const itemHue = chroma(item.style.backgroundColor).get('hsl.h');
-    if (Math.abs(colorHue - itemHue) < hueThreshold) {
+    const itemColor = item.style.backgroundColor;
+    const deltaE = chroma.deltaE(color, itemColor, 2);
+    if (deltaE < deltaEThreshold) {
       isUsed = true;
     }
   });
@@ -79,14 +78,14 @@ const getUniqueRandomColor = () => {
   do {
     randomColor = generateRandomColor();
     lightness = chroma(randomColor).get('hsl.l');
-  }
-  while (
+  } while (
     isColorUsedInSidebar(randomColor) ||
     lightness <= lowerLightnessThreshold || // Avoid colors close to black
     lightness >= upperLightnessThreshold // Avoid colors close to white
   );
   return randomColor;
 };
+
 
 function findLongestCommonSubsequence(tokens1, tokens2) {
   const lengths = Array(tokens1.length + 1)
@@ -200,6 +199,7 @@ document.addEventListener('click', (event) => {
   }
 });
 
+
 document.addEventListener("DOMContentLoaded", () => {
 
 function compareTextAreas() {
@@ -223,6 +223,77 @@ function compareTextAreas() {
     .join(' ');
 
   diffResults.innerHTML = diffHTML;
+}
+
+const applyColorWithRanges = (color, ranges) => {
+  const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
+  const style = document.createElement("style");
+  style.textContent = `
+    .${className} {
+      background-color: ${color};
+      border-radius: 3px;
+      padding: 1px 1px;
+    }
+  `;
+  document.head.appendChild(style);
+
+  const classApplier = rangy.createClassApplier(className, { normalize: true });
+
+  ranges.forEach((range) => {
+    // Remove the temporary highlight
+    tempHighlightClassApplier.undoToRange(range);
+
+    // Apply the new color highlight
+    classApplier.toggleRange(range);
+  });
+
+  // Update the sidebar with color indexes
+  updateSidebar(color);
+};
+
+function removeAllItemsFromSidebar() {
+  const deleteButtons = document.querySelectorAll(".delete-button, .horizontal-line-delete-button");
+
+  deleteButtons.forEach((deleteButton) => {
+    deleteButton.onclick();
+  });
+}
+
+const copyToDesignerBtn = document.querySelector(".copy-to-designer-btn");
+
+  copyToDesignerBtn.addEventListener("click", copyToDesigner);
+
+function copyToDesigner() {
+   console.log('copyToDesigner called'); // 
+  removeAllItemsFromSidebar(); // Call the removeAllItemsFromSidebar function to remove all items in the sidebar
+  // Get the input text
+  const diffResults = document.getElementById('diff-results');
+  const inputText = diffResults.innerHTML;
+
+  // Create a temporary DOM element to parse the input text
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = inputText;
+
+  // Handle <del> elements
+  const delElements = tempDiv.querySelectorAll("del");
+  delElements.forEach((delElement) => {
+    const selectedRange = rangy.createRange();
+    selectedRange.selectNodeContents(delElement);
+    applyStrikethrough([selectedRange]);
+  });
+
+  // Handle <ins> elements
+  const insElements = tempDiv.querySelectorAll("ins");
+  insElements.forEach((insElement) => {
+    const selectedRange = rangy.createRange();
+    selectedRange.selectNodeContents(insElement);
+    const randomColor = getUniqueRandomColor();
+    applyColorWithRanges(randomColor, [selectedRange]);
+  });
+
+  // Add the formatted text to the text-input area in the next collapsible
+  const outputTextArea = document.querySelector(".text-input");
+  outputTextArea.innerHTML = tempDiv.innerHTML;
 }
 
   const compareButton = document.querySelector(".compare-btn");
@@ -499,10 +570,22 @@ const addHorizontalLine = () => {
   line.classList.add("horizontal-line");
 
   // Add a delete button for the horizontal line
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "X";
-  deleteButton.classList.add("delete-button", "horizontal-line-delete");
-  deleteButton.onclick = () => wrapper.remove();
+const deleteButton = document.createElement("button");
+deleteButton.textContent = "X";
+deleteButton.classList.add("delete-button", "horizontal-line-delete");
+deleteButton.style.visibility = 'hidden';
+deleteButton.onclick = () => wrapper.remove();
+
+// Assuming `wrapper` is the element that wraps the content and the delete button
+wrapper.addEventListener('mouseover', () => {
+  deleteButton.style.visibility = 'visible';
+});
+
+wrapper.addEventListener('mouseout', () => {
+  deleteButton.style.visibility = 'hidden';
+});
+
+  
   const lineText = document.createElement("input");
   lineText.type = "text";
   lineText.placeholder = "Text";
@@ -598,6 +681,8 @@ function updateSidebar(color, isStrikethrough = false) {
     addButton.classList.add("button-hidden-style");
     addButton.style.visibility = "hidden";
 
+    // Add styles for the button
+
     function createDescriptionInput() {
       const inputWrapper = document.createElement("div");
       inputWrapper.classList.add("input-wrapper");
@@ -614,16 +699,15 @@ function updateSidebar(color, isStrikethrough = false) {
         updateDeleteInputButtons();
       };
 
-      inputWrapper.onmouseover = () => {
-        if (descriptionInputsContainer.children.length > 1) {
-          deleteInputButton.style.display = "inline-block";
-        }
-      };
+inputWrapper.onmouseover = () => {
+    if (descriptionInputsContainer.children.length > 1) {
+      deleteInputButton.style.visibility = "visible";
+    }
+  };
 
-      inputWrapper.onmouseout = () => {
-        deleteInputButton.style.display = "none";
-      };
-
+inputWrapper.onmouseout = () => {
+    deleteInputButton.style.visibility = "hidden";
+  };
       const dropdown = document.createElement("select");
       dropdown.classList.add("description-dropdown");
 
@@ -649,21 +733,20 @@ function updateSidebar(color, isStrikethrough = false) {
     }
 
 
-    function updateDeleteInputButtons() {
-      const inputWrappers = descriptionInputsContainer.querySelectorAll(".color-description-input").length;
-      const deleteButtons = descriptionInputsContainer.querySelectorAll(".delete-input-button");
+function updateDeleteInputButtons() {
+    const inputWrappers = descriptionInputsContainer.querySelectorAll(".color-description-input").length;
+    const deleteButtons = descriptionInputsContainer.querySelectorAll(".delete-input-button");
 
-      if (inputWrappers > 1) {
-        deleteButtons.forEach((button) => {
-          //button.style.display = "inline-block";
-          button.style.visibility = "visible";
-        });
-      } else {
-        deleteButtons.forEach((button) => {
-          button.style.visibility = "hidden";
-        });
-      }
+    if (inputWrappers > 1) {
+      deleteButtons.forEach((button) => {
+        button.style.visibility = "visible";
+      });
+    } else {
+      deleteButtons.forEach((button) => {
+        button.style.visibility = "hidden";
+      });
     }
+  }
 
     function addDescriptionInput(event) {
       event.preventDefault();
@@ -689,41 +772,43 @@ function updateSidebar(color, isStrikethrough = false) {
     wrapper.addEventListener("dragover", onDragOver);
     wrapper.addEventListener("drop", onDrop);
 
-    colorIndexContainer.appendChild(deleteButton);
+    
+  
     colorIndexContainer.appendChild(colorBox);
+    colorIndexContainer.appendChild(deleteButton);
+        colorIndexContainer.appendChild(addButton);
     colorIndexContainer.appendChild(descriptionInputsContainer);
-    colorIndexContainer.appendChild(addButton);
 
     wrapper.appendChild(colorIndexContainer);
     const itemContainer = document.querySelector(".item-container");
     itemContainer.appendChild(wrapper);
 
-    function handleMouseOver() {
-      deleteButton.style.visibility = "visible";
-      addButton.style.visibility = "visible";
+function handleMouseOver() {
+    deleteButton.style.visibility = "visible";
+    addButton.style.visibility = "visible";
 
-      const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
-      if (inputWrappers.length > 1) {
-        inputWrappers.forEach((inputWrapper) => {
-          const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
-          deleteInputButton.style.visibility = "visible";
-        });
-      }
-    }
-
-    function handleMouseOut() {
-      deleteButton.style.visibility = "hidden";
-      addButton.style.visibility = "hidden";
-
-      const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
+    const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
+    if (inputWrappers.length > 1) {
       inputWrappers.forEach((inputWrapper) => {
         const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
-        deleteInputButton.style.visibility = "hidden";
+        deleteInputButton.style.visibility = "visible";
       });
     }
+  }
 
-    wrapper.addEventListener("mouseover", handleMouseOver);
-    wrapper.addEventListener("mouseout", handleMouseOut);
+function handleMouseOut() {
+    deleteButton.style.visibility = "hidden";
+    addButton.style.visibility = "hidden";
+
+    const inputWrappers = descriptionInputsContainer.querySelectorAll(".input-wrapper");
+    inputWrappers.forEach((inputWrapper) => {
+      const deleteInputButton = inputWrapper.querySelector(".delete-input-button");
+      deleteInputButton.style.visibility = "hidden";
+    });
+  }
+
+wrapper.addEventListener("mouseover", handleMouseOver);
+  wrapper.addEventListener("mouseout", handleMouseOut);
   }
 }
 
