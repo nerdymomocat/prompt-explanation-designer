@@ -10,9 +10,8 @@ export const create_viz = () => {
   const svg = d3
     .select("#visualization")
     .append("svg")
-    // Set width and height using the computed style of the container element
-    .attr("width", containerStyle.width)
-    .attr("height", containerStyle.height);
+    // Set the viewBox attribute to maintain the aspect ratio
+    .attr("viewBox", "0 0 600 335");
 
   // Define padding
   const padding = {
@@ -150,7 +149,9 @@ export const create_viz = () => {
   const bbox = plotGroup.node().getBBox();
   const remainingWidth = parseFloat(containerStyle.width) - bbox.width;
   const remainingHeight = parseFloat(containerStyle.height) - bbox.height;
-  plotGroup.attr("transform", `translate(${bbox.x + remainingWidth / 2}, ${bbox.y + remainingHeight / 2})`);
+  plotGroup.attr("transform", `translate(${padding.left}, ${padding.top})`);
+  console.log('SVG contents:', svg.node().outerHTML);
+console.log('Bounding box:', bbox);
 
   const hiddenTrigger = document.querySelector('.hidden-trigger');
   hiddenTrigger.textContent = Math.random();
