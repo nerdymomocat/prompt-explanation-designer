@@ -7,6 +7,18 @@ import { create_viz } from './module_viz.js'
 
 const textInput = document.querySelector('.text-input');
 
+
+function updatePlaceholderVisibility() {
+  const itemContainer = document.querySelector(".item-container");
+  const placeholder = document.querySelector(".item-placeholder");
+
+  // Check if the item container has any child elements other than the placeholder
+  const hasItems = Array.from(itemContainer.children).some(child => child !== placeholder);
+
+  // Show or hide the placeholder based on the presence of items
+  placeholder.style.display = hasItems ? "none" : "block";
+}
+
 textInput.addEventListener('click', (event) => {
   event.stopPropagation(); // Prevent the click event from bubbling up to the document
   textInput.classList.add('active');
@@ -19,13 +31,66 @@ document.addEventListener('click', (event) => {
   }
 });
 
+function showModal(imageSrc) {
+  const modal = document.getElementById('modal');
+  const generatedImage = document.getElementById('generated-image');
+  generatedImage.src = imageSrc;
+  modal.style.display = 'block';
+}
+
+// Close the modal
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'none';
+}
+
 
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const visualizeBtn = document.querySelector('.export-canvas-btn');
+  const visualizeBtn = document.querySelector('.export-viz-btn');
   visualizeBtn.addEventListener("click", () => {
     create_viz();
+  });
+
+  const exportBtn = document.querySelector('.export-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const closeModalBtn = document.querySelector('.close');
+
+  // Capture the container and show the image in the modal
+exportBtn.addEventListener('click', () => {
+    const container = document.querySelector('.container');
+    const desiredWidth = 1200;
+    const desiredHeight = 675;
+    const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+
+    html2canvas(container, {
+      scale: scaleFactor,
+    }).then((canvas) => {
+      const imageSrc = canvas.toDataURL('image/png');
+      showModal(imageSrc);
+    });
+  });
+
+  // Download the image when the download button is clicked
+  downloadBtn.addEventListener('click', () => {
+    const generatedImage = document.getElementById('generated-image');
+    const link = document.createElement('a');
+    link.href = generatedImage.src;
+    link.download = 'explained-prompt.png';
+    link.click();
+  });
+
+  // Close the modal when the close button or outside of the modal is clicked
+  closeModalBtn.addEventListener('click', () => {
+    closeModal();
+  });
+
+  window.addEventListener('click', (event) => {
+    const modal = document.getElementById('modal');
+    if (event.target === modal) {
+      closeModal();
+    }
   });
 
   const collapsibles = document.querySelectorAll('.collapsible');
@@ -183,38 +248,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   copyToDesignerBtn.addEventListener("click", copyToDesigner);
 
-  function copyToDesigner() {
-    console.log('copyToDesigner called'); // 
-    removeAllItemsFromSidebar(); // Call the removeAllItemsFromSidebar function to remove all items in the sidebar
-    // Get the input text
-    const diffResults = document.getElementById('diff-results');
-    const inputText = diffResults.innerHTML;
 
-    // Create a temporary DOM element to parse the input text
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = inputText;
+function copyToDesigner() {
+  console.log('copyToDesigner called');
+  removeAllItemsFromSidebar();
 
-    // Handle <del> elements
-    const delElements = tempDiv.querySelectorAll("del");
-    delElements.forEach((delElement) => {
-      const selectedRange = rangy.createRange();
-      selectedRange.selectNodeContents(delElement);
-      applyStrikethrough([selectedRange]);
-    });
+  // Get the input text
+  const diffResults = document.getElementById('diff-results');
+  const inputText = diffResults.innerHTML;
 
-    // Handle <ins> elements
-    const insElements = tempDiv.querySelectorAll("ins");
-    insElements.forEach((insElement) => {
-      const selectedRange = rangy.createRange();
-      selectedRange.selectNodeContents(insElement);
-      const randomColor = getUniqueRandomColor();
-      applyColorWithRanges(randomColor, [selectedRange]);
-    });
+  // Create a temporary DOM element to parse the input text
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = inputText;
 
-    // Add the formatted text to the text-input area in the next collapsible
-    const outputTextArea = document.querySelector(".text-input");
-    outputTextArea.innerHTML = tempDiv.innerHTML;
-  }
+  // Handle <del> elements
+  const delElements = tempDiv.querySelectorAll("del");
+  delElements.forEach((delElement) => {
+    const selectedRange = rangy.createRange();
+    selectedRange.selectNodeContents(delElement);
+    applyStrikethrough([selectedRange]);
+  });
+
+  // Handle <ins> elements
+  const insElements = tempDiv.querySelectorAll("ins");
+  insElements.forEach((insElement) => {
+    const selectedRange = rangy.createRange();
+    selectedRange.selectNodeContents(insElement);
+    const randomColor = getUniqueRandomColor();
+    applyColorWithRanges(randomColor, [selectedRange]);
+  });
+
+  // Unwrap <del> elements
+  delElements.forEach((delElement) => {
+    const parent = delElement.parentNode;
+    while (delElement.firstChild) {
+      parent.insertBefore(delElement.firstChild, delElement);
+    }
+    parent.removeChild(delElement);
+  });
+
+  // Unwrap <ins> elements
+  insElements.forEach((insElement) => {
+    const parent = insElement.parentNode;
+    while (insElement.firstChild) {
+      parent.insertBefore(insElement.firstChild, insElement);
+    }
+    parent.removeChild(insElement);
+  });
+
+  // Add the formatted text to the text-input area in the next collapsible
+  const outputTextArea = document.querySelector(".text-input");
+  outputTextArea.innerHTML = tempDiv.innerHTML;
+}
 
   const compareButton = document.querySelector(".compare-btn");
   compareButton.addEventListener("click", compareTextAreas);
@@ -557,7 +642,6 @@ const updateInputSize = (input) => {
 };
 
 // Function to update the sidebar with color indexes
-
 function updateSidebar(color, isStrikethrough = false) {
   const wrapper = document.createElement("div");
   wrapper.classList.add("item-wrapper");
@@ -752,6 +836,7 @@ function updateSidebar(color, isStrikethrough = false) {
     wrapper.addEventListener("mouseover", handleMouseOver);
     wrapper.addEventListener("mouseout", handleMouseOut);
   }
+  updatePlaceholderVisibility();
 }
 
 
@@ -829,13 +914,3 @@ const deleteColor = (color, isStrikethrough = false) => {
 const sidebar = document.querySelector(".sidebar");
 sidebar.addEventListener("dragover", onDragOver);
 sidebar.addEventListener("drop", onDrop);
-
-const exportCanvasBtn = document.querySelector('.export-canvas-btn');
-
-
-
-exportCanvasBtn.addEventListener('click', (event) => {
-  const contenteditableDiv =
-    document.querySelector('.text-input');
-  const innerHTML = contenteditableDiv.innerHTML;
-});
