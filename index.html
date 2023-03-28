@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +10,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/rangy/1.3.1/rangy-classapplier.min.js"></script>
   <script src="https://unpkg.com/rangy@1.3.1/lib/rangy-selectionsaverestore.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.2/chroma.min.js"></script>
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+    data-id="nerdymomocat" data-description="Support me on Buy me a coffee!" data-message="" data-color="#40DCA5"
+    data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.8.2/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+
   <title>Prompt Explainer</title>
 </head>
+
 <body>
   <header class="header">
     <div class="logo-container">
@@ -21,69 +31,91 @@
     </div>
   </header>
   <main>
-<div id="optionsModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <button id="saveOptions" class="modal-button" title="Save">
-        <svg width="800" height="800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" class="save-icon">
-          <path d="m20.71 9.29-6-6a1 1 0 0 0-.32-.21A1.09 1.09 0 0 0 14 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a1 1 0 0 0-.29-.71ZM9 5h4v2H9Zm6 14H9v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1Zm4-1a1 1 0 0 1-1 1h-1v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.41l4 4Z"/>
-        </svg>
-      </button>
-      <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
-      <h3 class="modal-title">Edit Explanation Categories</h3>
-    </div>
-    <textarea id="optionsTextarea" rows="5"></textarea>
-  </div>
-</div>
-  <div class="collapsible-container">
-    <button class="collapsible"><span class="text-border">Prompt Compare</span></button>
-    <div class="content">
-      <div class="text-comparison-container">
-        <div class="text-area-container">
-          <textarea class="text-area" id="text-area-1" placeholder="Original Prompt"></textarea>
-          <textarea class="text-area" id="text-area-2" placeholder="New Prompt"></textarea>
+    <div id="optionsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="saveOptions" class="modal-button" title="Save">
+            <svg width="800" height="800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
+              class="save-icon">
+              <path
+                d="m20.71 9.29-6-6a1 1 0 0 0-.32-.21A1.09 1.09 0 0 0 14 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a1 1 0 0 0-.29-.71ZM9 5h4v2H9Zm6 14H9v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1Zm4-1a1 1 0 0 1-1 1h-1v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.41l4 4Z" />
+            </svg>
+          </button>
+          <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
+          <h3 class="modal-title">Edit Explanation Categories</h3>
         </div>
-        <div class="output-container">
-          <button class="compare-btn">Compare</button>
-          <div id="results-container">
-            <div id="diff-results"></div>
+        <textarea id="optionsTextarea" rows="5"></textarea>
+      </div>
+    </div>
+    <div class="collapsible-container">
+      <button class="collapsible"><span class="text-border">Prompt Compare</span></button>
+      <div class="content">
+        <div class="text-comparison-container">
+          <div class="text-area-container">
+            <textarea class="text-area" id="text-area-1" placeholder="Original Prompt"></textarea>
+            <textarea class="text-area" id="text-area-2" placeholder="New Prompt"></textarea>
           </div>
-          <button class="copy-to-designer-btn">Copy to Designer</button>
+          <div class="output-container">
+            <button class="compare-btn">Compare</button>
+            <div id="results-container">
+              <div id="diff-results"></div>
+            </div>
+            <button class="copy-to-designer-btn">Copy to Designer</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="collapsible-container">
-    <button class="collapsible"><span class="text-border">Explanation Design</span></button>
-    <div class="content">
-      <div class="container-wrapper">
-        <div class="container">
-          <div class="text-input-wrapper">
-            <div class="text-input" contenteditable="true" spellcheck="false" data-placeholder="Final Prompt Goes Here"></div>
-          </div>
-          <div id="sidebar" class="sidebar">
-            <div class="plus-button-container">
-              <button class="plus-button">— + —</button>
-              <button class="settings-button">
-  <i class="fas fa-cog"></i>
-</button>
+    <div class="collapsible-container">
+      <button class="collapsible"><span class="text-border">Explanation Design</span></button>
+      <div class="content">
+        <div class="container-wrapper">
+          <div class="container flex-container">
+            <div class="text-input-wrapper">
+              <div class="text-input" id="text-input" contenteditable="true" spellcheck="false"
+                data-placeholder="Final Prompt Goes Here"></div>
             </div>
-            <div class="sidebar-content">
-              <div class="item-container">
+            <div id="sidebar" class="sidebar">
+              <div class="plus-button-container">
+                <button class="plus-button">— + —</button>
+                <button class="settings-button">
+                  <i class="fas fa-cog"></i>
+                </button>
+              </div>
+              <div class="sidebar-content">
+                <div class="item-container">
+                  <span class="item-placeholder">  Add a highlight or strikethrough to the text area to explain that prompt segment here.</span>
+                </div>
               </div>
             </div>
           </div>
+          <svg id="visualization"></svg> <span class="hidden-trigger" style="display: none;"></span>
+          <button class="export-btn">Export as Image</button>
+          <button class="export-viz-btn">Export as Visualization</button>
         </div>
-        <button class="export-btn">Export as Image</button>
       </div>
     </div>
-  </div>
-    </main>
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <img src="" alt="Generated Image" id="generated-image">
+        <button id="download-btn" class="download-btn">Download Image</button>
+      </div>
+    </div>
+  </main>
   <footer class="footer">
     <div class="footer-content">
+      <font color="grey"><i><p> <b>Known Issues:</b> <br> 1. Multi-line highlights break the Export as Image </p></i></font>
       <p>&copy; 2023 Prompt Explanation Designer. All rights reserved.</p>
+      <div class="open-source">
+        <a href="https://github.com/nerdymomocat/prompt-explanation-designer/" target="_blank">
+          <img src="https://cdnjs.cloudflare.com/ajax/libs/octicons/8.5.0/svg/mark-github.svg" alt="GitHub"
+            class="github-logo" />
+          Open Source
+        </a>
+      </div>
     </div>
   </footer>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
+
 </html>
