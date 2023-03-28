@@ -30,6 +30,8 @@ document.addEventListener('click', (event) => {
     textInput.classList.remove('active');
   }
 });
+document.querySelector("#text-input").addEventListener("input", handleTextInputChange);
+
 
 function showModal(imageSrc) {
   const modal = document.getElementById('modal');
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.querySelector('.close');
 
   // Capture the container and show the image in the modal
-exportBtn.addEventListener('click', () => {
+  exportBtn.addEventListener('click', () => {
     const container = document.querySelector('.container');
     const desiredWidth = 1200;
     const desiredHeight = 675;
@@ -249,57 +251,57 @@ exportBtn.addEventListener('click', () => {
   copyToDesignerBtn.addEventListener("click", copyToDesigner);
 
 
-function copyToDesigner() {
-  console.log('copyToDesigner called');
-  removeAllItemsFromSidebar();
+  function copyToDesigner() {
+    console.log('copyToDesigner called');
+    removeAllItemsFromSidebar();
 
-  // Get the input text
-  const diffResults = document.getElementById('diff-results');
-  const inputText = diffResults.innerHTML;
+    // Get the input text
+    const diffResults = document.getElementById('diff-results');
+    const inputText = diffResults.innerHTML;
 
-  // Create a temporary DOM element to parse the input text
-  const tempDiv = document.createElement("div");
-  tempDiv.innerHTML = inputText;
+    // Create a temporary DOM element to parse the input text
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = inputText;
 
-  // Handle <del> elements
-  const delElements = tempDiv.querySelectorAll("del");
-  delElements.forEach((delElement) => {
-    const selectedRange = rangy.createRange();
-    selectedRange.selectNodeContents(delElement);
-    applyStrikethrough([selectedRange]);
-  });
+    // Handle <del> elements
+    const delElements = tempDiv.querySelectorAll("del");
+    delElements.forEach((delElement) => {
+      const selectedRange = rangy.createRange();
+      selectedRange.selectNodeContents(delElement);
+      applyStrikethrough([selectedRange]);
+    });
 
-  // Handle <ins> elements
-  const insElements = tempDiv.querySelectorAll("ins");
-  insElements.forEach((insElement) => {
-    const selectedRange = rangy.createRange();
-    selectedRange.selectNodeContents(insElement);
-    const randomColor = getUniqueRandomColor();
-    applyColorWithRanges(randomColor, [selectedRange]);
-  });
+    // Handle <ins> elements
+    const insElements = tempDiv.querySelectorAll("ins");
+    insElements.forEach((insElement) => {
+      const selectedRange = rangy.createRange();
+      selectedRange.selectNodeContents(insElement);
+      const randomColor = getUniqueRandomColor();
+      applyColorWithRanges(randomColor, [selectedRange]);
+    });
 
-  // Unwrap <del> elements
-  delElements.forEach((delElement) => {
-    const parent = delElement.parentNode;
-    while (delElement.firstChild) {
-      parent.insertBefore(delElement.firstChild, delElement);
-    }
-    parent.removeChild(delElement);
-  });
+    // Unwrap <del> elements
+    delElements.forEach((delElement) => {
+      const parent = delElement.parentNode;
+      while (delElement.firstChild) {
+        parent.insertBefore(delElement.firstChild, delElement);
+      }
+      parent.removeChild(delElement);
+    });
 
-  // Unwrap <ins> elements
-  insElements.forEach((insElement) => {
-    const parent = insElement.parentNode;
-    while (insElement.firstChild) {
-      parent.insertBefore(insElement.firstChild, insElement);
-    }
-    parent.removeChild(insElement);
-  });
+    // Unwrap <ins> elements
+    insElements.forEach((insElement) => {
+      const parent = insElement.parentNode;
+      while (insElement.firstChild) {
+        parent.insertBefore(insElement.firstChild, insElement);
+      }
+      parent.removeChild(insElement);
+    });
 
-  // Add the formatted text to the text-input area in the next collapsible
-  const outputTextArea = document.querySelector(".text-input");
-  outputTextArea.innerHTML = tempDiv.innerHTML;
-}
+    // Add the formatted text to the text-input area in the next collapsible
+    const outputTextArea = document.querySelector(".text-input");
+    outputTextArea.innerHTML = tempDiv.innerHTML;
+  }
 
   const compareButton = document.querySelector(".compare-btn");
   compareButton.addEventListener("click", compareTextAreas);
@@ -641,6 +643,40 @@ const updateInputSize = (input) => {
   document.body.removeChild(temp);
 };
 
+function handleTextInputChange() {
+  const textInput = document.querySelector("#text-input");
+  const spans = textInput.querySelectorAll("span");
+  const foundColors = new Set();
+
+  spans.forEach((span) => {
+    if (
+      (span.classList.value.startsWith("color-highlight-") ||
+        span.classList.value.startsWith("strikethrough-")) &&
+      !span.textContent.trim()
+    ) {
+      const colorCode = span.classList.value.split("-").pop();
+      const deleteButton = document.querySelector(`.delete-button-${colorCode}`);
+      if (deleteButton) {
+        deleteButton.click();
+      }
+    } else {
+      const colorCode = span.classList.value.split("-").pop();
+      foundColors.add(colorCode);
+    }
+  });
+
+  const allDeleteButtons = document.querySelectorAll(".delete-button");
+  allDeleteButtons.forEach((deleteButton) => {
+    const colorCode = deleteButton.classList.value.split("-").pop();
+    if (!foundColors.has(colorCode)) {
+      deleteButton.click();
+    }
+  });
+  updatePlaceholderVisibility();
+}
+
+
+
 // Function to update the sidebar with color indexes
 function updateSidebar(color, isStrikethrough = false) {
   const wrapper = document.createElement("div");
@@ -667,7 +703,7 @@ function updateSidebar(color, isStrikethrough = false) {
 
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "X";
-    deleteButton.classList.add("delete-button");
+    deleteButton.classList.add("delete-button", `delete-button-${color.replace("#", "").toLowerCase()}`);
     deleteButton.style.visibility = "hidden";
     deleteButton.onclick = () => {
       deleteColor(color, isStrikethrough);
