@@ -226,7 +226,11 @@ body {
  border: 1px solid #d27c04;
  padding: 10px;
  border-radius: 5px;
- z-index: 1000
+ z-index: 1000;
+  display: flex;               /* Add this line */
+  justify-content: center;     /* Add this line */
+  align-items: center;         /* Add this line */
+  flex-wrap: wrap;             /* Add this line, if you want items to wrap in multiple rows when not enough space */
 }
 
 .color-input {
@@ -1015,4 +1019,30 @@ text {
   text-align: center;
   top: 0;
   left: 0;
+}
+
+.download-svg-btn {
+  position: absolute;
+  z-index: 10; /* Change this value to ensure the button is above the SVG */
+}
+
+.download-svg{
+  z-index: 100;
+}
+
+.download-svg-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: #000; /* Set the color of the SVG icon */
+}
+
+.download-svg-btn svg {
+  width: 24px; /* Adjust the size of the SVG icon */
+  height: 24px;
+}
+
+.download-svg-btn:hover {
+  color: #555; /* Set the color of the SVG icon on hover */
 }
