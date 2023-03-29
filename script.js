@@ -4,6 +4,18 @@ import { wordDiff } from './module_diff.js'
 import { create_viz } from './module_viz.js'
 
 
+const visualization = document.getElementById('visualization');
+const sidebar_content = document.getElementById('sidebar-content');
+
+// Attach an event listener to the sidebar
+sidebar_content.addEventListener('input', (event) => {
+  // Check if the event target is an input element or one of its children
+  if (event.target.matches('input, input *')) {
+    // Perform your desired action
+   visualization.style.display = 'none';
+  }
+});
+
 
 const textInput = document.querySelector('.text-input');
 
@@ -52,7 +64,8 @@ function closeModal() {
 document.addEventListener("DOMContentLoaded", () => {
   const visualizeBtn = document.querySelector('.export-viz-btn');
   visualizeBtn.addEventListener("click", () => {
-    create_viz();
+    visualization.style.display = 'block';
+    create_viz();    
   });
 
   const exportBtn = document.querySelector('.export-btn');
@@ -644,6 +657,7 @@ const updateInputSize = (input) => {
 };
 
 function handleTextInputChange() {
+   visualization.style.display = 'none';
   const textInput = document.querySelector("#text-input");
   const spans = textInput.querySelectorAll("span");
   const foundColors = new Set();
@@ -690,7 +704,7 @@ function updateSidebar(color, isStrikethrough = false) {
     colorIndexContainer.id = colorIndexId;
     colorIndexContainer.classList.add("color-index-container");
     colorIndexContainer.style.display = "flex";
-    colorIndexContainer.style.alignItems = "flex-start";
+    colorIndexContainer.style.alignItems = "center";
 
     const colorBox = document.createElement("span");
     colorBox.style.backgroundColor = color;
