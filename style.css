@@ -185,6 +185,16 @@ body {
  box-sizing: border-box
  }
 
+  .visualization{
+    margin-left: auto;
+ margin-right: auto;
+ padding-left: 20px;
+ padding-right: 20px;
+ width: 100%;
+ max-width: 600px;
+ box-sizing: border-box
+  }
+
  .text-input-wrapper {
  order: 1
  }
@@ -192,6 +202,10 @@ body {
  .sidebar {
  order: 2
  }
+
+  .visualization{
+    order: 5
+  }
 
  .export-btn {
  order: 3
@@ -201,8 +215,27 @@ body {
  }
 }
 
+
+  .button-container {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 15px;
+  }
+
+@media (min-width: 769px) {
+  .export-btn,
+  .export-viz-btn {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: auto;
+    max-width: none;
+  }
+}
+
 .export-btn {
- margin-top: 70px;
+ margin-top: 10px;
  padding: 5px 10px;
  background-color: #44835a;
  color: #fff;
@@ -270,22 +303,23 @@ input[type="color"]::-webkit-color-swatch {
 
 
 .color-index-container {
- position: relative;
- display: flex;
- align-items: center;
- margin-bottom: 10px
+  position: relative;
+  display: flex;
+  align-items: center; /* keeps the content vertically centered */
+  justify-content: flex-start; /* added this line to align the content to the left */
+  margin-bottom: 10px;
 }
 
 .color-box {
- display: inline-block;
- width: 20px;
- height: 20px;
- margin-right: 5px;
- margin-bottom: 0px;
- vertical-align: bottom;
- border: 1px solid rgba(0, 0, 0, 0.1);
- border-radius: 5px;
- padding: 0
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  vertical-align: bottom;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 0;
 }
 
 .strikethrough-color-index {
@@ -882,7 +916,7 @@ ins {
 .export-viz-btn{
  margin-top: 10px;
  padding: 5px 10px;
- background-color: #44835a;
+ background-color: #cb9b34;
  color: #fff;
  border: none;
  border-radius: 5px;
@@ -892,7 +926,7 @@ ins {
  text-align: center
 }
 .export-viz-btn:hover {
- background-color: #335a30
+ background-color: #f5b400
 }
 
 .annotation {
@@ -932,10 +966,13 @@ text {
   fill-opacity: 1;
 }
 #visualization {
-  border: 1px solid black;
+  border: 1px solid #c9e8cd;
+  border-radius: 10px;
   width: 100%;
-  padding-bottom: 55.83%; /* (335 / 600) * 100 */
+/*   padding-bottom: 55.83%;  */
+  /* (335 / 600) * 100 */
   position: relative;
+  min-height: 335px
 }
 
 #visualization > svg {
@@ -944,6 +981,8 @@ text {
   position: absolute;
   top: 0;
   left: 0;
+  
+  
 }
 
 .modal {
@@ -1026,15 +1065,11 @@ text {
   z-index: 10; /* Change this value to ensure the button is above the SVG */
 }
 
-.download-svg{
-  z-index: 100;
-}
-
 .download-svg-btn {
   border: none;
   background: none;
   cursor: pointer;
-  padding: 0;
+  padding: 3px;
   color: #000; /* Set the color of the SVG icon */
 }
 
@@ -1045,4 +1080,14 @@ text {
 
 .download-svg-btn:hover {
   color: #555; /* Set the color of the SVG icon on hover */
+}
+
+.export-btn,
+.export-viz-btn,
+.copy-to-designer-btn,
+.compare-btn{
+    /* Add your existing styles */
+    display: inline-flex; /* Use flex to center align the content */
+    align-items: center; /* Align content vertically */
+    justify-content: center; /* Align content horizontally */
 }
