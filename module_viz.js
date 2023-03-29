@@ -111,11 +111,28 @@ export const create_viz = () => {
 		};
 
 		const newBBoxUp = computeBoundingBox("up");
-		const newBBoxDown = computeBoundingBox("down");
-		const direction = hasOverlap(newBBoxUp) ? "down" : "up";
-		const adjustedLineEndY = direction === "up" ? upEndY : downEndY;
-		const bbox = direction === "up" ? newBBoxUp : newBBoxDown;
-		const lineStartYAdjusted = direction === "up" ? y - bbox.height / 2 : y;
+    const newBBoxDown = computeBoundingBox("down");
+
+    // Check if both up and down directions have overlaps
+    const upOverlap = hasOverlap(newBBoxUp);
+    const downOverlap = hasOverlap(newBBoxDown);
+
+    // Choose the best direction
+    let direction;
+    if (!upOverlap && !downOverlap) {
+        direction = newBBoxUp.height < newBBoxDown.height ? "up" : "down";
+    } else if (!upOverlap) {
+        direction = "up";
+    } else if (!downOverlap) {
+        direction = "down";
+    } else {
+        direction = newBBoxUp.height < newBBoxDown.height ? "up" : "down";
+    }
+
+    const adjustedLineEndY = direction === "up" ? upEndY : downEndY;
+    const bbox = direction === "up" ? newBBoxUp : newBBoxDown;
+    const lineStartYAdjusted = direction === "up" ? y - bbox.height / 2 : y;
+
 
 		const annotationLine = plotGroup
 			.append("line")
