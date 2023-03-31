@@ -3,6 +3,11 @@ import { getUniqueRandomColor } from './module_color.js'
 import { wordDiff } from './module_diff.js'
 import { create_viz } from './module_viz.js'
 
+window.addEventListener('resize', () => {
+  // Call create_viz to update the visualization when the screen width changes
+  create_viz();
+});
+
 
 const visualization = document.getElementById('visualization');
 const sidebar_content = document.getElementById('sidebar-content');
