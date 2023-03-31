@@ -969,15 +969,13 @@ text {
   border: 1px solid #c9e8cd;
   border-radius: 10px;
   width: 100%;
-/*   padding-bottom: 55.83%;  */
-  /* (335 / 600) * 100 */
+  padding-bottom: 55.83%; /* (335 / 600) * 100 */
   position: relative;
-  min-height: 335px
 }
 
 #visualization > svg {
   width: 100%;
-  height: 100%;
+/*   height: 100%; */
   position: absolute;
   top: 0;
   left: 0;
