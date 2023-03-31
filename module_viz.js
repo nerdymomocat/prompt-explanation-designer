@@ -29,26 +29,66 @@ const clearVisualization = () => {
   }
 };
 
-const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight) => {
+const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, minHeight, lineExtension) => {
   const allTextNodes = canvas.selectAll('text');
   let newY = y;
+  let newX = x;
+  let direction;
+
+  // Determine the initial direction based on the original text position
+  if (y <= lineHeight) {
+    direction = 1; // Down
+  } else {
+    direction = -1; // Up
+  }
 
   while (true) {
     let overlap = false;
     allTextNodes.each(function () {
       const bbox = this.getBBox();
-      if (x + width > bbox.x && x < bbox.x + bbox.width && newY + height > bbox.y && newY < bbox.y + bbox.height) {
+      if (newX + width > bbox.x && newX < bbox.x + bbox.width && newY + height > bbox.y && newY < bbox.y + bbox.height) {
         overlap = true;
       }
     });
 
     if (!overlap) {
-      return newY;
+      break;
     }
 
-    newY += lineHeight;
+    let found = false;
+    let i = 1;
+    while (!found && i < 100) { // Limit the iterations to avoid infinite loops
+      newY = y + direction * lineHeight * i;
+      overlap = false;
+
+      allTextNodes.each(function () {
+        const bbox = this.getBBox();
+        if (newX + width > bbox.x && newX < bbox.x + bbox.width && newY + height > bbox.y && newY < bbox.y + bbox.height) {
+          overlap = true;
+        }
+      });
+
+      if (!overlap) {
+        found = true;
+      } else {
+        i++;
+      }
+    }
+
+    // Check if the line height is less than minHeight
+    if (Math.abs(newY - y) < minHeight) {
+      newY = direction === 1 ? y + minHeight : y - minHeight;
+    }
+
+    // If still overlapping, change direction and try again
+    if (overlap) {
+      direction *= -1;
+    }
   }
+
+  return { x: newX, y: newY };
 };
+
 
 export const create_viz = () => {
   clearVisualization();
@@ -59,7 +99,7 @@ export const create_viz = () => {
     .attr('width', '100%')
     .attr('height', '100%')
     .attr('viewBox', '0 0 600 335')
-  .attr('preserveAspectRatio', 'xMidYMid meet');
+    .attr('preserveAspectRatio', 'xMidYMid meet');
 
   const plot = canvas.append('g');
 
@@ -94,11 +134,19 @@ export const create_viz = () => {
       const words = node.textContent.split(' ');
 
       words.forEach(word => {
-        const wordWidth = word.length * 10;
+        // Create a temporary text node to calculate the word width
+        const tempText = plot.append('text')
+          .attr('x', -9999) // Place the temporary text node off-screen
+          .attr('y', -9999)
+          .text(word);
+
+        const wordWidth = tempText.node().getComputedTextLength(); // Use getComputedTextLength() method
+        tempText.remove(); // Remove the temporary text node
+        const spaceBetweenWords = 5;
 
         if (currentX + wordWidth > maxLineWidth) {
           currentX = 0;
-          currentY += lineHeight;
+          currentY += lineHeight + 15;
         }
 
         const text = plot.append('text')
@@ -106,7 +154,7 @@ export const create_viz = () => {
           .attr('y', currentY)
           .text(word);
 
-        currentX += wordWidth + 10;
+        currentX += wordWidth + spaceBetweenWords;
       });
     } else if (node.nodeType === Node.ELEMENT_NODE) {
       const span = node;
@@ -115,85 +163,108 @@ export const create_viz = () => {
       const isStrikethrough = span.className.includes('strikethrough');
 
       const words = span.textContent.split(' ');
+      const middleWordIndex = Math.floor(words.length+1/ 2)-1;
+      let middleWordX;
 
-      words.forEach(word => {
-        const wordWidth = word.length * 10;
+
+      words.forEach((word, wordIndex) => {
+
+        // Create a temporary text node to calculate the word width
+        const tempText = plot.append('text')
+          .attr('x', -9999) // Place the temporary text node off-screen
+          .attr('y', -9999)
+          .text(word);
+
+        const wordWidth = tempText.node().getComputedTextLength(); // Use getComputedTextLength() method
+        tempText.remove(); // Remove the temporary text node
+        const spaceBetweenWords = 5;
+
 
         if (currentX + wordWidth > maxLineWidth) {
           currentX = 0;
-          currentY += lineHeight;
+          currentY += lineHeight + 15;
         }
+
+        if (wordIndex === middleWordIndex) {
+  middleWordX = currentX;
+}
 
         const text = plot.append('text')
           .attr('x', currentX)
           .attr('y', currentY)
-          .attr('fill', `#${color}`)
           .text(word);
 
         if (isHighlight) {
           const rect = plot.insert('rect', 'text')
-            .attr('x', currentX)
+            .attr('x', currentX - 3)
             .attr('y', currentY - 15)
-            .attr('width', wordWidth)
+            .attr('width', wordWidth + 6)
             .attr('height', lineHeight)
             .attr('fill', `#${color}`);
         }
 
         if (isStrikethrough) {
           const line = plot.insert('line', 'text')
-            .attr('x1', currentX)
-            .attr('y1', currentY - 10)
-            .attr('x2', currentX + wordWidth)
-            .attr('y2', currentY - 10)
+            .attr('x1', currentX - 3)
+            .attr('y1', currentY - 5)
+            .attr('x2', currentX + wordWidth + 2)
+            .attr('y2', currentY - 5)
             .attr('stroke', `#${color}`)
             .attr('stroke-width', 2);
         }
 
-        currentX += wordWidth + 10;
+        currentX += wordWidth + spaceBetweenWords; // Change the spacing between words in highlight/strikethrough spans to 5 pixels
       });
+if (annotations[color] && !annotatedSpans.has(span)) {
+  annotatedSpans.add(span);
+  console.log('Drawing annotation for color:', color);
 
-      if (annotations[color] && !annotatedSpans.has(span)) {
-        annotatedSpans.add(span);
-        console.log('Drawing annotation for color:', color);
-        const annotationText = plot.append('text')
-          .attr('x', currentX - 10)
-          .attr('y', currentY + 30)
-          .text(annotations[color]);
+  const annotationLines = annotations[color].split('\n');
+  const annotationText = plot.append('text')
+    .attr('x', middleWordX - 10)
+    .style('fill', invertLightness(`#${color}`));
 
-        const bbox = annotationText.node().getBBox();
-        const newY = findNonOverlappingRegion(plot, currentX - 10, currentY + 30, bbox.width, bbox.height, lineHeight);
+  annotationLines.forEach((line, index) => {
+    annotationText.append('tspan')
+      .text(line)
+      .attr('x', middleWordX - 10)
+      .attr('dy', index === 0 ? 0 : lineHeight);
+  });
 
-        annotationText.attr('y', newY);
+  const bbox = annotationText.node().getBBox();
+const newCoords = findNonOverlappingRegion(plot, middleWordX - 10, currentY + 30, bbox.width, bbox.height, lineHeight, 6 * lineHeight, 20);
 
-        const line = plot.append('line')
-          .attr('x1', currentX - 10)
-          .attr('y1', currentY)
-          .attr('x2', currentX - 10)
-          .attr('y2', newY)
-          .attr('stroke', `#${color}`)
-          .attr('stroke-width', 2);
+annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
 
-        const circle = plot.append('circle')
-          .attr('cx', currentX - 10)
-          .attr('cy', newY)
-          .attr('r', 5)
-          .attr('fill', `#${color}`);
-      }
+const line = plot.append('line')
+  .attr('x1', middleWordX - 10)
+  .attr('y1', currentY)
+  .attr('x2', newCoords.x)
+  .attr('y2', newCoords.y)
+  .attr('stroke', invertLightness(`#${color}`))
+  .attr('stroke-width', 1.5);
+
+const circle = plot.append('circle')
+  .attr('cx', newCoords.x)
+  .attr('cy', newCoords.y)
+  .attr('r', 3)
+  .attr('fill', invertLightness(`#${color}`));
+}
     }
   });
 
-  const plotBBox = plot.node().getBBox();
-  const plotWidth = plotBBox.width;
-  const plotHeight = plotBBox.height;
+// Get the bounding box of the plot after rendering all the text elements
+const plotBBox = plot.node().getBBox();
 
-  // Calculate the translation needed to center the plot
-  const canvasWidth = 600; // viewBox width
-  const canvasHeight = 335; // viewBox height
-  const translateX = (canvasWidth - plotWidth) / 2;
-  const translateY = (canvasHeight - plotHeight) / 2;
+// Update the viewBox based on the plot's bounding box
+const padding = 20;
+const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
+canvas.attr('viewBox', updatedViewBox);
 
-  // Apply the translation to the plot
-  plot.attr('transform', `translate(${translateX}, ${translateY})`);
+// Center the plot within the updated viewBox
+const translateX = padding - plotBBox.x;
+const translateY = padding - plotBBox.y;
+plot.attr('transform', `translate(${translateX}, ${translateY})`);
 };
 
 
@@ -252,38 +323,6 @@ function downloadVisualization(svg) {
     link.click();
     console.log("Download should have started...");
   };
-}
-
-function getAnnotationText(classNames) {
-  if (!classNames) return '';
-
-  let descriptions = [];
-  for (const className of classNames) {
-    if (className.startsWith('color-highlight-') || className.startsWith('strikethrough-')) {
-      const colorId = className.slice(-6);
-      const inputWrappers = document.querySelectorAll(`#color-index-${colorId} .input-wrapper`);
-
-      inputWrappers.forEach(inputWrapper => {
-        let descriptionParts = [];
-
-        const dropdownElement = inputWrapper.querySelector('.description-dropdown');
-        if (dropdownElement && dropdownElement.value) {
-          descriptionParts.push(dropdownElement.value);
-        }
-
-        const inputElement = inputWrapper.querySelector('.color-description-input');
-        if (inputElement && inputElement.value) {
-          descriptionParts.push(inputElement.value);
-        }
-
-        if (descriptionParts.length > 0) {
-          descriptions.push(descriptionParts.join(': '));
-        }
-      });
-    }
-  }
-
-  return descriptions.join('\n');
 }
 
 function includeStyles(svg) {
