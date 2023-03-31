@@ -12,7 +12,7 @@ sidebar_content.addEventListener('input', (event) => {
   // Check if the event target is an input element or one of its children
   if (event.target.matches('input, input *')) {
     // Perform your desired action
-   visualization.style.display = 'none';
+    visualization.style.display = 'none';
   }
 });
 
@@ -65,8 +65,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const visualizeBtn = document.querySelector('.export-viz-btn');
   visualizeBtn.addEventListener("click", () => {
     visualization.style.display = 'block';
-    create_viz();    
+    create_viz();
   });
+
+
 
   const exportBtn = document.querySelector('.export-btn');
   const downloadBtn = document.getElementById('download-btn');
@@ -321,6 +323,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   const textInput = document.querySelector(".text-input");
+
+    textInput.addEventListener('paste', function(e) {
+        e.preventDefault(); // Prevent the default paste action
+
+        var plainText = '';
+
+        if (e.clipboardData && e.clipboardData.getData) {
+            plainText = e.clipboardData.getData('text/plain');
+        } else if (window.clipboardData && window.clipboardData.getData) {
+            plainText = window.clipboardData.getData('Text');
+        }
+
+        document.execCommand('insertText', false, plainText);
+    });
 
   let selectedRanges = [];
   let isCmdKeyDown = false;
@@ -657,7 +673,7 @@ const updateInputSize = (input) => {
 };
 
 function handleTextInputChange() {
-   visualization.style.display = 'none';
+  visualization.style.display = 'none';
   const textInput = document.querySelector("#text-input");
   const spans = textInput.querySelectorAll("span");
   const foundColors = new Set();
