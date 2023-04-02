@@ -44,7 +44,7 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
   const allTextNodes = canvas.selectAll('text').filter(function() { return this !== excludeElement; });
   let newY1 = y + minHeight;
   let newY2 = y - minHeight;
-  let newX = (x - 6) - width / 2;
+  let newX = (x) - width / 2;
 
   const checkOverlap = (newY) => {
     let overlapCount = 0;
@@ -256,10 +256,11 @@ export const create_viz = () => {
 
       const newCoords = findNonOverlappingRegion(plot, middleWordX, currentY, bbox.width, bbox.height, lineHeight, padding, annotationText.node());
 
-
-
       annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
-      annotationText.node().setAttribute('x', newCoords.x);
+
+      // Update the x attribute for each tspan inside annotationText
+annotationText.selectAll('tspan').attr('x', newCoords.x);
+
 
 
       const newBbox = getPaddedBBox(annotationText.node(), padding);
@@ -290,11 +291,6 @@ export const create_viz = () => {
         .attr('y2', closestCenter.y)
         .attr('stroke', darkenColor(`#${color}`))
         .attr('stroke-width', 1.5);
-
-      //hack
-      let diff = closestCenter.x - (middleWordX - 6);
-
-      annotationText.attr('x', newCoords.x - diff);
 
 
       const circle = annotationGroup.append('circle')
@@ -413,6 +409,7 @@ export const create_viz = () => {
   const translateX = padding - plotBBox.x;
   const translateY = padding - plotBBox.y;
   plot.attr('transform', `translate(${translateX}, ${translateY})`);
+  addDownloadButton(canvas);
 };
 
 
@@ -476,10 +473,26 @@ function downloadVisualization(svg) {
   // Include the styles in the cloned SVG
   includeStyles(clonedSVG);
 
+  // Update the viewBox attribute based on the bounding box of the SVG content
+  const bbox = getSVGContentBoundingBox(svg);
+  clonedSVG.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
   // Serialize the cloned SVG
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(clonedSVG);
   const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  // Get the width and height from the SVG's viewBox attribute
+  const viewBox = clonedSVG.getAttribute('viewBox').split(' ').map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  // Calculate the aspect ratio
+  const aspectRatio = width / height;
+
+  // Set the canvas width and height based on the desired output size while preserving the aspect ratio
+  const outputWidth = 1200;
+  const outputHeight = outputWidth / aspectRatio;
 
   // Create an image element and set its source to the SVG data URL
   const img = new Image();
@@ -487,8 +500,8 @@ function downloadVisualization(svg) {
 
   // Set up a canvas and draw the image on it
   const canvas = document.createElement("canvas");
-  canvas.width = 1200;
-  canvas.height = 675;
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
   const ctx = canvas.getContext("2d");
 
   img.onload = () => {
@@ -503,6 +516,7 @@ function downloadVisualization(svg) {
     console.log("Download should have started...");
   };
 }
+
 
 function includeStyles(svg) {
   const styleSheets = document.styleSheets;
@@ -526,4 +540,10 @@ function includeStyles(svg) {
 
   styleElement.innerHTML = styleContent;
   svg.insertBefore(styleElement, svg.firstChild);
+}
+
+function getSVGContentBoundingBox(svg) {
+  const content = svg.select('g').node().parentNode; // Select the parent node of the outermost 'g' element
+  const bbox = content.getBBox();
+  return bbox;
 }
