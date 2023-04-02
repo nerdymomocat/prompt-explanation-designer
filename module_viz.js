@@ -1,4 +1,4 @@
-function invertLightness(color) {
+function darkenColor(color) {
   // Hardcoded factor
   const factor = 0.2;
 
@@ -29,62 +29,42 @@ const clearVisualization = () => {
   }
 };
 
-const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, minHeight, lineExtension) => {
-  const allTextNodes = canvas.selectAll('text');
-  let newY = y;
-  let newX = x;
-  let direction;
+function getPaddedBBox(node, padding) {
+  const bbox = node.getBBox();
+  return {
+    x: bbox.x - padding,
+    y: bbox.y - padding,
+    width: bbox.width + 2 * padding,
+    height: bbox.height + 2 * padding,
+  };
+}
 
-  // Determine the initial direction based on the original text position
-  if (y <= lineHeight) {
-    direction = 1; // Down
-  } else {
-    direction = -1; // Up
-  }
+const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, padding, excludeElement) => {
+  const minHeight = lineHeight * 3.5;
+  const allTextNodes = canvas.selectAll('text').filter(function() { return this !== excludeElement; });
+  let newY1 = y + minHeight;
+  let newY2 = y - minHeight;
+  let newX = (x - 6) - width / 2;
 
-  while (true) {
-    let overlap = false;
-    allTextNodes.each(function () {
-      const bbox = this.getBBox();
-      if (newX + width > bbox.x && newX < bbox.x + bbox.width && newY + height > bbox.y && newY < bbox.y + bbox.height) {
-        overlap = true;
+  const checkOverlap = (newY) => {
+    let overlapCount = 0;
+    allTextNodes.each(function() {
+      const bbox = getPaddedBBox(this, padding);
+      if (newX + width > bbox.x && newX < bbox.x + bbox.width &&
+        ((newY + height > bbox.y && newY < bbox.y + bbox.height) || (newY - height > bbox.y && newY - height < bbox.y + bbox.height))) {
+        overlapCount++;
       }
     });
+    return overlapCount;
+  };
 
-    if (!overlap) {
-      break;
-    }
+  const overlapCount1 = checkOverlap(newY1);
+  const overlapCount2 = checkOverlap(newY2);
 
-    let found = false;
-    let i = 1;
-    while (!found && i < 100) { // Limit the iterations to avoid infinite loops
-      newY = y + direction * lineHeight * i;
-      overlap = false;
+  console.log('Overlap count for newY1:', overlapCount1);
+  console.log('Overlap count for newY2:', overlapCount2);
 
-      allTextNodes.each(function () {
-        const bbox = this.getBBox();
-        if (newX + width > bbox.x && newX < bbox.x + bbox.width && newY + height > bbox.y && newY < bbox.y + bbox.height) {
-          overlap = true;
-        }
-      });
-
-      if (!overlap) {
-        found = true;
-      } else {
-        i++;
-      }
-    }
-
-    // Check if the line height is less than minHeight
-    if (Math.abs(newY - y) < minHeight) {
-      newY = direction === 1 ? y + minHeight : y - minHeight;
-    }
-
-    // If still overlapping, change direction and try again
-    if (overlap) {
-      direction *= -1;
-    }
-  }
+  const newY = (overlapCount1 === overlapCount2) ? (Math.random() < 0.5 ? newY1 : newY2) : (overlapCount1 < overlapCount2 ? newY1 : newY2);
 
   return { x: newX, y: newY };
 };
@@ -129,6 +109,10 @@ export const create_viz = () => {
   const maxLineWidth = 80 * 10;
   const annotatedSpans = new Set();
 
+  // Add a new array to store the x positions of the words
+  const wordXPositions = [];
+  const annotationData = [];
+
   textNodes.forEach((node, index) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const words = node.textContent.split(' ');
@@ -154,6 +138,9 @@ export const create_viz = () => {
           .attr('y', currentY)
           .text(word);
 
+        // Store the x position of the word
+        wordXPositions.push(currentX);
+
         currentX += wordWidth + spaceBetweenWords;
       });
     } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -163,7 +150,7 @@ export const create_viz = () => {
       const isStrikethrough = span.className.includes('strikethrough');
 
       const words = span.textContent.split(' ');
-      const middleWordIndex = Math.floor(words.length+1/ 2)-1;
+      const middleWordIndex = Math.floor((words.length + 1) / 2) - 1;
       let middleWordX;
 
 
@@ -186,13 +173,19 @@ export const create_viz = () => {
         }
 
         if (wordIndex === middleWordIndex) {
-  middleWordX = currentX;
-}
+          middleWordX = currentX;
+        }
 
         const text = plot.append('text')
           .attr('x', currentX)
           .attr('y', currentY)
-          .text(word);
+          .text(word)
+          .style('pointer-events', 'none'); // Add this line
+
+        // Calculate the middle word's x position
+        if (wordIndex === middleWordIndex) {
+          middleWordX = currentX + wordWidth / 2;
+        }
 
         if (isHighlight) {
           const rect = plot.insert('rect', 'text')
@@ -215,57 +208,243 @@ export const create_viz = () => {
 
         currentX += wordWidth + spaceBetweenWords; // Change the spacing between words in highlight/strikethrough spans to 5 pixels
       });
-if (annotations[color] && !annotatedSpans.has(span)) {
-  annotatedSpans.add(span);
-  console.log('Drawing annotation for color:', color);
+      if (annotations[color] && !annotatedSpans.has(span)) {
+        annotatedSpans.add(span);
 
-  const annotationLines = annotations[color].split('\n');
-  const annotationText = plot.append('text')
-    .attr('x', middleWordX - 10)
-    .style('fill', invertLightness(`#${color}`));
+        annotationData.push({
+          color,
+          middleWordX,
+          currentY,
+          annotationLines: annotations[color].split('\n')
+        });
+      }
 
-  annotationLines.forEach((line, index) => {
-    annotationText.append('tspan')
-      .text(line)
-      .attr('x', middleWordX - 10)
-      .attr('dy', index === 0 ? 0 : lineHeight);
-  });
-
-  const bbox = annotationText.node().getBBox();
-const newCoords = findNonOverlappingRegion(plot, middleWordX - 10, currentY + 30, bbox.width, bbox.height, lineHeight, 6 * lineHeight, 20);
-
-annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
-
-const line = plot.append('line')
-  .attr('x1', middleWordX - 10)
-  .attr('y1', currentY)
-  .attr('x2', newCoords.x)
-  .attr('y2', newCoords.y)
-  .attr('stroke', invertLightness(`#${color}`))
-  .attr('stroke-width', 1.5);
-
-const circle = plot.append('circle')
-  .attr('cx', newCoords.x)
-  .attr('cy', newCoords.y)
-  .attr('r', 3)
-  .attr('fill', invertLightness(`#${color}`));
-}
     }
   });
 
-// Get the bounding box of the plot after rendering all the text elements
-const plotBBox = plot.node().getBBox();
 
-// Update the viewBox based on the plot's bounding box
-const padding = 20;
-const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
-canvas.attr('viewBox', updatedViewBox);
+  // Second pass: add the annotation lines, circles, and texts (outside the first pass loop)
+  annotationData
+    .filter(({ annotationLines }) => {
+      return annotationLines.some(line => line.trim() !== '');
+    })
+    .forEach(({ color, middleWordX, currentY, annotationLines }) => {
+      console.log('Drawing annotation for color:', color);
 
-// Center the plot within the updated viewBox
-const translateX = padding - plotBBox.x;
-const translateY = padding - plotBBox.y;
-plot.attr('transform', `translate(${translateX}, ${translateY})`);
+      // Create a group element to hold the annotation elements
+      const annotationGroup = plot.append('g')
+        .on('mouseover', function() { showDragHandles(d3.select(this)); })
+        .on('mouseout', function() { hideDragHandles(d3.select(this)); })
+        .on('touchstart', function() { showDragHandles(d3.select(this)); });
+
+      const annotationText = annotationGroup.append('text')
+        .attr('x', middleWordX - 6)
+        .attr('y', currentY)
+        .style('fill', darkenColor(`#${color}`))
+        .style('font-size', '14px')
+        .style('pointer-events', 'none'); // Add this line
+
+      annotationLines.forEach((line, index) => {
+        annotationText.append('tspan')
+          .text(line)
+          .attr('x', middleWordX - 6)
+          .attr('dy', index === 0 ? 0 : lineHeight);
+      });
+      const padding = 5;
+
+      const bbox = getPaddedBBox(annotationText.node(), padding);
+
+      const newCoords = findNonOverlappingRegion(plot, middleWordX, currentY, bbox.width, bbox.height, lineHeight, padding, annotationText.node());
+
+
+
+      annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
+      annotationText.node().setAttribute('x', newCoords.x);
+
+
+      const newBbox = getPaddedBBox(annotationText.node(), padding);
+      const centerXLeft = newBbox.x;
+      const centerXRight = newBbox.x + newBbox.width;
+      const centerYTop = newBbox.y;
+      const centerYBottom = newBbox.y + newBbox.height;
+
+      const centers = [
+        { x: centerXLeft, y: (centerYTop + centerYBottom) / 2 },
+        { x: centerXRight, y: (centerYTop + centerYBottom) / 2 },
+        { x: (centerXLeft + centerXRight) / 2, y: centerYTop },
+        { x: (centerXLeft + centerXRight) / 2, y: centerYBottom },
+      ];
+
+      const middleWordCoords = { x: middleWordX, y: currentY };
+
+      const closestCenter = centers.reduce((prev, curr) => {
+        const prevDist = Math.sqrt(Math.pow(prev.x - middleWordCoords.x, 2) + Math.pow(prev.y - middleWordCoords.y, 2));
+        const currDist = Math.sqrt(Math.pow(curr.x - middleWordCoords.x, 2) + Math.pow(curr.y - middleWordCoords.y, 2));
+        return currDist < prevDist ? curr : prev;
+      });
+
+      const line = annotationGroup.append('line')
+        .attr('x1', middleWordX - 6)
+        .attr('y1', currentY)
+        .attr('x2', closestCenter.x)
+        .attr('y2', closestCenter.y)
+        .attr('stroke', darkenColor(`#${color}`))
+        .attr('stroke-width', 1.5);
+
+      //hack
+      let diff = closestCenter.x - (middleWordX - 6);
+
+      annotationText.attr('x', newCoords.x - diff);
+
+
+      const circle = annotationGroup.append('circle')
+        .attr('cx', closestCenter.x)
+        .attr('cy', closestCenter.y)
+        .attr('r', 3)
+        .attr('fill', darkenColor(`#${color}`));
+
+      if (newCoords.y < currentY) {
+        annotationText.attr('y', parseFloat(annotationText.attr('y')) - padding);
+      } else {
+        annotationText.attr('y', parseFloat(annotationText.attr('y')) + padding);
+      }
+
+      // Create drag handles and add drag behavior
+      const handleRadius = 4;
+
+      const textHandle = annotationGroup.append('circle')
+        .attr('class', 'drag-handle')
+        .attr('cx', closestCenter.x)
+        .attr('cy', closestCenter.y)
+        .attr('r', handleRadius)
+        .attr('fill', 'blue')
+        .style('cursor', 'move')
+        .style('display', 'none');
+
+      textHandle.call(createDragBehavior((dx, dy) => {
+        // Update the position of the text handle
+        textHandle.attr('cx', parseFloat(textHandle.attr('cx')) + dx)
+          .attr('cy', parseFloat(textHandle.attr('cy')) + dy);
+
+        // Update the position of the multi-line text
+        const newTextX = parseFloat(annotationText.attr('x')) + dx;
+        const newTextY = parseFloat(annotationText.attr('y')) + dy;
+        annotationText.attr('x', newTextX)
+          .attr('y', newTextY);
+
+        // Update the position of tspan elements
+        annotationText.selectAll('tspan')
+          .attr('x', newTextX);
+
+        // Update the line's end position
+        line.attr('x2', parseFloat(line.attr('x2')) + dx)
+          .attr('y2', parseFloat(line.attr('y2')) + dy);
+
+        // Update the circle's position
+        circle.attr('cx', parseFloat(circle.attr('cx')) + dx)
+          .attr('cy', parseFloat(circle.attr('cy')) + dy);
+
+      }, () => {
+        // Recalculate the centers of the annotation text bounding box
+        const newBbox = getPaddedBBox(annotationText.node(), padding);
+        const centerXLeft = newBbox.x;
+        const centerXRight = newBbox.x + newBbox.width;
+        const centerYTop = newBbox.y;
+        const centerYBottom = newBbox.y + newBbox.height;
+
+        const newCenters = [
+          { x: centerXLeft, y: (centerYTop + centerYBottom) / 2 },
+          { x: centerXRight, y: (centerYTop + centerYBottom) / 2 },
+          { x: (centerXLeft + centerXRight) / 2, y: centerYTop },
+          { x: (centerXLeft + centerXRight) / 2, y: centerYBottom },
+        ];
+
+        // Calculate the closest center
+        const newClosestCenter = newCenters.reduce((prev, curr) => {
+          const prevDist = Math.sqrt(Math.pow(prev.x - middleWordCoords.x, 2) + Math.pow(prev.y - middleWordCoords.y, 2));
+          const currDist = Math.sqrt(Math.pow(curr.x - middleWordCoords.x, 2) + Math.pow(curr.y - middleWordCoords.y, 2));
+          return currDist < prevDist ? curr : prev;
+        });
+
+        // Update the line's end position
+        line.attr('x2', newClosestCenter.x)
+          .attr('y2', newClosestCenter.y);
+
+        // Update the circle's position
+        circle.attr('cx', newClosestCenter.x)
+          .attr('cy', newClosestCenter.y);
+
+        // Update the text handle position
+        textHandle.attr('cx', newClosestCenter.x)
+          .attr('cy', newClosestCenter.y);
+      }));
+
+      const lineEndHandle = annotationGroup.append('circle')
+        .attr('class', 'drag-handle')
+        .attr('cx', middleWordX - 6)
+        .attr('cy', currentY)
+        .attr('r', handleRadius)
+        .attr('fill', 'blue')
+        .style('cursor', 'move')
+        .style('display', 'none');
+
+      lineEndHandle.call(createDragBehavior((dx, dy) => {
+        // Update the position of the line's start position
+        line.attr('x1', parseFloat(line.attr('x1')) + dx)
+          .attr('y1', parseFloat(line.attr('y1')) + dy);
+
+        // Update the position of the line end handle
+        lineEndHandle.attr('cx', parseFloat(lineEndHandle.attr('cx')) + dx)
+          .attr('cy', parseFloat(lineEndHandle.attr('cy')) + dy);
+      }, () => {
+        // No additional logic needed for lineEndHandle drag end
+      }));
+    });
+
+  // Get the bounding box of the plot after rendering all the text elements
+  const plotBBox = plot.node().getBBox();
+
+  // Update the viewBox based on the plot's bounding box
+  const padding = 20;
+  const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
+  canvas.attr('viewBox', updatedViewBox);
+
+  // Center the plot within the updated viewBox
+  const translateX = padding - plotBBox.x;
+  const translateY = padding - plotBBox.y;
+  plot.attr('transform', `translate(${translateX}, ${translateY})`);
 };
+
+
+// Helper function to create drag behavior
+function createDragBehavior(onDrag, onDragEnd) {
+  let prevX, prevY;
+
+  return d3.drag()
+    .on('start', (event) => {
+      event.sourceEvent.stopPropagation();
+      prevX = event.x;
+      prevY = event.y;
+    })
+    .on('drag', (event) => {
+      const dx = event.x - prevX;
+      const dy = event.y - prevY;
+      prevX = event.x;
+      prevY = event.y;
+      onDrag.call(this, dx, dy);
+    })
+    .on('end', onDragEnd);
+}
+// Helper function to show drag handles
+function showDragHandles(annotationGroup) {
+  annotationGroup.selectAll('.drag-handle').style('display', 'block');
+}
+
+// Helper function to hide drag handles
+function hideDragHandles(annotationGroup) {
+  annotationGroup.selectAll('.drag-handle').style('display', 'none');
+}
+
 
 
 function addDownloadButton(svg) {
