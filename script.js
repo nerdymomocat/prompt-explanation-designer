@@ -3,6 +3,11 @@ import { getUniqueRandomColor } from './module_color.js'
 import { wordDiff } from './module_diff.js'
 import { create_viz } from './module_viz.js'
 
+window.addEventListener('resize', () => {
+  // Call create_viz to update the visualization when the screen width changes
+  create_viz();
+});
+
 
 const visualization = document.getElementById('visualization');
 const sidebar_content = document.getElementById('sidebar-content');
@@ -967,7 +972,15 @@ const deleteColor = (color, isStrikethrough = false) => {
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
   const colorIndexContainer = document.getElementById(colorIndexId);
   if (colorIndexContainer) {
-    colorIndexContainer.remove();
+        const itemWrapper = colorIndexContainer.closest('.item-wrapper');
+
+    // Remove the item-wrapper div if it exists
+    if (itemWrapper) {
+      itemWrapper.remove();
+    } else {
+      // If the item-wrapper is not found, remove the color index container directly
+      colorIndexContainer.remove();
+    }
   }
 
   // Remove the CSS class from the document
