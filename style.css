@@ -630,7 +630,7 @@ ins {
 }
 .horizontal-accordion {
   display: flex;
-  height: 100vh;
+  min-height: 100px;
 }
 
 .accordion-heading {
@@ -666,13 +666,16 @@ ins {
 .accordion-content {
   display: none;
   padding: 20px;
-  flex-grow: 1;
   overflow: auto;
-  min-height:0%;
+  min-height: 300px;
+  align-items: center;
+  width: 100%; /* Add this property */
 }
 
-.accordion-content.active {
-  display: block;
+.accordion-content.active,
+.accordion-content.visible {
+  display: flex;
+  flex-direction: column;
 }
 
 .hamburger-menu {
