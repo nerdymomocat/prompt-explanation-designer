@@ -15,7 +15,7 @@
  width: 100%;
  height: 200px;
  overflow: hidden;
- margin-bottom: 40px
+/*  margin-bottom: 40px */
 }
 
 .logo-container {
@@ -107,6 +107,11 @@ body {
  align-items: center
 }
 
+.fixed-width {
+  width: 1px;
+  visibility: hidden;
+}
+
 .container {
  display: flex;
  flex-wrap: wrap;
@@ -167,6 +172,13 @@ body {
 
 
 @media (max-width: 768px) {
+    .horizontal-accordion .accordion-heading {
+    display: none;
+  }
+
+  .hamburger-menu {
+    display: block;
+  }
   .text-input-wrapper {
     flex: 1;
     margin-right: 20px;
@@ -215,13 +227,6 @@ body {
  }
 }
 
-
-  .button-container {
-    display: flex;
-    gap: 10px;
-    padding-bottom: 15px;
-  }
-
 @media (min-width: 769px) {
   .export-btn,
   .export-viz-btn {
@@ -232,7 +237,21 @@ body {
     width: auto;
     max-width: none;
   }
+    .hamburger-menu {
+    display: none;
+  }
+    .dropdown-menu {
+    display: none !important;
+  }
 }
+
+  .button-container {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 15px;
+  }
+
+
 
 .export-btn {
  margin-top: 10px;
@@ -609,69 +628,89 @@ ins {
  text-decoration: none;
  color: #008000
 }
-
-
-.collapsible-container {
- margin-bottom: 1rem;
- width: 100%
+.horizontal-accordion {
+  display: flex;
+  height: 100vh;
 }
 
-.collapsible {
- background-color: transparent;
- color: #165b15;
- cursor: pointer;
- padding: 18px;
- width: 100%;
- border: none;
- text-align: left;
- outline: none;
- font-size: 15px;
- transition: 0.4s;
- font-weight: 700;
- position: relative
+.accordion-heading {
+  position: relative;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 14px;
+  color: #008000;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border-right: 1px solid #d1e0d2;
+  box-shadow: 2px 0 4px rgba(184, 204, 184, 0.1);  
+  transition: all 0.3s;
 }
 
-.collapsible .text-wrapper {
- display: inline;
- background-color: rgba(255, 255, 255, 1);
- padding: 0 5px;
- border: 2px solid #c16c0b;
- border-radius: 5px
+.accordion-heading.active {
+  color: #ff7300;
+  border-right: 1px solid #e08910;
+  box-shadow: 2px 0 4px rgba(255, 170, 51, 0.3);
 }
 
-.collapsible::before {
- content: "";
- position: absolute;
- top: 50%;
- left: 0;
- right: 0;
- height: 2px;
- background-color: #c16c0b;
- z-index: -1
+.accordion-heading:before {
+  content: attr(data-text);
+  position: absolute;
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  font-family: monospace;
 }
 
-.collapsible::after {
- content: '\002B';
- color: #bc6706;
- font-weight: 700;
- float: right;
- margin-left: 5px
+.accordion-content {
+  display: none;
+  padding: 20px;
+  flex-grow: 1;
+  overflow: auto;
 }
 
-.collapsible.active::after {
- content: "\2212"
+.accordion-content.active {
+  display: block;
 }
 
-.content {
- max-height: 0;
- overflow: hidden;
- transition: max-height 0.2s ease-out;
- padding: 0 18px 0px 18px;
- margin-top: 20px;
- margin-bottom: 20px;
- display: flex;
- justify-content: center;
- background-color: transparent
+.hamburger-menu {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 24px;
+  z-index: 10;
+  color: #664594; /* Make the icon yellow */
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.9); /* Make the dropdown a bit translucent */
+  border: none; /* Remove border to make it flat */
+  border-radius: 5px; /* Add rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 150px; /* Make the dropdown wider */
+  overflow: hidden; /* Add this line to keep the hover background within the rounded corners */
+
+}
+
+.dropdown-item {
+  padding: 8px 16px; /* Adjust padding for smaller text */
+  cursor: pointer;
+  font-size: 14px; /* Make the text smaller */
+  color: #107012;
+  font-family: monospace; /* Add this line to set the font to monospace */
+}
+
+
+.dropdown-item:hover {
+  background-color: #ceeed2;
+  color: #8e6506;
+  cursor: pointer; /* Add this line to change the cursor to a pointer on hover */
 }
 
 .text-area {
@@ -1088,4 +1127,41 @@ text {
     display: inline-flex; /* Use flex to center align the content */
     align-items: center; /* Align content vertically */
     justify-content: center; /* Align content horizontally */
+}
+
+.tab-container {
+  width: 100%;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tab-link {
+  background-color: #f1f1f1;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #000;
+  transition: 0.3s;
+}
+
+.tab-link:hover {
+  background-color: #ddd;
+}
+
+.tab-link.active {
+  background-color: #ccc;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }
