@@ -66,7 +66,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
           <div class="dropdown-item" data-target="tab1-header">Compare: Texts</div>
           <div class="dropdown-item" data-target="tab2-header">Explain: Text</div>
           <div class="dropdown-item" data-target="tab3-header">Prompt + Generate</div>
-                    <div class="dropdown-item" data-target="tab4-header">Prompt + 2 Generations</div>
+          <div class="dropdown-item" data-target="tab4-header">Prompt + 2 Generations</div>
           <div class="dropdown-item" data-target="tab5-header">2 (Prompt + Generation)</div>
         </div>
       </div>
@@ -76,8 +76,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="accordion-content" id="tab1">
           <div class="text-comparison-container">
             <div class="text-area-container">
-              <textarea class="text-area" id="text-area-1" placeholder="Original Prompt"></textarea>
-              <textarea class="text-area" id="text-area-2" placeholder="New Prompt"></textarea>
+              <textarea class="text-area" id="text-area-1" placeholder="Original Text"></textarea>
+              <textarea class="text-area" id="text-area-2" placeholder="New Text"></textarea>
             </div>
             <div class="output-container">
               <button class="compare-btn"><svg width="16" height="16" viewBox="0 0 16 16"
@@ -86,7 +86,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                     d="m10.08 7 1 1 3.44-3.45L11 1l-1 1 1.8 1.8H2v1.4h9.82ZM5.86 9l-1-1-3.44 3.5L4.91 15l1-1-1.81-1.8H14v-1.4H4.1Z" />
                 </svg> Compare</button>
               <div id="results-container">
-                <div id="diff-results"></div>
+                <div id="diff-results" data-placeholder="Comparison Output Will Appear Here"></div>
               </div>
               <button class="copy-to-designer-btn"><svg width="16" height="16" viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg" fill="currentColor">
@@ -104,7 +104,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="container flex-container">
               <div class="text-input-wrapper">
                 <div class="text-input" id="text-input" contenteditable="true" spellcheck="false"
-                  data-placeholder="Final Prompt Goes Here"></div>
+                  data-placeholder="Text Goes Here"></div>
               </div>
               <div id="sidebar" class="sidebar">
                 <div class="plus-button-container">
@@ -116,7 +116,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                 <div id="sidebar-content" class="sidebar-content">
                   <div class="item-container">
                     <span class="item-placeholder"> Add a highlight or strikethrough to the text area to explain that
-                      prompt segment here.</span>
+                      text segment here.</span>
                   </div>
                 </div>
               </div>
@@ -147,14 +147,38 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
               <button id="download-btn" class="download-btn">Download Image</button>
             </div>
           </div>
+
+          <div id="settingsModal" class="modal">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h3 class="modal-title">Settings</h3>
+                <button id="closeSettingsModal" class="modal-button" title="Close">&#x2715;</button>
+              </div>
+              <div class="modal-body">
+                <label for="dropdown">Dropdown:</label>
+                <select id="dropdown">
+                  <option value="option1">Option 1</option>
+                  <option value="option2">Option 2</option>
+                  <option value="option3">Option 3</option>
+                </select>
+                <br><br>
+                <label for="textbox">Text Box:</label>
+                <input type="text" id="textbox" />
+              </div>
+              <div class="modal-footer">
+                <button id="saveOptions" class="modal-button">Save</button>
+              </div>
+            </div>
+          </div>
         </div>
+
 
         <div class="accordion-heading" id="tab3-header" data-text="Prompt + Generate"></div>
 
         <div class="accordion-content" id="tab3">
           <div class="grid-container">
             <div class="grid-item grid-item-content-editable">
-              <div class="text-input-wrapper">
+              <div class="text-input-tab3-wrapper">
                 <div class="text-input-tab3" id="text-input-1" contenteditable="true" spellcheck="false"
                   data-placeholder="Content Editable 1"></div>
               </div>
@@ -184,12 +208,12 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         </div>
 
         <div class="accordion-heading" id="tab4-header" data-text="Prompt + 2 Generations"></div>
-<div class="accordion-content" id="tab4"> </div>
+        <div class="accordion-content" id="tab4"> </div>
 
-                <div class="accordion-heading" id="tab5-header" data-text="2 (Prompt + Generation)"></div>
-<div class="accordion-content" id="tab5"> </div>
+        <div class="accordion-heading" id="tab5-header" data-text="2 (Prompt + Generation)"></div>
+        <div class="accordion-content" id="tab5"> </div>
 
-        
+
       </div>
 
     </nav>
