@@ -681,7 +681,11 @@ ins {
   cursor: pointer;
   font-size: 24px;
   z-index: 10;
-  color: #664594; /* Make the icon yellow */
+    padding: 5px;
+  background: linear-gradient(to right, #bfaed5, #664594);
+  -webkit-background-clip: text; /* Clip the background to the text for WebKit browsers */
+  background-clip: text; /* Clip the background to the text */
+  color: transparent; /* Make the original text color transparent */
 }
 
 .dropdown-menu {
