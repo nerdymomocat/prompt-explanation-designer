@@ -65,7 +65,9 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="dropdown-menu" id="dropdown-menu">
           <div class="dropdown-item" data-target="tab1-header">Compare: Texts</div>
           <div class="dropdown-item" data-target="tab2-header">Explain: Text</div>
-          <!--       <div class="dropdown-item" data-target="tab3-header">Explain: Prompt + Output</div> -->
+          <div class="dropdown-item" data-target="tab3-header">Prompt + Generate</div>
+                    <div class="dropdown-item" data-target="tab4-header">Prompt + 2 Generations</div>
+          <div class="dropdown-item" data-target="tab5-header">2 (Prompt + Generation)</div>
         </div>
       </div>
       <div class="horizontal-accordion">
@@ -146,23 +148,57 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
           </div>
         </div>
-        <!--         
-        <div class="accordion-heading" id="tab3-header" data-text="Explain: Prompt + Output"></div>
+
+        <div class="accordion-heading" id="tab3-header" data-text="Prompt + Generate"></div>
 
         <div class="accordion-content" id="tab3">
+          <div class="grid-container">
+            <div class="grid-item grid-item-content-editable">
+              <div class="text-input-wrapper">
+                <div class="text-input-tab3" id="text-input-1" contenteditable="true" spellcheck="false"
+                  data-placeholder="Content Editable 1"></div>
+              </div>
+            </div>
+            <div class="grid-item grid-item-sidebar">
+              <div id="sidebar-1" class="sidebar-tab3">
 
-        </div> 
+              </div>
+            </div>
+            <div class="grid-item grid-item-content-editable">
+              <div class="text-input-tab3-wrapper">
+                <div class="text-input-tab3" id="text-input-3" contenteditable="true" spellcheck="false"
+                  data-placeholder="Content Editable 3">
+                  <button class="settings-button">
+                    <i class="fas fa-cog"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="grid-item grid-item-sidebar">
+              <div id="sidebar-3" class="sidebar-tab3">
+
+              </div>
+            </div>
+          </div>
+          <button class="generate-button">Generate</button>
+        </div>
+
+        <div class="accordion-heading" id="tab4-header" data-text="Prompt + 2 Generations"></div>
+<div class="accordion-content" id="tab4"> </div>
+
+                <div class="accordion-heading" id="tab5-header" data-text="2 (Prompt + Generation)"></div>
+<div class="accordion-content" id="tab5"> </div>
+
+        
       </div>
-        -->
 
-
-      </div>
     </nav>
   </main>
   <footer class="footer">
     <div class="footer-content">
       <font color="grey"><i>
-          <p> <b>Known Issues:</b> <br> 1. If your highlight color spans multiple lines, it breaks image export<br>2. Works better on large screens. </p>
+          <p> <b>Known Issues:</b> <br> 1. If your highlight color spans multiple lines, it breaks image export<br>2.
+            Works better on large screens. </p>
         </i></font>
       <p>&copy; 2023 Prompt Explanation Designer. All rights reserved.</p>
       <div class="open-source">
