@@ -110,6 +110,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  const settingsButton = document.querySelector('.settings-button');
+  const closeModalButton = document.querySelector('#closeSettingsModal');
+  const saveOptionsButton = document.querySelector('#saveOptions');
+  const settingsModal = document.querySelector('#settingsModal');
+
+  settingsButton.addEventListener('click', () => {
+    settingsModal.style.display = 'block';
+  });
+
+  closeModalButton.addEventListener('click', () => {
+    settingsModal.style.display = 'none';
+  });
+
+  saveOptionsButton.addEventListener('click', () => {
+    const dropdownValue = document.querySelector('#dropdown').value;
+    const textboxValue = document.querySelector('#textbox').value;
+
+    localStorage.setItem('dropdownValue', dropdownValue);
+    localStorage.setItem('textboxValue', textboxValue);
+
+    settingsModal.style.display = 'none';
+  });
+
+  // Load saved values from local storage
+  const savedDropdownValue = localStorage.getItem('dropdownValue');
+  const savedTextboxValue = localStorage.getItem('textboxValue');
+
+  if (savedDropdownValue) {
+    document.querySelector('#dropdown').value = savedDropdownValue;
+  }
+
+  if (savedTextboxValue) {
+    document.querySelector('#textbox').value = savedTextboxValue;
+  }
 
 
   document.addEventListener('click', (event) => {
@@ -298,6 +332,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Get the input text
     const diffResults = document.getElementById('diff-results');
+    if (diffResults.textContent.trim() === '') {
+      diffResults.setAttribute('data-placeholder', 'Comparison Output Will Appear Here');
+    }
     const inputText = diffResults.innerHTML;
 
     // Create a temporary DOM element to parse the input text
