@@ -42,11 +42,7 @@ textInput.addEventListener('click', (event) => {
 });
 
 // Remove the active class when clicking outside the text input
-document.addEventListener('click', (event) => {
-  if (!textInput.contains(event.target) && textInput.classList.contains('active')) {
-    textInput.classList.remove('active');
-  }
-});
+
 document.querySelector("#text-input").addEventListener("input", handleTextInputChange);
 
 
@@ -64,9 +60,72 @@ function closeModal() {
 }
 
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
+  const accordionHeadings = document.querySelectorAll(".accordion-heading");
+  const accordionContents = document.querySelectorAll(".accordion-content");
+
+  accordionHeadings.forEach((heading) => {
+    heading.addEventListener("click", () => {
+      const target = heading.getAttribute("id").replace("-header", "");
+
+      accordionHeadings.forEach((otherHeading) => {
+        if (otherHeading === heading) {
+          otherHeading.classList.add("active");
+        } else {
+          otherHeading.classList.remove("active");
+        }
+      });
+
+      accordionContents.forEach((content) => {
+        if (content.getAttribute("id") === target) {
+          content.classList.add("active");
+          content.style.display = "block";
+        } else {
+          content.classList.remove("active");
+          content.style.display = "none";
+        }
+      });
+    });
+  });
+
+  // Set the first heading and content as active
+  accordionHeadings[0].classList.add("active");
+  accordionContents[0].classList.add("active");
+
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const dropdownMenu = document.getElementById("dropdown-menu");
+  const dropdownItems = document.querySelectorAll(".dropdown-item");
+
+  hamburgerMenu.addEventListener("click", () => {
+    dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
+  });
+
+  dropdownItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const target = item.getAttribute("data-target");
+      document.getElementById(target).click();
+      dropdownMenu.style.display = "none";
+    });
+  });
+
+
+
+  document.addEventListener('click', (event) => {
+    if (!textInput.contains(event.target) && textInput.classList.contains('active')) {
+      textInput.classList.remove('active');
+    }
+    if (!hamburgerMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
+      dropdownMenu.style.display = "none";
+    }
+  });
+
+  // Add an event listener for the keydown event on the document
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      dropdownMenu.style.display = "none";
+    }
+  });
+
   const visualizeBtn = document.querySelector('.export-viz-btn');
   visualizeBtn.addEventListener("click", () => {
     visualization.style.display = 'block';
@@ -115,47 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const collapsibles = document.querySelectorAll('.collapsible');
 
-  // Function to set the maxHeight based on content size
-  function setContentHeight(content) {
-    content.style.maxHeight = content.scrollHeight + 'px';
-  }
-  // Loop through all the collapsible elements and add a click event listener
-  collapsibles.forEach((collapsible) => {
-    collapsible.addEventListener('click', function() {
-      // Toggle the current collapsible
-      this.classList.toggle('active');
-      const content = this.nextElementSibling;
-      if (content.style.maxHeight) {
-        content.style.maxHeight = null;
-      } else {
-        setContentHeight(content);
-      }
-
-      // Close other collapsibles
-      collapsibles.forEach((otherCollapsible) => {
-        if (otherCollapsible !== collapsible) {
-          otherCollapsible.classList.remove('active');
-          const otherContent = otherCollapsible.nextElementSibling;
-          otherContent.style.maxHeight = null;
-        }
-      });
-    });
-
-    // Create a MutationObserver to observe changes in content
-    const content = collapsible.nextElementSibling;
-    const observer = new MutationObserver(function() {
-      setContentHeight(content);
-    });
-
-    // Observe changes in the content's childList and subtree
-    observer.observe(content, { childList: true, subtree: true });
-  });
-
-  collapsibles[1].classList.add('active');
-  const secondContent = collapsibles[1].nextElementSibling;
-  setContentHeight(secondContent);
 
   document.querySelector('.text-input').setAttribute('tabindex', '0');
 
@@ -329,19 +348,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const textInput = document.querySelector(".text-input");
 
-    textInput.addEventListener('paste', function(e) {
-        e.preventDefault(); // Prevent the default paste action
+  textInput.addEventListener('paste', function(e) {
+    e.preventDefault(); // Prevent the default paste action
 
-        var plainText = '';
+    var plainText = '';
 
-        if (e.clipboardData && e.clipboardData.getData) {
-            plainText = e.clipboardData.getData('text/plain');
-        } else if (window.clipboardData && window.clipboardData.getData) {
-            plainText = window.clipboardData.getData('Text');
-        }
+    if (e.clipboardData && e.clipboardData.getData) {
+      plainText = e.clipboardData.getData('text/plain');
+    } else if (window.clipboardData && window.clipboardData.getData) {
+      plainText = window.clipboardData.getData('Text');
+    }
 
-        document.execCommand('insertText', false, plainText);
-    });
+    document.execCommand('insertText', false, plainText);
+  });
 
   let selectedRanges = [];
   let isCmdKeyDown = false;
@@ -972,7 +991,7 @@ const deleteColor = (color, isStrikethrough = false) => {
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
   const colorIndexContainer = document.getElementById(colorIndexId);
   if (colorIndexContainer) {
-        const itemWrapper = colorIndexContainer.closest('.item-wrapper');
+    const itemWrapper = colorIndexContainer.closest('.item-wrapper');
 
     // Remove the item-wrapper div if it exists
     if (itemWrapper) {
