@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   dropdownItems.forEach((item) => {
     item.addEventListener("click", () => {
+      event.stopPropagation();
       const target = item.getAttribute("data-target");
       document.getElementById(target).click();
       dropdownMenu.style.display = "none";
