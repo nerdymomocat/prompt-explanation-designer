@@ -668,6 +668,7 @@ ins {
   padding: 20px;
   flex-grow: 1;
   overflow: auto;
+  min-height:0%;
 }
 
 .accordion-content.active {
@@ -715,6 +716,14 @@ ins {
   background-color: #ceeed2;
   color: #8e6506;
   cursor: pointer; /* Add this line to change the cursor to a pointer on hover */
+}
+
+main {
+  width: 100%;
+  box-sizing: border-box; /* This ensures that the padding is included within the specified width */
+  padding-left: 5px; /* Adjust the value as needed */
+  padding-right: 5px; /* Adjust the value as needed */
+
 }
 
 .text-area {
