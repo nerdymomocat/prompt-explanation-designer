@@ -79,14 +79,15 @@ document.addEventListener("DOMContentLoaded", () => {
       accordionContents.forEach((content) => {
         if (content.getAttribute("id") === target) {
           content.classList.add("active");
-          content.style.display = "block";
+          content.classList.add("visible"); // Add the 'visible' class
         } else {
           content.classList.remove("active");
-          content.style.display = "none";
+          content.classList.remove("visible"); // Remove the 'visible' class
         }
       });
     });
   });
+
 
   // Set the first heading and content as active
   accordionHeadings[0].classList.add("active");
