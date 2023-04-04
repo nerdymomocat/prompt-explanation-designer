@@ -53,11 +53,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
       <div class="modal-content">
         <div class="modal-header">
           <button id="saveOptions" class="modal-button" title="Save">
-            <svg width="800" height="800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
-              class="save-icon">
-              <path
-                d="m20.71 9.29-6-6a1 1 0 0 0-.32-.21A1.09 1.09 0 0 0 14 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a1 1 0 0 0-.29-.71ZM9 5h4v2H9Zm6 14H9v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1Zm4-1a1 1 0 0 1-1 1h-1v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.41l4 4Z" />
-            </svg>
+            <object type="image/svg+xml" data="svgs/save_icon.svg" class="save-icon" width="24" height="24">
+            </object>
           </button>
           <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
           <h3 class="modal-title">Edit Explanation Categories</h3>
@@ -86,19 +83,15 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
               <textarea class="text-area" id="text-area-2" placeholder="New Text"></textarea>
             </div>
             <div class="output-container">
-              <button class="compare-btn"><svg width="16" height="16" viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="m10.08 7 1 1 3.44-3.45L11 1l-1 1 1.8 1.8H2v1.4h9.82ZM5.86 9l-1-1-3.44 3.5L4.91 15l1-1-1.81-1.8H14v-1.4H4.1Z" />
-                </svg> Compare</button>
+              <button class="compare-btn"> <object type="image/svg+xml" data="compare.svg" width="16" height="16"
+                  fill="currentColor"> </object>
+                Compare</button>
               <div id="results-container">
                 <div id="diff-results" data-placeholder="Comparison Output Will Appear Here"></div>
               </div>
-              <button class="copy-to-designer-btn"><svg width="16" height="16" viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="M21 8.94a1.31 1.31 0 0 0-.06-.27v-.09a1.07 1.07 0 0 0-.19-.28l-6-6a1.07 1.07 0 0 0-.28-.19.32.32 0 0 0-.09 0 .88.88 0 0 0-.33-.11H10a3 3 0 0 0-3 3v1H6a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-1h1a3 3 0 0 0 3-3V8.94Zm-6-3.53L17.59 8H16a1 1 0 0 1-1-1ZM15 19a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h1v7a3 3 0 0 0 3 3h5Zm4-4a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3v3a3 3 0 0 0 3 3h3Z" />
-                </svg> Copy to Designer</button>
+              <button class="copy-to-designer-btn"> <object type="image/svg+xml" data="copy.svg" width="16" height="16"
+                  fill="currentColor">
+                </object>Copy to Designer</button>
             </div>
           </div>
         </div>
@@ -129,16 +122,10 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
             <br>
             <div class="button-container">
-              <button class="export-btn"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                  viewBox="0 0 16 16" fill="currentColor">
-                  <path fill-rule="evenodd"
-                    d="M14 9a1 1 0 0 1 1 1v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a1 1 0 0 1 2 0v3h10v-3a1 1 0 0 1 1-1ZM8 1a1 1 0 0 1 1 1v4.586l1.293-1.293a1 1 0 1 1 1.414 1.414L8 10.414 4.293 6.707a1 1 0 0 1 1.414-1.414L7 6.586V2a1 1 0 0 1 1-1Z" />
-                </svg> Download Indexed Explanation</button>
-              <button class="export-viz-btn"><svg width="16" height="16" viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="M0 5h3v1H0V5zm5-5h1v3H5V0zm1 11H5V8.5l1 1zm5-5H9.5l-1-1H11zM3.131 7.161l.707.707-2.97 2.97-.707-.707 2.97-2.97zm7-7 .707.707-2.97 2.97-.707-.707 2.97-2.97zM.836.199l3.465 3.465-.707.707L.129.906.836.199zM6.1 4.1 4 6.1l9.8 9.9 2.2-2.1-9.9-9.8zm0 1.4L8.5 8l-.6.6-2.5-2.5.7-.6z" />
-                </svg> Generate Canvas Visualization</button>
+              <button class="export-btn"><object type="image/svg+xml" data="download.svg" width="16" height="16"
+                  fill="currentColor"></object> Download Indexed Explanation</button>
+              <button class="export-viz-btn"><object type="image/svg+xml" data="magic.svg" width="16" height="16"
+                  fill="currentColor"></object> Generate Canvas Visualization</button>
             </div>
 
             <div class="visualization" id="visualization"><span class="hidden-trigger" id="hiddenTrigger"
@@ -191,28 +178,27 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
             <div class="grid-item grid-item-sidebar">
               <div id="sidebar-1" class="sidebar-tab3">
-
               </div>
+            </div>
+            <div class="grid-item grid-item-buttons">
+              <button class="generate-button">Generate</button>
+              <button class="settings-button">
+                <i class="fas fa-cog"></i>
+              </button>
             </div>
             <div class="grid-item grid-item-content-editable">
               <div class="text-input-tab3-wrapper">
                 <div class="text-input-tab3" id="text-input-3" contenteditable="true" spellcheck="false"
                   data-placeholder="Generation Appears Here. Add the API key and change the model by clicking on the settings icon on the top right.">
-                  <button class="settings-button">
-                    <i class="fas fa-cog"></i>
-                  </button>
                 </div>
               </div>
             </div>
             <div class="grid-item grid-item-sidebar">
               <div id="sidebar-3" class="sidebar-tab3">
-
               </div>
             </div>
           </div>
-          <button class="generate-button">Generate</button>
         </div>
-
         <div class="accordion-heading" id="tab4-header" data-text="Prompt + 2 Generations"></div>
         <div class="accordion-content" id="tab4"> </div>
 
