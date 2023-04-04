@@ -101,7 +101,7 @@
 
 .footer {
  width: 100%;
- background-color: var(--light-tealish);
+ background-color: var(--very-light-tealish);
  padding: 20px 0
 }
 
@@ -135,16 +135,7 @@ body {
 }
 
 
-.sidebar {
-  flex-basis: 300px;
-  margin-left: 20px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  min-height: 50px;
-  flex: 0 0 auto;
-  min-width: 300px;
-}
+
 
 .color-picker {
  display: flex;
@@ -160,49 +151,6 @@ body {
  border-radius: 5px
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  grid-gap: 20px;
-}
-
-.grid-item {
-  box-sizing: border-box;
-}
-
-.grid-item-content-editable {
-  position: relative;
-}
-
-.sidebar-tab3 {
-  background-color: var(--light-silverish);
-  padding: 10px;
-  border: 1px solid var(--dark-silverish);
-}
-
-.settings-button {
-  background-color: transparent;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.generate-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: var(--light-tealish);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.grid-item-buttons {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px; /* Adjust the gap between the buttons */
-}
 
 
 
@@ -212,13 +160,14 @@ body {
     padding-bottom: 15px;
   }
 
+.export-btn{
+   margin-top: 10px;
+}
 
-
-.export-btn {
- margin-top: 10px;
+.export-btn,
+.generate-button{
  padding: 5px 10px;
- background-color: var(--dark-tealish);
- color: #fff;
+ background-color: var(--light-tealish);
  border: none;
  border-radius: 5px;
  cursor: pointer;
@@ -227,9 +176,10 @@ body {
  text-align: center
 }
 
-
-.export-btn:hover {
- background-color: var(--very-dark-tealish);
+.export-btn:hover,
+.generate-button:hover
+{
+ background-color: var(--dark-tealish);
 }
 
 
@@ -335,103 +285,6 @@ input[type="color"]::-webkit-color-swatch {
  font-style: italic
 }
 
-
-.horizontal-line-container {
- position: relative;
- margin: 20px 0
-}
-
-.horizontal-line {
- width: 100%;
- height: 1px;
- background-color: var(--dark-tealish);
- z-index: -1
-}
-
-.horizontal-line-text {
- position: absolute;
- top: -0.75em;
- left: 50%;
- transform: translateX(-50%);
- background-color: #fff;
- border: none;
- outline: none;
- padding: 0 4px;
-  line-height: 1.4;
-  font-weight: 700;
-  color: var(--very-dark-tealish);
-  
-}
-
-.horizontal-line-text:focus {
- box-shadow: inset 0 0 0 1px var(--dark-silverish);
-}
-
-.delete-button.horizontal-line-delete {
- position: absolute;
- top: -10px;
- right: -15px;
- background-color: var(--light-silverish);
- border: none;
- border-radius: 50%;
- font-size: 12px;
- width: 20px;
- height: 20px;
- line-height: 20px;
- text-align: center;
- cursor: pointer
-}
-
-.item-wrapper {
- position: relative
-}
-
-.item-wrapper:hover .delete-button {
- visibility: visible
-}
-
-.horizontal-line-delete-button {
- display: inline-block
-}
-
-.add-horizontal-line-button {
- position: absolute;
- top: 50%;
- left: 50%;
- transform: translate(-50%, -50%);
- background-color: var(--light-silverish);
- border: 1px solid var(--dark-silverish);
- border-radius: 50%;
- width: 30px;
- height: 30px;
- line-height: 28px;
- text-align: center;
- font-size: 20px;
- font-weight: 500;
- color: var(--very-dark-tealish);
- cursor: pointer;
- display: none;
- z-index: 10
-}
-
-.add-between-items-button {
- display: none;
- position: absolute;
- left: 50%;
- top: 0;
- transform: translate(-50%, -100%);
- background-color: var(--light-silverish);
- border: none;
- cursor: pointer
-}
-
-.item-container {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  min-height: 20px; /* Adjust the height as needed */
-}
-
 .flex-container {
   display: flex;
   flex-wrap: wrap;
@@ -439,21 +292,6 @@ input[type="color"]::-webkit-color-swatch {
 
 .item-wrapper {
  position: relative
-}
-
-.add-between-items-button {
- display: flex;
- align-self: center;
- justify-content: center;
- margin-top: -15px;
- background-color: transparent;
- border: none;
- cursor: pointer;
- opacity: 0;
- transition: opacity 0.3s;
- position: relative;
- z-index: 10;
- width: 100%
 }
 
 .item-wrapper:hover + .add-between-items-button,
@@ -473,11 +311,6 @@ input[type="color"]::-webkit-color-swatch {
   pointer-events: none;
 }
 
-.sidebar:hover .plus-button-container {
- visibility: visible;
- pointer-events: auto
-}
-
 .plus-button {
  background-color: transparent;
  border: none;
@@ -485,10 +318,6 @@ input[type="color"]::-webkit-color-swatch {
  cursor: pointer;
  opacity: 0;
  transition: opacity 0.3s
-}
-
-.sidebar:hover .plus-button {
- opacity: 1
 }
 
 .plus-button:focus {
@@ -505,16 +334,8 @@ input[type="color"]::-webkit-color-swatch {
   margin-left: 5px;
 }
 
-.sidebar:hover .settings-button {
-  opacity: 1;
-}
-
 .settings-button:focus {
   outline: none;
-}
-
-.sidebar-content {
- padding-top: 40px
 }
 
 .description-inputs-container {
@@ -616,8 +437,8 @@ ins {
   box-shadow: 2px 0 4px rgba(255, 170, 51, 0.3);
 }
 
-.accordion-heading:before {
-  content: attr(data-text);
+
+.rotated-content {
   position: absolute;
   transform: rotate(-90deg);
   white-space: nowrap;
@@ -658,44 +479,41 @@ ins {
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: rgba(255, 255, 255, 0.9); /* Make the dropdown a bit translucent */
-  border: none; /* Remove border to make it flat */
-  border-radius: 5px; /* Add rounded corners */
+  background-color: rgba(255, 255, 255, 0.95); 
+  border: none; 
+  border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-width: 150px; /* Make the dropdown wider */
-  overflow: hidden; /* Add this line to keep the hover background within the rounded corners */
+  min-width: 150px;
+  overflow: hidden;
 
 }
 
 .dropdown-item {
-  padding: 8px 16px; /* Adjust padding for smaller text */
+  padding: 8px 16px; 
   cursor: pointer;
-  font-size: 14px; /* Make the text smaller */
+  font-size: 14px; 
   color: var(--dark-tealish);
-  font-family: monospace; /* Add this line to set the font to monospace */
+  font-family: monospace;
 }
 
 
 .dropdown-item:hover {
   background-color: rgba(206, 238, 210, 0.7);
   color: var(--very-dark-tealish);
-  cursor: pointer; /* Add this line to change the cursor to a pointer on hover */
+  cursor: pointer;
 }
+
+.dropdown-item.current {
+  background-color: rgba(206, 238, 210, 0.7);
+  color: var(--very-dark-tealish);
+}
+
 
 main {
   width: 100%;
-  box-sizing: border-box; /* This ensures that the padding is included within the specified width */
-  padding-left: 5px; /* Adjust the value as needed */
-  padding-right: 5px; /* Adjust the value as needed */
-
-}
-
-.text-area {
- font-family: Arial, sans-serif;
- font-size: 16px;
- width: 100%;
- min-height: 100px;
- margin-bottom: 10px
+  box-sizing: border-box;
+  padding-left: 5px; 
+  padding-right: 5px;
 }
 
 .text-comparison-container {
@@ -706,48 +524,12 @@ main {
  padding: 20px 10px 10px 10px
 }
 
-.text-area-container {
- display: flex;
- flex-direction: column;
- justify-content: space-between;
- margin-right: 20px;
- margin-left: 10px;
- gap: 10px
-}
-
-.text-area {
- font-family: Arial, sans-serif;
- font-size: 16px;
- width: 100%;
- min-height: 100px;
- margin-bottom: 10px
-}
-
 .text-comparison-container {
  display: flex;
  flex-wrap: wrap;
  align-items: center;
  justify-content: center;
  padding: 20px 10px 10px 10px
-}
-
-.text-area-container {
- display: flex;
- flex-direction: column;
- justify-content: space-between;
- margin-right: 20px;
- margin-left: 10px;
- gap: 10px
-}
-
-.text-area {
- width: 300px;
- height: 200px;
- resize: none;
- border: 1px solid var(--dark-silverish);
- border-radius: 4px;
- padding: 10px;
- line-height: 1.6
 }
 
 .output-container {
@@ -995,7 +777,7 @@ text {
 .modal {
   display: none;
   position: fixed;
-  z-index: 1;
+  z-index: 10;
   left: 0;
   top: 0;
   width: 100%;
@@ -1009,14 +791,14 @@ text {
   background-color: var(--light-silverish);
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid var(--dark-silverish);
+  border: 1px solid var(--dark-tealish);
   width: 80%;
   max-width: 600px;
   text-align: center;
 }
 
 .close {
-  color: var(--dark-silverish);
+  color: var(--dark-pinkish);
   float: right;
   font-size: 28px;
   font-weight: bold;
@@ -1024,7 +806,7 @@ text {
 
 .close:hover,
 .close:focus {
-  color: var(--very-dark-tealish);
+  color: var(--dark-pinkish);
   text-decoration: none;
   cursor: pointer;
 }
@@ -1091,11 +873,11 @@ text {
 .export-btn,
 .export-viz-btn,
 .copy-to-designer-btn,
-.compare-btn{
-    /* Add your existing styles */
-    display: inline-flex; /* Use flex to center align the content */
-    align-items: center; /* Align content vertically */
-    justify-content: center; /* Align content horizontally */
+.compare-btn,
+.generate-button{
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
 }
 
 .tab-container {
