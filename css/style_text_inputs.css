@@ -10,19 +10,19 @@
  max-width: 80ch;
  word-wrap: break-word;
  text-align: center;
-  border-color: #f8f0e8;
+  border-color: var(--light-yellowish);
 }
 
 .text-input.active,
 .text-input-tab3.active{
- border-color: #cb7615;
- background-color: #e7eee8
+ border-color: var(--deep-yellowish);
+ background-color: var(--light-silverish)
 }
 
 .text-input[data-placeholder]:empty::before,
 .text-input-tab3[data-placeholder]:empty::before{
  content: attr(data-placeholder);
- color: #999;
+ color: var(--dark-silverish);
  pointer-events: none
 }
 
