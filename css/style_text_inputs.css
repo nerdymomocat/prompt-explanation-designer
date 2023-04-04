@@ -1,4 +1,5 @@
-.text-input {
+.text-input,
+.text-input-tab3 {
  flex: 1;
  min-height: 100px;
  padding: 10px;
@@ -12,18 +13,21 @@
   border-color: #f8f0e8;
 }
 
-.text-input.active {
+.text-input.active,
+.text-input-tab3.active{
  border-color: #cb7615;
  background-color: #e7eee8
 }
 
-.text-input[data-placeholder]:empty::before {
+.text-input[data-placeholder]:empty::before,
+.text-input-tab3[data-placeholder]:empty::before{
  content: attr(data-placeholder);
  color: #999;
  pointer-events: none
 }
 
-.text-input:focus[data-placeholder]:empty::before {
+.text-input:focus[data-placeholder]:empty::before,
+.text-input-tab3:focus[data-placeholder]:empty::before{
  content: none
 }
 
@@ -43,16 +47,8 @@
 }
 
 .text-input-tab3-wrapper {
-  width: 100%;
-  height: 100%;
-}
-
-.text-input-tab3 {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  resize: none;
-  overflow: auto;
+ display: flex;
+ flex-direction: column;
+ flex: 1;
+ min-width: 300px
 }
