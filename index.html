@@ -55,8 +55,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
       <div class="modal-content">
         <div class="modal-header">
           <button id="saveOptions" class="modal-button" title="Save">
-            <object type="image/svg+xml" data="svgs/save_icon.svg" class="save-icon" width="24" height="24">
-            </object>
+            <i class="fas fa-save"></i>
           </button>
           <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
           <h3 class="modal-title">Edit Explanation Categories</h3>
@@ -68,24 +67,25 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
       <div class="hamburger-menu" id="hamburger-menu">
         <i class="fas fa-bars"></i>
         <div class="dropdown-menu" id="dropdown-menu">
-          <div class="dropdown-item current" data-target="tab1-header"><i class="fas fa-balance-scale"></i> Texts</div>
-          <div class="dropdown-item" data-target="tab2-header"><i class="fas fa-edit"></i> Text</div>
-          <div class="dropdown-item" data-target="tab2b-header"><i class="fas fa-edit"></i> Two Texts
+          <div class="dropdown-item current" data-target="tab1-header"><i class="fas fa-balance-scale"></i>&nbsp;Texts
           </div>
-          <div class="dropdown-item" data-target="tab3-header"><i class="fas fa-edit"></i> Prompt +
+          <div class="dropdown-item" data-target="tab2-header"><i class="fas fa-info-circle"></i>&nbsp;Text</div>
+          <div class="dropdown-item" data-target="tab2b-header"><i class="fas fa-info-circle"></i>&nbsp;Two Texts
+          </div>
+          <div class="dropdown-item" data-target="tab3-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt +
             Generation</div>
-          <div class="dropdown-item" data-target="tab4-header"><i class="fas fa-edit"></i> Prompt + Two
+          <div class="dropdown-item" data-target="tab4-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt + Two
             Generations
           </div>
-          <div class="dropdown-item" data-target="tab5-header"><i class="fas fa-balance-scale"></i> <i
-              class="fas fa-edit"></i> Two (Prompts + Generations)</div>
+          <div class="dropdown-item" data-target="tab5-header"><i class="fas fa-balance-scale"></i>&nbsp;<i
+              class="fas fa-info-circle"></i>&nbsp;Two (Prompts + Generations)</div>
         </div>
       </div>
       <div class="horizontal-accordion">
 
         <div class="accordion-heading" id="tab1-header">
           <span class="rotated-content">
-            <i class="fas fa-balance-scale"></i> Texts
+            <i class="fas fa-balance-scale"></i>&nbsp;Texts
           </span>
         </div>
         <div class="accordion-content" id="tab1">
@@ -95,22 +95,18 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
               <textarea class="text-area" id="text-area-2" placeholder="New Text"></textarea>
             </div>
             <div class="output-container">
-              <button class="compare-btn"> <object type="image/svg+xml" data="svgs/compare.svg" width="16" height="16"
-                  fill="currentColor"> </object>
-                Compare</button>
+              <button class="compare-btn"> <i class="fas fa-balance-scale"></i>&nbsp;Compare</button>
               <div id="results-container">
                 <div id="diff-results" data-placeholder="Comparison Output Will Appear Here"></div>
               </div>
-              <button class="copy-to-designer-btn"> <object type="image/svg+xml" data="svgs/copy.svg" width="16"
-                  height="16" fill="currentColor">
-                </object>Copy to Designer</button>
+              <button class="copy-to-designer-btn"> <i class="fas fa-copy"></i>&nbsp;Copy to Designer</button>
             </div>
           </div>
         </div>
 
         <div class="accordion-heading" id="tab2-header">
           <span class="rotated-content">
-            <i class="fas fa-edit"></i> Text
+            <i class="fas fa-info-circle"></i>&nbsp;Text
           </span>
         </div>
 
@@ -138,10 +134,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
             <br>
             <div class="button-container">
-              <button class="export-btn"><object type="image/svg+xml" data="svgs/download.svg" width="16"
-                  height="16"></object> Download Indexed Explanation</button>
-              <button class="export-viz-btn"><object type="image/svg+xml" data="svgs/magic.svg" width="16" height="16"
-                  fill="currentColor"></object> Generate Canvas Visualization</button>
+              <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+              <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
             </div>
 
             <div class="visualization" id="visualization"><span class="hidden-trigger" id="hiddenTrigger"
@@ -163,14 +157,14 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
         <div class="accordion-heading" id="tab2b-header">
           <span class="rotated-content">
-            <i class="fas fa-edit"></i> Two Texts
+            <i class="fas fa-info-circle"></i>&nbsp;Two Texts
           </span>
         </div>
         <div class="accordion-content" id="tab2b"> </div>
 
         <div class="accordion-heading" id="tab3-header">
           <span class="rotated-content">
-            <i class="fas fa-edit"></i> Prompt + Generation
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Generation
           </span>
         </div>
 
@@ -179,7 +173,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="modal-header-gen">
               <div class="modal-buttons-gen">
                 <button id="saveOptions-gen">
-                  <object type="image/svg+xml" data="svgs/save_icon.svg" width="16" height="16"></object>
+                  <i class="fas fa-save"></i>
                 </button>
                 <button id="closeSettingsModal-gen" title="Close">&#x2715;</button>
               </div>
@@ -234,8 +228,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                     <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="temperature-slider" />
                   </div>
                 </div>
-                <button class="generate-button"><object type="image/svg+xml" data="svgs/ai.svg" width="16"
-                    height="16"></object>Generate Output</button>
+                <button class="generate-button"><i class="fas fa-robot"></i>&nbsp;Generate Output</button>
               </div>
               <div class="grid-item grid-item-content-editable">
                 <div class="text-input-tab3-wrapper">
@@ -262,10 +255,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
           </div>
           <div class="button-container">
-            <button class="export-btn"><object type="image/svg+xml" data="svgs/download.svg" width="16"
-                height="16"></object> Download Indexed Explanation</button>
-            <button class="export-viz-btn"><object type="image/svg+xml" data="svgs/magic.svg" width="16" height="16"
-                fill="currentColor"></object> Generate Canvas Visualization</button>
+            <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+            <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
           </div>
           <div class="visualization" id="visualization-tab3"><span class="hidden-trigger" id="hiddenTrigger-tab3"
               style="display: none;"></span></div>
@@ -274,14 +265,15 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
         <div class="accordion-heading" id="tab4-header">
           <span class="rotated-content">
-            <i class="fas fa-edit"></i> Prompt + Two Generations
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Two Generations
           </span>
         </div>
         <div class="accordion-content" id="tab4"> </div>
 
         <div class="accordion-heading" id="tab5-header">
           <span class="rotated-content">
-            <i class="fas fa-balance-scale"></i> <i class="fas fa-edit"></i> Two (Prompts + Generations)
+            <i class="fas fa-balance-scale"></i>&nbsp;<i class="fas fa-info-circle"></i>&nbsp;Two (Prompts +
+            Generations)
           </span>
         </div>
 
@@ -306,8 +298,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
       <p>&copy; 2023 Text Explanation Designer. All rights reserved.</p>
       <div class="open-source">
         <a href="https://github.com/nerdymomocat/prompt-explanation-designer/" target="_blank">
-          <img src="https://cdnjs.cloudflare.com/ajax/libs/octicons/8.5.0/svg/mark-github.svg" alt="GitHub"
-            class="github-logo" />
+          <i class="fab fa-github" alt="GitHub" class="github-logo"></i>
           Open Source
         </a>
       </div>
