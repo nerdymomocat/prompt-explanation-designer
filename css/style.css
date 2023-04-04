@@ -1,5 +1,19 @@
+:root {
+  --light-tealish: #93E4D2;
+  --very-light-tealish:#C2E5E3;
+  --light-yellowish: #FAE1A8;
+  --dark-yellowish: #E7A16E;
+  --dark-pinkish: #E87189;
+  --light-pinkish: #F8D4E9;
+  --light-silverish: #EEEEEC;
+  --dark-tealish: #698F97;
+  --dark-silverish: #B4B8BD;
+  --very-dark-tealish: #536373;
+}
+
+
 .text-border {
- border: 2px solid #c16c0b;
+ border: 2px solid var(--dark-yellowish);
  border-radius: 5px;
  padding: 2px 4px;
  width: 150px;
@@ -7,7 +21,7 @@
  display: inline-block;
  text-align: center;
  line-height: 22px;
- background-color: #fff9f0
+ background-color:var(--light-silverish)
 }
 
 .header {
@@ -87,13 +101,13 @@
 
 .footer {
  width: 100%;
- background-color: #d0e5c3;
+ background-color: var(--light-tealish);
  padding: 20px 0
 }
 
 .footer-content {
  text-align: center;
- color: #085e36;
+ color: var(--dark-tealish);
  font-size: 14px
 }
 
@@ -161,17 +175,13 @@ body {
   position: relative;
 }
 
-
 .sidebar-tab3 {
-  background-color: #f1f1f1;
+  background-color: var(--light-silverish);
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--dark-silverish);
 }
 
 .settings-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
   background-color: transparent;
   border: none;
   font-size: 16px;
@@ -179,16 +189,19 @@ body {
 }
 
 .generate-button {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   padding: 10px 20px;
   border: none;
-  background-color: #40dca5;
+  background-color: var(--light-tealish);
   color: white;
   font-size: 16px;
   cursor: pointer;
+}
+
+.grid-item-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px; /* Adjust the gap between the buttons */
 }
 
 
@@ -204,7 +217,7 @@ body {
 .export-btn {
  margin-top: 10px;
  padding: 5px 10px;
- background-color: #44835a;
+ background-color: var(--dark-tealish);
  color: #fff;
  border: none;
  border-radius: 5px;
@@ -216,14 +229,14 @@ body {
 
 
 .export-btn:hover {
- background-color: #335a30
+ background-color: var(--very-dark-tealish);
 }
 
 
 .color-popup {
  position: absolute;
- background-color: #faf8f5;
- border: 1px solid #d27c04;
+ background-color: var(--light-silverish);
+ border: 1px solid var(--dark-yellowish);
  padding: 10px;
  border-radius: 5px;
  z-index: 1000;
@@ -265,7 +278,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .color-description-input:focus {
- box-shadow: inset 0 0 0 1px #ccc;
+ box-shadow: inset 0 0 0 1px var(--dark-silverish);
 }
 
 
@@ -305,7 +318,7 @@ input[type="color"]::-webkit-color-swatch {
  position: absolute;
  top: 0;
  right: 0;
- background-color: #f7f7f7;
+ background-color: var(--light-silverish);
  border: none;
  font-size: 12px;
  padding: 2px 5px;
@@ -318,7 +331,7 @@ input[type="color"]::-webkit-color-swatch {
 
 .strikethrough {
  text-decoration: line-through;
- color: #D3D3D3;
+ color: var(--dark-silverish);
  font-style: italic
 }
 
@@ -331,7 +344,7 @@ input[type="color"]::-webkit-color-swatch {
 .horizontal-line {
  width: 100%;
  height: 1px;
- background-color: #4c7051;
+ background-color: var(--dark-tealish);
  z-index: -1
 }
 
@@ -346,19 +359,19 @@ input[type="color"]::-webkit-color-swatch {
  padding: 0 4px;
   line-height: 1.4;
   font-weight: 700;
-  color: #218246;
+  color: var(--very-dark-tealish);
   
 }
 
 .horizontal-line-text:focus {
- box-shadow: inset 0 0 0 1px #ccc;
+ box-shadow: inset 0 0 0 1px var(--dark-silverish);
 }
 
 .delete-button.horizontal-line-delete {
  position: absolute;
  top: -10px;
  right: -15px;
- background-color: #f2f2f2;
+ background-color: var(--light-silverish);
  border: none;
  border-radius: 50%;
  font-size: 12px;
@@ -386,8 +399,8 @@ input[type="color"]::-webkit-color-swatch {
  top: 50%;
  left: 50%;
  transform: translate(-50%, -50%);
- background-color: #ffffff;
- border: 1px solid #000000;
+ background-color: var(--light-silverish);
+ border: 1px solid var(--dark-silverish);
  border-radius: 50%;
  width: 30px;
  height: 30px;
@@ -395,7 +408,7 @@ input[type="color"]::-webkit-color-swatch {
  text-align: center;
  font-size: 20px;
  font-weight: 500;
- color: #114b27;
+ color: var(--very-dark-tealish);
  cursor: pointer;
  display: none;
  z-index: 10
@@ -407,7 +420,7 @@ input[type="color"]::-webkit-color-swatch {
  left: 50%;
  top: 0;
  transform: translate(-50%, -100%);
- background-color: #fff;
+ background-color: var(--light-silverish);
  border: none;
  cursor: pointer
 }
@@ -537,7 +550,7 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .delete-input-button:hover {
- color: #f00;
+ color: var(--dark-pinkish);
  background-color: rgba(255, 255, 255, 0.5)
 }
 
@@ -557,7 +570,7 @@ input[type="color"]::-webkit-color-swatch {
  margin-bottom: 7px;
  margin-right: 15px;
  margin-left: 15px;
- color: #333;
+ color: var(--very-dark-tealish);
     padding: 5px;
   line-height: 1.4;
 }
@@ -569,12 +582,12 @@ input[type="color"]::-webkit-color-swatch {
 
 del {
  text-decoration: line-through;
- color: #FF0000
+ color: var(--dark-pinkish)
 }
 
 ins {
  text-decoration: none;
- color: #008000
+ color: var(--light-tealish)
 }
 .horizontal-accordion {
   display: flex;
@@ -586,20 +599,20 @@ ins {
   cursor: pointer;
   padding: 10px;
   font-size: 14px;
-  color: #008000;
+  color: var(--dark-tealish);
   width: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: transparent;
-  border-right: 1px solid #d1e0d2;
+  border-right: 1px solid var(--very-light-tealish);
   box-shadow: 2px 0 4px rgba(184, 204, 184, 0.1);  
   transition: all 0.3s;
 }
 
 .accordion-heading.active {
-  color: #ff7300;
-  border-right: 1px solid #e08910;
+  color: var(--dark-yellowish);
+  border-right: 1px solid var(--light-yellowish);
   box-shadow: 2px 0 4px rgba(255, 170, 51, 0.3);
 }
 
@@ -634,7 +647,7 @@ ins {
   font-size: 24px;
   z-index: 10;
     padding: 5px;
-  background: linear-gradient(to right, #bfaed5, #664594);
+  background: linear-gradient(to right, var(--light-tealish), var(--dark-tealish));
   -webkit-background-clip: text; /* Clip the background to the text for WebKit browsers */
   background-clip: text; /* Clip the background to the text */
   color: transparent; /* Make the original text color transparent */
@@ -658,14 +671,14 @@ ins {
   padding: 8px 16px; /* Adjust padding for smaller text */
   cursor: pointer;
   font-size: 14px; /* Make the text smaller */
-  color: #107012;
+  color: var(--dark-tealish);
   font-family: monospace; /* Add this line to set the font to monospace */
 }
 
 
 .dropdown-item:hover {
   background-color: rgba(206, 238, 210, 0.7);
-  color: #8e6506;
+  color: var(--very-dark-tealish);
   cursor: pointer; /* Add this line to change the cursor to a pointer on hover */
 }
 
@@ -731,7 +744,7 @@ main {
  width: 300px;
  height: 200px;
  resize: none;
- border: 1px solid #ccc;
+ border: 1px solid var(--dark-silverish);
  border-radius: 4px;
  padding: 10px;
  line-height: 1.6
@@ -748,8 +761,7 @@ main {
  margin-top: 20px;
  margin-bottom: 20px;
  padding: 5px 10px;
- background-color: #44835a;
- color: #fff;
+ background-color: var(--light-tealish);
  border: none;
  border-radius: 5px;
  cursor: pointer;
@@ -757,7 +769,7 @@ main {
 }
 
 .compare-btn:hover {
- background-color: #335a30
+ background-color: var(--dark-tealish)
 }
 
 .copy-to-designer-btn {
@@ -765,8 +777,7 @@ main {
  margin-top: 8px;
  margin-bottom: 20px;
  padding: 5px 10px;
- background-color: #44835a;
- color: #fff;
+ background-color: var(--light-tealish);
  border: none;
  border-radius: 5px;
  cursor: pointer;
@@ -774,11 +785,11 @@ main {
 }
 
 .copy-to-designer-btn:hover {
- background-color: #335a30
+ background-color: var(--dark-tealish)
 }
 
 #diff-results {
- border: 1px solid #ccc;
+ border: 1px solid var(--dark-silverish);
  padding: 10px;
  width: 300px;
  height: 200px;
@@ -794,7 +805,7 @@ main {
   display: block;
   pointer-events: none;
   opacity: 0.6;
-  color: #999;
+  color: var(--dark-silverish);
 }
 
 #diff-results:not(:empty)::before {
@@ -814,8 +825,7 @@ main {
 .add-description-button {
  padding: 2px;
  font-size: 12px;
- background-color: #779278;
- color: #FFFFFF;
+ background-color: var(--light-tealish);
  border: none;
  border-radius: 4px;
  cursor: pointer;
@@ -836,10 +846,10 @@ main {
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background-color: var(--light-silverish);
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid #888;
+  border: 1px solid var(--dark-silverish);
   width: 80%;
   max-width: 400px;
   border-radius: 10px;
@@ -859,7 +869,7 @@ main {
   font-size: 16px; /* Reduced font size */
   margin-right: 8px;
   padding: 0;
-  color: #888;
+  color: var(--dark-silverish);
   width: 24px; /* Set width and height */
   height: 24px;
   display: flex; /* Align the icon in the center */
@@ -868,11 +878,11 @@ main {
 }
 
 .modal-button:hover {
-  color: #444;
+  color: var(--very-dark-tealish);
 }
 
 .save-icon {
-  fill: #678967;
+  fill: var(--dark-tealish);
 }
 
 #optionsTextarea {
@@ -884,14 +894,14 @@ main {
   border-radius: 5px;
   line-height: 1.6;
   padding: 10px;
-  border-color: #c96d18
+  border-color: var(--dark-yellowish);
 }
 .modal-title {
   flex-grow: 1; 
   text-align: center; 
   margin: 0;
   font-size: 14px;
-  color: #c96d18;
+  color: var(--dark-yellowish);
   font-weight: bold
 }
 
@@ -918,8 +928,7 @@ main {
 .export-viz-btn{
  margin-top: 10px;
  padding: 5px 10px;
- background-color: #cb9b34;
- color: #fff;
+ background-color:var(--light-yellowish);
  border: none;
  border-radius: 5px;
  cursor: pointer;
@@ -928,16 +937,16 @@ main {
  text-align: center
 }
 .export-viz-btn:hover {
- background-color: #f5b400
+ background-color: var(--dark-yellowish)
 }
 
 .annotation {
       font-size: 12px;
-      fill: #ff0000;
+      fill: var(--dark-pinkish);
     }
 
 text {
-  fill: #000;
+  fill: var(--very-dark-tealish);
 }
 
 .text-node {
@@ -968,7 +977,7 @@ text {
   fill-opacity: 1;
 }
 #visualization {
-  border: 1px solid #c9e8cd;
+  border: 1px solid var(--very-light-tealish);
   border-radius: 10px;
   width: 100%;
   padding-bottom: 55.83%; /* (335 / 600) * 100 */
@@ -997,17 +1006,17 @@ text {
 
 .modal-content {
   position: relative;
-  background-color: #f1f1f1;
+  background-color: var(--light-silverish);
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid #888;
+  border: 1px solid var(--dark-silverish);
   width: 80%;
   max-width: 600px;
   text-align: center;
 }
 
 .close {
-  color: #aaa;
+  color: var(--dark-silverish);
   float: right;
   font-size: 28px;
   font-weight: bold;
@@ -1015,7 +1024,7 @@ text {
 
 .close:hover,
 .close:focus {
-  color: black;
+  color: var(--very-dark-tealish);
   text-decoration: none;
   cursor: pointer;
 }
@@ -1029,8 +1038,7 @@ text {
 .download-btn{
  margin-top: 10px;
  padding: 5px 10px;
- background-color: #e2a740;
- color: #fff;
+ background-color: var(--light-yellowish);
  border: none;
  border-radius: 5px;
  cursor: pointer;
@@ -1039,7 +1047,7 @@ text {
  text-align: center
 }
 .download-btn:hover {
- background-color: #d6931f
+ background-color: var(--dark-yellowish)
 }
 
 #generated-image {
@@ -1050,7 +1058,7 @@ text {
 }
 
 .item-placeholder {
-  color: gray; /* Adjust the color as needed */
+  color: var(--dark-silverish); /* Adjust the color as needed */
   font-style: italic; /* Adjust the font style as needed */
   position: absolute;
   text-align: center;
@@ -1068,7 +1076,7 @@ text {
   background: none;
   cursor: pointer;
   padding: 3px;
-  color: #000; /* Set the color of the SVG icon */
+  color: var(--dark-tealish); /* Set the color of the SVG icon */
 }
 
 .download-svg-btn svg {
@@ -1077,7 +1085,7 @@ text {
 }
 
 .download-svg-btn:hover {
-  color: #555; /* Set the color of the SVG icon on hover */
+  color: var(--very-dark-tealish); /* Set the color of the SVG icon on hover */
 }
 
 .export-btn,
@@ -1101,22 +1109,22 @@ text {
 }
 
 .tab-link {
-  background-color: #f1f1f1;
+  background-color: var(--light-silverish);
   border: none;
   outline: none;
   cursor: pointer;
   padding: 10px 20px;
   font-size: 16px;
-  color: #000;
+  color: var(--very-dark-tealish);
   transition: 0.3s;
 }
 
 .tab-link:hover {
-  background-color: #ddd;
+  background-color: var(--light-silverish);
 }
 
 .tab-link.active {
-  background-color: #ccc;
+  background-color: var(--dark-silverish);
 }
 
 .tab-content {
