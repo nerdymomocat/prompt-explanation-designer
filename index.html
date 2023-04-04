@@ -4,8 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/media_queries.css">
+  <link rel="stylesheet" href="css/style_text_inputs.css">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" />
+
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.3/d3.min.js"></script>
@@ -20,7 +26,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
 
 
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
 
 
 
@@ -36,10 +42,10 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 <body>
   <header class="header">
     <div class="logo-container">
-      <img class="logo" src="logo.png" alt="Logo">
+      <img class="logo" src="images/logo.png" alt="Logo">
     </div>
     <div class="header-background">
-      <img class="header-bg" src="header-background.jpg" alt="Header Background">
+      <img class="header-bg" src="images/header-background.jpg" alt="Header Background">
     </div>
   </header>
   <main>
@@ -180,7 +186,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="grid-item grid-item-content-editable">
               <div class="text-input-tab3-wrapper">
                 <div class="text-input-tab3" id="text-input-1" contenteditable="true" spellcheck="false"
-                  data-placeholder="Content Editable 1"></div>
+                  data-placeholder="Add Prompt Here"></div>
               </div>
             </div>
             <div class="grid-item grid-item-sidebar">
@@ -191,7 +197,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="grid-item grid-item-content-editable">
               <div class="text-input-tab3-wrapper">
                 <div class="text-input-tab3" id="text-input-3" contenteditable="true" spellcheck="false"
-                  data-placeholder="Content Editable 3">
+                  data-placeholder="Generation Appears Here. Add the API key and change the model by clicking on the settings icon on the top right.">
                   <button class="settings-button">
                     <i class="fas fa-cog"></i>
                   </button>
@@ -234,7 +240,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
       </div>
     </div>
   </footer>
-  <script type="module" src="script.js"></script>
+  <script type="module" src="scripts/script.js"></script>
 </body>
 
 </html>
