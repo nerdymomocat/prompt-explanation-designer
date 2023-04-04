@@ -259,7 +259,7 @@ export const create_viz = () => {
       annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
 
       // Update the x attribute for each tspan inside annotationText
-annotationText.selectAll('tspan').attr('x', newCoords.x);
+      annotationText.selectAll('tspan').attr('x', newCoords.x);
 
 
 
@@ -452,10 +452,7 @@ function addDownloadButton(svg) {
 
   // Add the SVG download icon
   downloadButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path fill-rule="evenodd" d="M14 9a1 1 0 0 1 1 1v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a1 1 0 0 1 2 0v3h10v-3a1 1 0 0 1 1-1ZM8 1a1 1 0 0 1 1 1v4.586l1.293-1.293a1 1 0 1 1 1.414 1.414L8 10.414 4.293 6.707a1 1 0 0 1 1.414-1.414L7 6.586V2a1 1 0 0 1 1-1Z"/>
-    </svg>
-  `;
+  <object type="image/svg+xml" data="svgs/download.svg" width="24" height="24" fill="currentColor"></object>`;
 
   downloadButton.onclick = () => {
     console.log("Download button clicked...");
