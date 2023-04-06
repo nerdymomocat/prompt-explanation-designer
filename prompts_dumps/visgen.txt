@@ -1,0 +1,920 @@
+ME: i have these 5 classes, create a detailed explanation of them with the text inputs, corresponding sidebars all these use, with class names. we will use that information to refractor a function later:
+
+class ExplainedPromptExplainedGen {
+  constructor(textInputOptions, inputComponentOptions, sidebarOptions) {
+    this.container = document.createElement('div');
+
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: textInputOptions.explainedTextInputContainerId,
+      sidebarOptions: {
+        containerId: sidebarOptions.explainedTextInputSidebarContainerId,
+        sidebarContentId: sidebarOptions.explainedTextInputSidebarContentId,
+      },
+    });
+
+    this.explainedTextInputGen = new ExplainedTextInputGen(
+      textInputOptions,
+      this.explainedTextInput.textInput, // Pass the textInput as inputComponent
+      sidebarOptions
+    );
+
+    // Append elements to the container
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen.textInputWrapper);
+  }
+}
+
+class ExplainedPromptExplained2Gen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: options.explainedTextInputId,
+      sidebarOptions: options.explainedTextInputSidebarOptions,
+    });
+
+    this.explainedTextInputGen1 = new ExplainedTextInputGen({
+      textInputId: options.explainedTextInputGen1Id,
+      inputComponent: this.explainedTextInput.textInput,
+      sidebarOptions: options.explainedTextInputGen1SidebarOptions,
+    });
+
+    this.explainedTextInputGen2 = new ExplainedTextInputGen({
+      textInputId: options.explainedTextInputGen2Id,
+      inputComponent: this.explainedTextInput.textInput,
+      sidebarOptions: options.explainedTextInputGen2SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen2.sidebarComponent.container);
+  }
+}
+
+
+class TwoExplainedPromptGen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.explainedTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.explainedTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.explainedTextInputSidebarContentId,
+    });
+
+    this.textInputGen1 = new TextInputGen({
+      textInputId: options.textInputGen1Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+    });
+
+    this.textInputGen2 = new TextInputGen({
+      textInputId: options.textInputGen2Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.textInputGen1.textInputWrapper);
+    this.container.appendChild(this.textInputGen2.textInputWrapper);
+  }
+}
+
+
+class TwoExplainedPromptExplainedGen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.explainedTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.explainedTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.explainedTextInputSidebarContentId,
+    });
+
+    this.explainedTextInputGen1 = new ExplainedTextInputGen({
+      textInputOptions: { textInputId: options.explainedTextInputGen1Id },
+      inputComponentOptions: { inputComponent: this.textInputsCompareSelf.textInput.textInput },
+      sidebarOptions: options.explainedTextInputGen1SidebarOptions,
+    });
+
+    this.explainedTextInputGen2 = new ExplainedTextInputGen({
+      textInputOptions: { textInputId: options.explainedTextInputGen2Id },
+      inputComponentOptions: { inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput },
+      sidebarOptions: options.explainedTextInputGen2SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.explainedTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen2.sidebarComponent.container);
+  }
+}
+
+
+class TwoExplainedPromptExplained2Gen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.eTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.eTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.eTextInputSidebarContentId,
+    });
+
+    this.eTextInputGen1 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen1Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+      sidebarOptions: options.eTextInputGen1SidebarOptions,
+    });
+
+    this.eTextInputGen2 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen2Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+      sidebarOptions: options.eTextInputGen2SidebarOptions,
+    });
+
+    this.eTextInputGen3 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen3Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+      sidebarOptions: options.eTextInputGen3SidebarOptions,
+    });
+
+    this.eTextInputGen4 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen4Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+      sidebarOptions: options.eTextInputGen4SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.eTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen2.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen3.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen3.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen4.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen4.sidebarComponent.container);
+  }
+}
+
+
+these are the basic classes they use:
+
+class TextInputsCompareSelf {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInput = new TextInput({ textInputId: options.textInputContainerId });
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: options.explainedTextInputContainerId,
+      sidebarOptions: {
+        containerId: options.explainedTextInputSidebarContainerId,
+        sidebarContentId: options.explainedTextInputSidebarContentId,
+      },
+    });
+
+    this.compareButton = document.createElement('button');
+    this.compareButton.textContent = 'Compare';
+    this.compareButton.addEventListener('click', () => {
+      // Use this.textInput and this.explainedTextInput.textInput as inputs
+      // and produce output in the TextInput component of ExplainedTextInput
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInput.textInputWrapper);
+    this.container.appendChild(this.compareButton);
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+  }
+}
+
+class TextInputGen extends TextInput {
+  constructor(textInputOptions, inputComponent) {
+    super(textInputOptions);
+
+    this.inputComponent = inputComponent;
+
+    this.generateButton = document.createElement('button');
+    this.generateButton.textContent = 'Generate Output';
+    this.generateButton.addEventListener('click', () => {
+      // ...
+    });
+
+    this.dropdown = document.createElement('select');
+    this.populateDropdown(models);
+
+    this.slider = document.createElement('input');
+    this.slider.type = 'range';
+    this.slider.min = 0.1;
+    this.slider.max = 1.0;
+    this.slider.step = 0.1;
+    this.slider.value = 0.5;
+
+    // Append elements to the container (textInputWrapper from TextInput class)
+    this.textInputWrapper.appendChild(this.generateButton);
+    this.textInputWrapper.appendChild(this.dropdown);
+    this.textInputWrapper.appendChild(this.slider);
+
+    this.generateButton.addEventListener('click', () => {
+      this.handleGenerateButtonClick();
+    });
+
+    // Create the temperature button and value icon
+    this.temperatureButton = document.createElement('button');
+    this.temperatureButton.classList.add('temperature-button');
+    this.temperatureButton.innerHTML = '<i class="fas fa-thermometer-half"></i>';
+
+    this.temperatureValueIcon = document.createElement('span');
+    this.temperatureValueIcon.classList.add('temperature-value');
+    this.temperatureValueIcon.textContent = this.slider.value;
+
+    this.temperatureButton.appendChild(this.temperatureValueIcon);
+
+    // Create the temperature slider popup
+    this.temperatureSliderPopup = document.createElement('div');
+    this.temperatureSliderPopup.classList.add('temperature-slider-popup');
+    this.temperatureSliderPopup.style.display = 'none';
+    this.temperatureSliderPopup.appendChild(this.slider);
+
+    // Append the temperature button and slider popup to the textInputWrapper
+    this.textInputWrapper.appendChild(this.temperatureButton);
+    this.textInputWrapper.appendChild(this.temperatureSliderPopup);
+
+    // Initialize the temperature slider popup
+    this.initializeTemperatureSliderPopup();
+
+    // Create the settings button
+    this.settingsButton = document.createElement('button');
+    this.settingsButton.classList.add('settings-button-gen');
+    this.settingsButton.innerHTML = '<i class="fas fa-cog"></i>';
+    this.textInputWrapper.appendChild(this.settingsButton);
+
+    // Initialize the settings modal
+    this.initializeSettingsModal();
+  }
+
+  async handleGenerateButtonClick() {
+    const apiKey = localStorage.getItem("apiKey");
+    const modelName = this.dropdown.value;
+    const prompt = this.inputComponent.textInput.innerText; // Use this.inputComponent.textInput for prompt
+    const temperature = this.slider.value;
+    const textInput3 = this.textInput; // Use this.textInput for textInput3
+    const current_date = new Date().toLocaleDateString();
+    let system_content;
+
+    if (modelName === "gpt-4") {
+      system_content = "You are GPT-4, a large language model trained by OpenAI. Answer as concisely as possible";
+    } else {
+      system_content = "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: 2021-09-01 Current date: " + current_date;
+    }
+
+    if (!apiKey) {
+      alert("Please add the API key in settings.");
+      return;
+    }
+
+    // Clear the text-input-3 and change the placeholder to "Loading..."
+    textInput3.innerText = "";
+    textInput3.setAttribute("data-placeholder", "Loading...");
+
+    try {
+      const assistantMessage = await getChatCompletion(apiKey, modelName, prompt, temperature, system_content);
+      // Revert the placeholder and display the assistant's message
+      textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+      textInput3.innerText = assistantMessage;
+    } catch (error) {
+      // Revert the placeholder and display an error message
+      textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+      textInput3.innerText = "Error: " + error.message;
+    }
+  }
+
+  populateDropdown(models) {
+    models.forEach((model) => {
+      const option = document.createElement('option');
+      option.value = model.value;
+      option.textContent = model.label;
+      this.dropdown.appendChild(option);
+    });
+  }
+
+  initializeTemperatureSliderPopup() {
+    this.temperatureButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      this.temperatureSliderPopup.style.display = 'block';
+    });
+
+    this.slider.addEventListener('input', () => {
+      this.temperatureValueIcon.textContent = this.slider.value;
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!this.temperatureSliderPopup.contains(event.target)) {
+        this.temperatureSliderPopup.style.display = 'none';
+      }
+    });
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        this.temperatureSliderPopup.style.display = 'none';
+      }
+    });
+  }
+
+  initializeSettingsModal() {
+    const apiKey = localStorage.getItem("apiKey");
+    const apiKeyTextbox = document.getElementById("textbox-gen");
+    const textInput3 = this.textInput;
+
+    if (apiKey) {
+      apiKeyTextbox.value = apiKey;
+      textInput3.setAttribute("data-placeholder", "Generation Appears Here");
+    } else {
+      textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+    }
+
+    this.settingsButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      document.getElementById("settingsModal-gen").style.display = "block";
+    });
+
+    document.getElementById("saveOptions-gen").addEventListener("click", () => {
+      const apiKey = document.getElementById("textbox-gen").value;
+      localStorage.setItem("apiKey", apiKey);
+      document.getElementById("settingsModal-gen").style.display = "none";
+    });
+
+    document.getElementById("closeSettingsModal-gen").addEventListener("click", () => {
+      document.getElementById("settingsModal-gen").style.display = "none";
+    });
+
+    document.getElementById("settingsModal-gen").addEventListener("click", (event) => {
+      if (event.target === event.currentTarget) {
+        document.getElementById("saveOptions-gen").click();
+      }
+    });
+
+    window.addEventListener("keydown", (event) => {
+      const settingsModal = document.getElementById("settingsModal-gen");
+      if (event.key === "Escape") {
+        settingsModal.style.display = "none";
+      }
+    });
+  }
+
+
+}
+
+class ExplainedTextInput extends TextInput {
+  constructor(textInputOptions, inputComponentOptions, sidebarOptions) {
+    super(textInputOptions);
+
+    this.inputComponent = inputComponentOptions;
+    this.sidebarComponent = new Sidebar(sidebarOptions);
+
+    // Append elements to the container (textInputWrapper from TextInput class)
+    this.textInputWrapper.appendChild(this.sidebarComponent.wrapper);
+  }
+}
+
+class ExplainedTextInputGen extends ExplainedTextInput {}
+
+
+---
+Raycast AI: Here's a detailed explanation of the given classes:
+
+1. `ExplainedPromptExplainedGen`:
+   - A class that creates a container with an `ExplainedTextInput` and an `ExplainedTextInputGen` component.
+   - Text input options, input component options, and sidebar options are passed to the constructor.
+   - The elements are appended to the container.
+
+2. `ExplainedPromptExplained2Gen`:
+   - A class that creates a container with an `ExplainedTextInput`, `ExplainedTextInputGen1`, and `ExplainedTextInputGen2` components.
+   - Options are passed to the constructor.
+   - The elements are appended to the container.
+
+3. `TwoExplainedPromptGen`:
+   - A class that creates a container with a `TextInputsCompareSelf`, `textInputGen1`, and `textInputGen2` components.
+   - Options are passed to the constructor.
+   - The elements are appended to the container.
+
+4. `TwoExplainedPromptExplainedGen`:
+   - A class that creates a container with a `TextInputsCompareSelf`, `explainedTextInputGen1`, and `explainedTextInputGen2` components.
+   - Options are passed to the constructor.
+   - The elements are appended to the container.
+
+5. `TwoExplainedPromptExplained2Gen`:
+   - A class that creates a container with a `TextInputsCompareSelf`, `eTextInputGen1`, `eTextInputGen2`, `eTextInputGen3`, and `eTextInputGen4` components.
+   - Options are passed to the constructor.
+   - The elements are appended to the container.
+
+Basic classes used:
+
+1. `TextInputsCompareSelf`:
+   - A class that creates a container with a `TextInput`, `ExplainedTextInput`, and a compare button.
+   - Options are passed to the constructor.
+   - The elements are appended to the container.
+
+2. `TextInputGen` (extends `TextInput`):
+   - A class that adds a generate button, dropdown, and slider to the `TextInput` component.
+   - Text input options and an input component are passed to the constructor.
+   - The elements are appended to the container.
+
+3. `ExplainedTextInput` (extends `TextInput`):
+   - A class that adds a sidebar component to the `TextInput` component.
+   - Text input options, input component options, and sidebar options are passed to the constructor.
+   - The elements are appended to the container.
+
+4. `ExplainedTextInputGen` (extends `ExplainedTextInput`):
+   - A class that inherits from `ExplainedTextInput` without adding any new functionality.
+
+These classes are used to create containers with different combinations of text input and sidebar components, which can be used for generating and comparing text based on user input.
+---
+ME: alright, now we are using this information to correctly format the visualization function
+
+const visualization = document.getElementById('visualization');
+visualization.style.display = 'none';
+
+
+const clearVisualization = () => {
+  const visualization = document.querySelector('#visualization');
+  while (visualization.firstChild) {
+    visualization.removeChild(visualization.firstChild);
+  }
+};
+
+function getPaddedBBox(node, padding) {
+  const bbox = node.getBBox();
+  return {
+    x: bbox.x - padding,
+    y: bbox.y - padding,
+    width: bbox.width + 2 * padding,
+    height: bbox.height + 2 * padding,
+  };
+}
+
+const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, padding, excludeElement) => {
+  const minHeight = lineHeight * 3.5;
+  const allTextNodes = canvas.selectAll('text').filter(function() { return this !== excludeElement; });
+  let newY1 = y + minHeight;
+  let newY2 = y - minHeight;
+  let newX = (x) - width / 2;
+
+  const checkOverlap = (newY) => {
+    let overlapCount = 0;
+    allTextNodes.each(function() {
+      const bbox = getPaddedBBox(this, padding);
+      if (newX + width > bbox.x && newX < bbox.x + bbox.width &&
+        ((newY + height > bbox.y && newY < bbox.y + bbox.height) || (newY - height > bbox.y && newY - height < bbox.y + bbox.height))) {
+        overlapCount++;
+      }
+    });
+    return overlapCount;
+  };
+
+  const overlapCount1 = checkOverlap(newY1);
+  const overlapCount2 = checkOverlap(newY2);
+
+  console.log('Overlap count for newY1:', overlapCount1);
+  console.log('Overlap count for newY2:', overlapCount2);
+
+  const newY = (overlapCount1 === overlapCount2) ? (Math.random() < 0.5 ? newY1 : newY2) : (overlapCount1 < overlapCount2 ? newY1 : newY2);
+
+  return { x: newX, y: newY };
+};
+
+
+export const create_viz = () => {
+  clearVisualization();
+  const textInputDOM = document.querySelector('#text-input');
+  const sidebarDOM = document.querySelector('#sidebar-content');
+  const canvas = d3.select('#visualization')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%')
+    .attr('viewBox', '0 0 600 335')
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const plot = canvas.append('g');
+
+  const textNodes = Array.from(textInputDOM.childNodes);
+  const items = sidebarDOM.querySelectorAll('.item-wrapper');
+
+  const annotations = {};
+
+  items.forEach(item => {
+    const colorIndexContainer = item.querySelector('.color-index-container');
+    const color = colorIndexContainer.id.slice(-6);
+    const inputs = item.querySelectorAll('.color-description-input');
+    const dropdowns = item.querySelectorAll('.description-dropdown');
+    const annotationText = Array.from(inputs).map((input, index) => {
+      const prefix = dropdowns[index].value;
+      return `${prefix} ${input.value}`.trim();
+    }).join('\n');
+
+    annotations[color] = annotationText;
+  });
+
+  console.log('Annotations:', annotations);
+
+  let currentX = 0;
+  let currentY = 20;
+  const lineHeight = 20;
+  const maxLineWidth = 80 * 10;
+  const annotatedSpans = new Set();
+
+  // Add a new array to store the x positions of the words
+  const wordXPositions = [];
+  const annotationData = [];
+
+  textNodes.forEach((node, index) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const words = node.textContent.split(' ');
+
+      words.forEach(word => {
+        // Create a temporary text node to calculate the word width
+        const tempText = plot.append('text')
+          .attr('x', -9999) // Place the temporary text node off-screen
+          .attr('y', -9999)
+          .text(word);
+
+        const wordWidth = tempText.node().getComputedTextLength(); // Use getComputedTextLength() method
+        tempText.remove(); // Remove the temporary text node
+        const spaceBetweenWords = 5;
+
+        if (currentX + wordWidth > maxLineWidth) {
+          currentX = 0;
+          currentY += lineHeight + 15;
+        }
+
+        const text = plot.append('text')
+          .attr('x', currentX)
+          .attr('y', currentY)
+          .text(word);
+
+        // Store the x position of the word
+        wordXPositions.push(currentX);
+
+        currentX += wordWidth + spaceBetweenWords;
+      });
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const span = node;
+      const color = span.className.slice(-6);
+      const isHighlight = span.className.includes('color-highlight');
+      const isStrikethrough = span.className.includes('strikethrough');
+
+      const words = span.textContent.split(' ');
+      const middleWordIndex = Math.floor((words.length + 1) / 2) - 1;
+      let middleWordX;
+
+
+      words.forEach((word, wordIndex) => {
+
+        // Create a temporary text node to calculate the word width
+        const tempText = plot.append('text')
+          .attr('x', -9999) // Place the temporary text node off-screen
+          .attr('y', -9999)
+          .text(word);
+
+        const wordWidth = tempText.node().getComputedTextLength(); // Use getComputedTextLength() method
+        tempText.remove(); // Remove the temporary text node
+        const spaceBetweenWords = 5;
+
+
+        if (currentX + wordWidth > maxLineWidth) {
+          currentX = 0;
+          currentY += lineHeight + 15;
+        }
+
+        if (wordIndex === middleWordIndex) {
+          middleWordX = currentX;
+        }
+
+        const text = plot.append('text')
+          .attr('x', currentX)
+          .attr('y', currentY)
+          .text(word)
+          .style('pointer-events', 'none'); // Add this line
+
+        // Calculate the middle word's x position
+        if (wordIndex === middleWordIndex) {
+          middleWordX = currentX + wordWidth / 2;
+        }
+
+        if (isHighlight) {
+          const rect = plot.insert('rect', 'text')
+            .attr('x', currentX - 3)
+            .attr('y', currentY - 15)
+            .attr('width', wordWidth + 6)
+            .attr('height', lineHeight)
+            .attr('fill', `#${color}`);
+        }
+
+        if (isStrikethrough) {
+          const line = plot.insert('line', 'text')
+            .attr('x1', currentX - 3)
+            .attr('y1', currentY - 5)
+            .attr('x2', currentX + wordWidth + 2)
+            .attr('y2', currentY - 5)
+            .attr('stroke', `#${color}`)
+            .attr('stroke-width', 2);
+        }
+
+        currentX += wordWidth + spaceBetweenWords; // Change the spacing between words in highlight/strikethrough spans to 5 pixels
+      });
+      if (annotations[color] && !annotatedSpans.has(span)) {
+        annotatedSpans.add(span);
+
+        annotationData.push({
+          color,
+          middleWordX,
+          currentY,
+          annotationLines: annotations[color].split('\n')
+        });
+      }
+
+    }
+  });
+
+
+  // Second pass: add the annotation lines, circles, and texts (outside the first pass loop)
+  annotationData
+    .filter(({ annotationLines }) => {
+      return annotationLines.some(line => line.trim() !== '');
+    })
+    .forEach(({ color, middleWordX, currentY, annotationLines }) => {
+      console.log('Drawing annotation for color:', color);
+
+      // Create a group element to hold the annotation elements
+      const annotationGroup = plot.append('g')
+        .on('mouseover', function() { showDragHandles(d3.select(this)); })
+        .on('mouseout', function() { hideDragHandles(d3.select(this)); })
+        .on('touchstart', function() { showDragHandles(d3.select(this)); });
+
+      const annotationText = annotationGroup.append('text')
+        .attr('x', middleWordX - 6)
+        .attr('y', currentY)
+        .style('fill', darkenColor(`#${color}`))
+        .style('font-size', '14px')
+        .style('pointer-events', 'none'); // Add this line
+
+      annotationLines.forEach((line, index) => {
+        annotationText.append('tspan')
+          .text(line)
+          .attr('x', middleWordX - 6)
+          .attr('dy', index === 0 ? 0 : lineHeight);
+      });
+      const padding = 5;
+
+      const bbox = getPaddedBBox(annotationText.node(), padding);
+
+      const newCoords = findNonOverlappingRegion(plot, middleWordX, currentY, bbox.width, bbox.height, lineHeight, padding, annotationText.node());
+
+      annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
+
+      // Update the x attribute for each tspan inside annotationText
+      annotationText.selectAll('tspan').attr('x', newCoords.x);
+
+
+
+      const newBbox = getPaddedBBox(annotationText.node(), padding);
+      const centerXLeft = newBbox.x;
+      const centerXRight = newBbox.x + newBbox.width;
+      const centerYTop = newBbox.y;
+      const centerYBottom = newBbox.y + newBbox.height;
+
+      const centers = [
+        { x: centerXLeft, y: (centerYTop + centerYBottom) / 2 },
+        { x: centerXRight, y: (centerYTop + centerYBottom) / 2 },
+        { x: (centerXLeft + centerXRight) / 2, y: centerYTop },
+        { x: (centerXLeft + centerXRight) / 2, y: centerYBottom },
+      ];
+
+      const middleWordCoords = { x: middleWordX, y: currentY };
+
+      const closestCenter = centers.reduce((prev, curr) => {
+        const prevDist = Math.sqrt(Math.pow(prev.x - middleWordCoords.x, 2) + Math.pow(prev.y - middleWordCoords.y, 2));
+        const currDist = Math.sqrt(Math.pow(curr.x - middleWordCoords.x, 2) + Math.pow(curr.y - middleWordCoords.y, 2));
+        return currDist < prevDist ? curr : prev;
+      });
+
+      const line = annotationGroup.append('line')
+        .attr('x1', middleWordX - 6)
+        .attr('y1', currentY)
+        .attr('x2', closestCenter.x)
+        .attr('y2', closestCenter.y)
+        .attr('stroke', darkenColor(`#${color}`))
+        .attr('stroke-width', 1.5);
+
+
+      const circle = annotationGroup.append('circle')
+        .attr('cx', closestCenter.x)
+        .attr('cy', closestCenter.y)
+        .attr('r', 3)
+        .attr('fill', darkenColor(`#${color}`));
+
+      if (newCoords.y < currentY) {
+        annotationText.attr('y', parseFloat(annotationText.attr('y')) - padding);
+      } else {
+        annotationText.attr('y', parseFloat(annotationText.attr('y')) + padding);
+      }
+
+      // Create drag handles and add drag behavior
+      const handleRadius = 4;
+
+      const textHandle = annotationGroup.append('circle')
+        .attr('class', 'drag-handle')
+        .attr('cx', closestCenter.x)
+        .attr('cy', closestCenter.y)
+        .attr('r', handleRadius)
+        .attr('fill', 'blue')
+        .style('cursor', 'move')
+        .style('display', 'none');
+
+      textHandle.call(createDragBehavior((dx, dy) => {
+        // Update the position of the text handle
+        textHandle.attr('cx', parseFloat(textHandle.attr('cx')) + dx)
+          .attr('cy', parseFloat(textHandle.attr('cy')) + dy);
+
+        // Update the position of the multi-line text
+        const newTextX = parseFloat(annotationText.attr('x')) + dx;
+        const newTextY = parseFloat(annotationText.attr('y')) + dy;
+        annotationText.attr('x', newTextX)
+          .attr('y', newTextY);
+
+        // Update the position of tspan elements
+        annotationText.selectAll('tspan')
+          .attr('x', newTextX);
+
+        // Update the line's end position
+        line.attr('x2', parseFloat(line.attr('x2')) + dx)
+          .attr('y2', parseFloat(line.attr('y2')) + dy);
+
+        // Update the circle's position
+        circle.attr('cx', parseFloat(circle.attr('cx')) + dx)
+          .attr('cy', parseFloat(circle.attr('cy')) + dy);
+
+      }, () => {
+        // Recalculate the centers of the annotation text bounding box
+        const newBbox = getPaddedBBox(annotationText.node(), padding);
+        const centerXLeft = newBbox.x;
+        const centerXRight = newBbox.x + newBbox.width;
+        const centerYTop = newBbox.y;
+        const centerYBottom = newBbox.y + newBbox.height;
+
+        const newCenters = [
+          { x: centerXLeft, y: (centerYTop + centerYBottom) / 2 },
+          { x: centerXRight, y: (centerYTop + centerYBottom) / 2 },
+          { x: (centerXLeft + centerXRight) / 2, y: centerYTop },
+          { x: (centerXLeft + centerXRight) / 2, y: centerYBottom },
+        ];
+
+        // Calculate the closest center
+        const newClosestCenter = newCenters.reduce((prev, curr) => {
+          const prevDist = Math.sqrt(Math.pow(prev.x - middleWordCoords.x, 2) + Math.pow(prev.y - middleWordCoords.y, 2));
+          const currDist = Math.sqrt(Math.pow(curr.x - middleWordCoords.x, 2) + Math.pow(curr.y - middleWordCoords.y, 2));
+          return currDist < prevDist ? curr : prev;
+        });
+
+        // Update the line's end position
+        line.attr('x2', newClosestCenter.x)
+          .attr('y2', newClosestCenter.y);
+
+        // Update the circle's position
+        circle.attr('cx', newClosestCenter.x)
+          .attr('cy', newClosestCenter.y);
+
+        // Update the text handle position
+        textHandle.attr('cx', newClosestCenter.x)
+          .attr('cy', newClosestCenter.y);
+      }));
+
+      const lineEndHandle = annotationGroup.append('circle')
+        .attr('class', 'drag-handle')
+        .attr('cx', middleWordX - 6)
+        .attr('cy', currentY)
+        .attr('r', handleRadius)
+        .attr('fill', 'blue')
+        .style('cursor', 'move')
+        .style('display', 'none');
+
+      lineEndHandle.call(createDragBehavior((dx, dy) => {
+        // Update the position of the line's start position
+        line.attr('x1', parseFloat(line.attr('x1')) + dx)
+          .attr('y1', parseFloat(line.attr('y1')) + dy);
+
+        // Update the position of the line end handle
+        lineEndHandle.attr('cx', parseFloat(lineEndHandle.attr('cx')) + dx)
+          .attr('cy', parseFloat(lineEndHandle.attr('cy')) + dy);
+      }, () => {
+        // No additional logic needed for lineEndHandle drag end
+      }));
+    });
+
+  // Get the bounding box of the plot after rendering all the text elements
+  const plotBBox = plot.node().getBBox();
+
+  // Update the viewBox based on the plot's bounding box
+  const padding = 20;
+  const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
+  canvas.attr('viewBox', updatedViewBox);
+
+  // Center the plot within the updated viewBox
+  const translateX = padding - plotBBox.x;
+  const translateY = padding - plotBBox.y;
+  plot.attr('transform', `translate(${translateX}, ${translateY})`);
+  addDownloadButton(canvas);
+};
+
+
+// Helper function to create drag behavior
+function createDragBehavior(onDrag, onDragEnd) {
+  let prevX, prevY;
+
+  return d3.drag()
+    .on('start', (event) => {
+      event.sourceEvent.stopPropagation();
+      prevX = event.x;
+      prevY = event.y;
+    })
+    .on('drag', (event) => {
+      const dx = event.x - prevX;
+      const dy = event.y - prevY;
+      prevX = event.x;
+      prevY = event.y;
+      onDrag.call(this, dx, dy);
+    })
+    .on('end', onDragEnd);
+}
+// Helper function to show drag handles
+function showDragHandles(annotationGroup) {
+  annotationGroup.selectAll('.drag-handle').style('display', 'block');
+}
+
+// Helper function to hide drag handles
+function hideDragHandles(annotationGroup) {
+  annotationGroup.selectAll('.drag-handle').style('display', 'none');
+}
+
+
+this is how it was coded before i refractored the code to use classes and components. this code is for one related text-input and one sidebar. i want this to be generalizable such that it takes all the ExplainedTextInput (or extended ExplainedTextInputGen) components on the page and creates visualization for them one below another. each individual visualization remains of the same size and the canvas just becomes stacked at bottom. right now an individual canvas is 600*335. if there are 2 of  ExplainedTextInput (or extended ExplainedTextInputGen), it becomes 1200*335 where the top 600*335 is for first group, and the bottom 600*335 is for second group. remember to refractor the code to be generic and use correct selectors, queries, scopes etc.
+---
+Raycast AI: Here's the updated `create_viz` function that generalizes the visualization for multiple `ExplainedTextInput` or `ExplainedTextInputGen` components on the page. The canvas is stacked vertically, and each visualization has the same size.
+
+```javascript
+export const create_viz = () => {
+  clearVisualization();
+
+  const explainedTextInputs = document.querySelectorAll('.explained-text-input');
+  const sidebars = document.querySelectorAll('.sidebar-content');
+
+  const canvasHeight = 335;
+  const canvasWidth = 600;
+  const totalHeight = canvasHeight * explainedTextInputs.length;
+
+  const canvas = d3.select('#visualization')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', totalHeight)
+    .attr('viewBox', `0 0 ${canvasWidth} ${totalHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  explainedTextInputs.forEach((textInputDOM, index) => {
+    const sidebarDOM = sidebars[index];
+    const yOffset = index * canvasHeight;
+
+    const plot = canvas.append('g')
+      .attr('transform', `translate(0, ${yOffset})`);
+
+    // The rest of the function remains the same, but with `textInputDOM` and `sidebarDOM` instead of `#text-input` and `#sidebar-content`.
+
+    // ...
+
+    // Update the viewBox based on the plot's bounding box
+    const padding = 20;
+    const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
+    canvas.attr('viewBox', updatedViewBox);
+
+    // Center the plot within the updated viewBox
+    const translateX = padding - plotBBox.x;
+    const translateY = padding - plotBBox.y + yOffset;
+    plot.attr('transform', `translate(${translateX}, ${translateY})`);
+  });
+
+  addDownloadButton(canvas);
+};
+```
+
+This updated function first selects all the `.explained-text-input` and `.sidebar-content` elements on the page. It then calculates the total height of the canvas by multiplying the height of an individual canvas (335) by the number of `ExplainedTextInput` components. 
+
+For each `ExplainedTextInput` component, it creates a new plot within the canvas and translates it vertically based on the index of the component. The rest of the function remains the same, but it uses the `textInputDOM` and `sidebarDOM` variables instead of the hardcoded `#text-input` and `#sidebar-content` selectors.

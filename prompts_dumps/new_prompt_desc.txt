@@ -1,0 +1,588 @@
+i have this app. understand what it does with class names and structure and explain in detail:
+
+rangy.init();
+
+import { updatePlaceholderVisibility, wordDiff, getChatCompletion, editDropdownOptions } from './global_utilities.js';
+
+const models = [
+  { value: 'model1', label: 'Model 1' },
+  { value: 'model2', label: 'Model 2' },
+  // ...
+];
+
+class TextInput {
+  constructor(options) {
+    this.textInputWrapper = document.createElement('div');
+    this.textInputWrapper.classList.add('text-input-wrapper');
+
+    this.textInput = document.createElement('div');
+    this.textInput.classList.add('text-input');
+    this.textInput.id = options.textInputId;
+    this.textInput.contentEditable = 'true';
+    this.textInput.spellcheck = false;
+    this.textInput.dataset.placeholder = 'Text Goes Here';
+
+    this.textInputWrapper.appendChild(this.textInput);
+
+    this.textInput.addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent the click event from bubbling up to the document
+      this.textInput.classList.add('active');
+    });
+
+    this.textInput.addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent the click event from bubbling up to the document
+      this.textInput.classList.add('active');
+    });
+
+    this.textInput.addEventListener('paste', (e) => {
+      e.preventDefault(); // Prevent the default paste action
+
+      let plainText = '';
+
+      if (e.clipboardData && e.clipboardData.getData) {
+        plainText = e.clipboardData.getData('text/plain');
+      } else if (window.clipboardData && window.clipboardData.getData) {
+        plainText = window.clipboardData.getData('Text');
+      }
+
+      document.execCommand('insertText', false, plainText);
+    });
+  }
+}
+
+class Sidebar {
+  constructor(options) {
+    this.container = document.getElementById(options.containerId);
+
+    this.plusButtonContainer = document.createElement('div');
+    this.plusButtonContainer.classList.add('plus-button-container');
+
+    this.plusButton = document.createElement('button');
+    this.plusButton.classList.add('plus-button');
+    this.plusButton.textContent = '— + —';
+
+    this.settingsButton = document.createElement('button');
+    this.settingsButton.classList.add('settings-button');
+    this.settingsButton.innerHTML = '<i class="fas fa-cog"></i>';
+    this.settingsButton.addEventListener('click', () => {
+      editDropdownOptions();
+    });
+
+
+    this.sidebarContent = document.createElement('div');
+    this.sidebarContent.id = options.sidebarContentId;
+    this.sidebarContent.classList.add('sidebar-content');
+
+    this.itemContainer = document.createElement('div');
+    this.itemContainer.classList.add('item-container');
+
+    this.itemPlaceholder = document.createElement('span');
+    this.itemPlaceholder.classList.add('item-placeholder');
+    this.itemPlaceholder.textContent = 'Add a highlight or strikethrough to the text area to explain that text segment here.';
+
+    this.plusButtonContainer.appendChild(this.plusButton);
+    this.plusButtonContainer.appendChild(this.settingsButton);
+    this.itemContainer.appendChild(this.itemPlaceholder);
+    this.sidebarContent.appendChild(this.itemContainer);
+    this.container.appendChild(this.plusButtonContainer);
+    this.container.appendChild(this.sidebarContent);
+
+    this.container.addEventListener("dragover", this.onDragOver);
+    this.container.addEventListener("drop", this.onDrop);
+    this.plusButton.addEventListener('click', () => {
+      this.addHorizontalLine();
+    });
+
+    this.predefinedColors = ["#E8DFF5", "#BED6DC", "#F3E2CE", "#F4EADE", "#D9DECB", "#FCE8E1", "#B2DCF3"];
+    this.lowerLightnessThreshold = 0.2;
+    this.upperLightnessThreshold = 0.9;
+  }
+
+isColorCloseToPredefinedColors(color) 
+generateRandomColor() 
+isColorUsedInSidebar(color)
+getUniqueRandomColor() 
+onDragStart(e)
+onDragOver(e) 
+onDrop(e) 
+addHorizontalLine() 
+updateInputSize(input) 
+
+
+class TextInputGen extends TextInput {
+  constructor(textInputOptions, inputComponent) {
+    super(textInputOptions);
+
+    this.inputComponent = inputComponent;
+
+    this.generateButton = document.createElement('button');
+    this.generateButton.textContent = 'Generate Output';
+    this.generateButton.addEventListener('click', () => {
+      // ...
+    });
+
+    this.dropdown = document.createElement('select');
+    this.populateDropdown(models);
+
+    this.slider = document.createElement('input');
+    this.slider.type = 'range';
+    this.slider.min = 0.1;
+    this.slider.max = 1.0;
+    this.slider.step = 0.1;
+    this.slider.value = 0.5;
+
+    // Append elements to the container (textInputWrapper from TextInput class)
+    this.textInputWrapper.appendChild(this.generateButton);
+    this.textInputWrapper.appendChild(this.dropdown);
+    this.textInputWrapper.appendChild(this.slider);
+
+    this.generateButton.addEventListener('click', () => {
+      this.handleGenerateButtonClick();
+    });
+
+    // Create the temperature button and value icon
+    this.temperatureButton = document.createElement('button');
+    this.temperatureButton.classList.add('temperature-button');
+    this.temperatureButton.innerHTML = '<i class="fas fa-thermometer-half"></i>';
+
+    this.temperatureValueIcon = document.createElement('span');
+    this.temperatureValueIcon.classList.add('temperature-value');
+    this.temperatureValueIcon.textContent = this.slider.value;
+
+    this.temperatureButton.appendChild(this.temperatureValueIcon);
+
+    // Create the temperature slider popup
+    this.temperatureSliderPopup = document.createElement('div');
+    this.temperatureSliderPopup.classList.add('temperature-slider-popup');
+    this.temperatureSliderPopup.style.display = 'none';
+    this.temperatureSliderPopup.appendChild(this.slider);
+
+    // Append the temperature button and slider popup to the textInputWrapper
+    this.textInputWrapper.appendChild(this.temperatureButton);
+    this.textInputWrapper.appendChild(this.temperatureSliderPopup);
+
+    // Initialize the temperature slider popup
+    this.initializeTemperatureSliderPopup();
+
+    // Create the settings button
+    this.settingsButton = document.createElement('button');
+    this.settingsButton.classList.add('settings-button-gen');
+    this.settingsButton.innerHTML = '<i class="fas fa-cog"></i>';
+    this.textInputWrapper.appendChild(this.settingsButton);
+
+    // Initialize the settings modal
+    this.initializeSettingsModal();
+  }
+
+async handleGenerateButtonClick()
+populateDropdown(models) initializeTemperatureSliderPopup() 
+initializeSettingsModal()
+
+}
+
+class ExplainedTextInput extends TextInput {
+  constructor(textInputOptions, inputComponentOptions, sidebarOptions) {
+    super(textInputOptions);
+
+    this.inputComponent = inputComponentOptions;
+    this.sidebarComponent = new Sidebar(sidebarOptions);
+
+    // Append elements to the container (textInputWrapper from TextInput class)
+    this.textInputWrapper.appendChild(this.sidebarComponent.wrapper);
+
+    this.textInput.addEventListener('input', () => this.handleTextInputChange());
+    this.textInput.addEventListener('mouseup', (event) => {
+      const selection = rangy.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (!range.collapsed) {
+          this.applyColorPopup(event);
+        }
+      }
+    });
+  }
+
+ handleTextInputChange()
+removeAllItemsFromSidebar() 
+deleteColor(color, isStrikethrough = false) 
+removeStrikethroughStyle(className) 
+applyStrikethrough(range)
+updateSidebar(color, isStrikethrough = false)
+applyColorPopup(event) 
+applyColorWithRanges(color) 
+applyStrikethrough() 
+handleColorPopupClosing()
+closeColorPopup() 
+}
+
+class ExplainedTextInputGen extends ExplainedTextInput {
+  constructor(textInputOptions, inputComponentOptions, sidebarOptions) {
+    super(textInputOptions, inputComponentOptions, sidebarOptions);
+
+    this.generateButton = document.createElement('button');
+    this.generateButton.textContent = 'Generate Output';
+    this.generateButton.addEventListener('click', () => {
+      // ...
+    });
+
+    this.dropdown = document.createElement('select');
+    // ... (populate the dropdown)
+
+    this.slider = document.createElement('input');
+    this.slider.type = 'range';
+    this.slider.min = 0.1;
+    this.slider.max = 1.0;
+    this.slider.step = 0.1;
+    this.slider.value = 0.5;
+
+    // Append elements to the container (textInputWrapper from TextInput class)
+    this.textInputWrapper.appendChild(this.generateButton);
+    this.textInputWrapper.appendChild(this.dropdown);
+    this.textInputWrapper.appendChild(this.slider);
+
+    this.generateButton.addEventListener('click', () => {
+      this.handleGenerateButtonClick();
+    });
+  }
+  handleGenerateButtonClick() {
+  }
+}
+
+class TextInputsCompareNew {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInput1 = new TextInput({ textInputId: options.textInput1ContainerId });
+    this.textInput2 = new TextInput({ textInputId: options.textInput2ContainerId });
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: options.explainedTextInputContainerId,
+      sidebarOptions: {
+        containerId: options.explainedTextInputSidebarContainerId,
+        sidebarContentId: options.explainedTextInputSidebarContentId,
+      },
+    });
+
+    this.compareButton = document.createElement('button');
+    this.compareButton.textContent = 'Compare';
+    this.compareButton.addEventListener('click', () => {
+      const diffs = wordDiff(this.textInput1.textInput.textContent, this.textInput2.textInput.textContent);
+      this.compareAndApplyDiffs(diffs);
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInput1.textInputWrapper);
+    this.container.appendChild(this.textInput2.textInputWrapper);
+    this.container.appendChild(this.compareButton);
+    this.container.appendChild(this.explainedTextInput.textInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.wrapper);
+  }
+compareAndApplyDiffs(diffs)
+}
+
+class TextInputsCompareSelf {
+constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInput = new TextInput({ textInputId: options.textInputContainerId });
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: options.explainedTextInputContainerId,
+      sidebarOptions: {
+        containerId: options.explainedTextInputSidebarContainerId,
+        sidebarContentId: options.explainedTextInputSidebarContentId,
+      },
+    });
+
+    this.compareButton = document.createElement('button');
+    this.compareButton.textContent = 'Compare';
+    this.compareButton.addEventListener('click', () => {
+      const diffs = wordDiff(this.textInput.textInput.textContent, this.explainedTextInput.textInput.textContent);
+      this.compareAndApplyDiffs(diffs);
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInput.textInputWrapper);
+    this.container.appendChild(this.compareButton);
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+  }
+compareAndApplyDiffs(diffs)
+}
+
+class PromptGen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInput = new TextInput({ textInputId: options.textInputContainerId });
+
+    this.textInputGen = new TextInputGen({
+      textInputId: options.textInputGenContainerId,
+      inputComponent: this.textInput,
+    });
+
+    this.container.appendChild(this.textInput.textInputWrapper);
+    this.container.appendChild(this.textInputGen.textInputWrapper);
+  }
+}
+
+class ExplainedPromptExplainedGen {
+  constructor(textInputOptions, inputComponentOptions, sidebarOptions) {
+    this.container = document.createElement('div');
+
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: textInputOptions.explainedTextInputContainerId,
+      sidebarOptions: {
+        containerId: sidebarOptions.explainedTextInputSidebarContainerId,
+        sidebarContentId: sidebarOptions.explainedTextInputSidebarContentId,
+      },
+    });
+
+    this.explainedTextInputGen = new ExplainedTextInputGen(
+      textInputOptions,
+      this.explainedTextInput.textInput, // Pass the textInput as inputComponent
+      sidebarOptions
+    );
+
+    // Append elements to the container
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen.textInputWrapper);
+  }
+}
+
+class Prompt2Gen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInput = new TextInput({ textInputId: options.textInputContainerId });
+
+    this.textInputGen1 = new TextInputGen({
+      textInputId: options.textInputGen1ContainerId,
+      inputComponent: this.textInput,
+    });
+
+    this.textInputGen2 = new TextInputGen({
+      textInputId: options.textInputGen2ContainerId,
+      inputComponent: this.textInput,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInput.textInputWrapper);
+    this.container.appendChild(this.textInputGen1.textInputWrapper);
+    this.container.appendChild(this.textInputGen2.textInputWrapper);
+  }
+}
+
+class ExplainedPromptExplained2Gen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.explainedTextInput = new ExplainedTextInput({
+      textInputId: options.explainedTextInputId,
+      sidebarOptions: options.explainedTextInputSidebarOptions,
+    });
+
+    this.explainedTextInputGen1 = new ExplainedTextInputGen({
+      textInputId: options.explainedTextInputGen1Id,
+      inputComponent: this.explainedTextInput.textInput,
+      sidebarOptions: options.explainedTextInputGen1SidebarOptions,
+    });
+
+    this.explainedTextInputGen2 = new ExplainedTextInputGen({
+      textInputId: options.explainedTextInputGen2Id,
+      inputComponent: this.explainedTextInput.textInput,
+      sidebarOptions: options.explainedTextInputGen2SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.explainedTextInput.textInputWrapper);
+    this.container.appendChild(this.explainedTextInput.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen2.sidebarComponent.container);
+  }
+}
+
+class TwoExplainedPromptGen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.explainedTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.explainedTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.explainedTextInputSidebarContentId,
+    });
+
+    this.textInputGen1 = new TextInputGen({
+      textInputId: options.textInputGen1Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+    });
+
+    this.textInputGen2 = new TextInputGen({
+      textInputId: options.textInputGen2Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.textInputGen1.textInputWrapper);
+    this.container.appendChild(this.textInputGen2.textInputWrapper);
+  }
+}
+
+class TwoExplainedPromptExplainedGen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.explainedTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.explainedTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.explainedTextInputSidebarContentId,
+    });
+
+    this.explainedTextInputGen1 = new ExplainedTextInputGen({
+      textInputOptions: { textInputId: options.explainedTextInputGen1Id },
+      inputComponentOptions: { inputComponent: this.textInputsCompareSelf.textInput.textInput },
+      sidebarOptions: options.explainedTextInputGen1SidebarOptions,
+    });
+
+    this.explainedTextInputGen2 = new ExplainedTextInputGen({
+      textInputOptions: { textInputId: options.explainedTextInputGen2Id },
+      inputComponentOptions: { inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput },
+      sidebarOptions: options.explainedTextInputGen2SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.explainedTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.explainedTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.explainedTextInputGen2.sidebarComponent.container);
+  }
+}
+
+class TwoExplainedPromptExplained2Gen {
+  constructor(options) {
+    this.container = document.createElement('div');
+
+    this.textInputsCompareSelf = new TextInputsCompareSelf({
+      textInputContainerId: options.textInputContainerId,
+      explainedTextInputContainerId: options.eTextInputContainerId,
+      explainedTextInputSidebarContainerId: options.eTextInputSidebarContainerId,
+      explainedTextInputSidebarContentId: options.eTextInputSidebarContentId,
+    });
+
+    this.eTextInputGen1 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen1Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+      sidebarOptions: options.eTextInputGen1SidebarOptions,
+    });
+
+    this.eTextInputGen2 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen2Id,
+      inputComponent: this.textInputsCompareSelf.textInput,
+      sidebarOptions: options.eTextInputGen2SidebarOptions,
+    });
+
+    this.eTextInputGen3 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen3Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+      sidebarOptions: options.eTextInputGen3SidebarOptions,
+    });
+
+    this.eTextInputGen4 = new ExplainedTextInputGen({
+      textInputId: options.eTextInputGen4Id,
+      inputComponent: this.textInputsCompareSelf.explainedTextInput.textInput,
+      sidebarOptions: options.eTextInputGen4SidebarOptions,
+    });
+
+    // Append elements to the container
+    this.container.appendChild(this.textInputsCompareSelf.container);
+    this.container.appendChild(this.eTextInputGen1.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen1.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen2.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen2.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen3.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen3.sidebarComponent.container);
+    this.container.appendChild(this.eTextInputGen4.textInputWrapper);
+    this.container.appendChild(this.eTextInputGen4.sidebarComponent.container);
+  }
+}
+
+export const create_viz = () => {
+  clearVisualization();
+
+  const explainedTextInputs = document.querySelectorAll('.explained-text-input');
+  const sidebars = document.querySelectorAll('.sidebar-content');
+
+  const canvasHeight = 335;
+  const canvasWidth = 600;
+  const totalHeight = canvasHeight * explainedTextInputs.length;
+
+  const canvas = d3.select('#visualization')
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', totalHeight)
+    .attr('viewBox', `0 0 ${canvasWidth} ${totalHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  explainedTextInputs.forEach((textInputDOM, index) => {
+    const sidebarDOM = sidebars[index];
+    const yOffset = index * canvasHeight;
+
+    const plot = canvas.append('g')
+      .attr('transform', `translate(0, ${yOffset})`);
+
+    // The rest of the function remains the same, but with `textInputDOM` and `sidebarDOM` instead of `#text-input` and `#sidebar-content`.
+
+    // ...
+
+    // Update the viewBox based on the plot's bounding box
+    const padding = 20;
+    const updatedViewBox = `0 0 ${plotBBox.width + padding * 2} ${plotBBox.height + padding * 2}`;
+    canvas.attr('viewBox', updatedViewBox);
+
+    // Center the plot within the updated viewBox
+    const translateX = padding - plotBBox.x;
+    const translateY = padding - plotBBox.y + yOffset;
+    plot.attr('transform', `translate(${translateX}, ${translateY})`);
+  });
+
+  addDownloadButton(canvas);
+};
+
+
+
+This app is a text input and analysis tool that allows users to create, edit, and compare text inputs with various features. The app consists of several classes that define different components and their functionalities. Here's a detailed explanation of each class and their structure:
+
+1. `TextInput`: This class creates a basic text input component with a wrapper, a content-editable div, and event listeners for click, paste, and input events. It also handles pasting plain text into the input field.
+
+2. `Sidebar`: This class creates a sidebar component with a plus button, settings button, and a container for items. It also has methods for handling drag and drop events, adding horizontal lines, and generating unique random colors.
+
+3. `TextInputGen`: This class extends `TextInput` and adds a generate button, a dropdown, and a slider for controlling the "temperature" of the generated output. It also initializes the temperature slider popup and settings modal.
+
+4. `ExplainedTextInput`: This class extends `TextInput` and adds a sidebar component to the text input. It also handles text input changes, applying color popups, and applying strikethrough styles.
+
+5. `ExplainedTextInputGen`: This class extends `ExplainedTextInput` and adds a generate button, a dropdown, and a slider for controlling the "temperature" of the generated output.
+
+6. `TextInputsCompareNew`: This class creates a container with two `TextInput` components and an `ExplainedTextInput` component. It also has a compare button that compares the text content of the two `TextInput` components and applies the differences to the `ExplainedTextInput` component.
+
+7. `TextInputsCompareSelf`: This class creates a container with a `TextInput` component and an `ExplainedTextInput` component. It also has a compare button that compares the text content of the `TextInput` component with the `ExplainedTextInput` component and applies the differences.
+
+8. `PromptGen`: This class creates a container with a `TextInput` component and a `TextInputGen` component.
+
+9. `ExplainedPromptExplainedGen`: This class creates a container with an `ExplainedTextInput` component and an `ExplainedTextInputGen` component.
+
+10. `Prompt2Gen`: This class creates a container with a `TextInput` component and two `TextInputGen` components.
+
+11. `ExplainedPromptExplained2Gen`: This class creates a container with an `ExplainedTextInput` component and two `ExplainedTextInputGen` components.
+
+12. `TwoExplainedPromptGen`: This class creates a container with a `TextInputsCompareSelf` component and two `TextInputGen` components.
+
+13. `TwoExplainedPromptExplainedGen`: This class creates a container with a `TextInputsCompareSelf` component and two `ExplainedTextInputGen` components.
+
+14. `TwoExplainedPromptExplained2Gen`: This class creates a container with a `TextInputsCompareSelf` component and four `ExplainedTextInputGen` components.
+
+The `create_viz` function at the end of the script is used to create a visualization of the text inputs and sidebars using the D3.js library. It calculates the total height of the canvas, appends an SVG element to the visualization container, and iterates through the explained text inputs and sidebars to create the visualization. It also updates the viewBox attribute of the SVG element and adds a download button to the visualization.
