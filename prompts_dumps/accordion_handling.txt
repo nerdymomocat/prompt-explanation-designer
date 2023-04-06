@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/gen_settings.css">
+  <link rel="stylesheet" href="css/sidebars.css">
+  <link rel="stylesheet" href="css/media_queries.css">
+  <link rel="stylesheet" href="css/style_text_inputs.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.3/d3.min.js"></script>
+  <script src="
+https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
+"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rangy/1.3.1/rangy-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/rangy/1.3.1/rangy-classapplier.min.js"></script>
+  <script src="https://unpkg.com/rangy@1.3.1/lib/rangy-selectionsaverestore.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.1.2/chroma.min.js"></script>
+
+
+
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
+
+
+
+
+  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+    data-id="nerdymomocat" data-description="Support me on Buy me a coffee!" data-message="" data-color="#40DCA5"
+    data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+
+
+  <title>Prompt Explainer</title>
+</head>
+
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <img class="logo" src="images/logo.png" alt="Logo">
+    </div>
+    <div class="header-background">
+      <img class="header-bg" src="images/header-background.jpg" alt="Header Background">
+    </div>
+  </header>
+  <main>
+    <nav class="main-navigation">
+      <div class="hamburger-menu" id="hamburger-menu">
+        <i class="fas fa-bars"></i>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <div class="dropdown-item current" data-target="tab1-header"><i class="fas fa-balance-scale"></i>&nbsp;Texts
+          </div>
+          <div class="dropdown-item" data-target="tab2-header"><i class="fas fa-info-circle"></i>&nbsp;Text</div>
+          <div class="dropdown-item" data-target="tab2b-header"><i class="fas fa-info-circle"></i>&nbsp;Two Texts
+          </div>
+          <div class="dropdown-item" data-target="tab3-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt +
+            Generation</div>
+          <div class="dropdown-item" data-target="tab4-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt + Two
+            Generations
+          </div>
+          <div class="dropdown-item" data-target="tab5-header"><i class="fas fa-balance-scale"></i>&nbsp;<i
+              class="fas fa-info-circle"></i>&nbsp;Two (Prompts + Generations)</div>
+                    <div class="dropdown-item" data-target="tab6-header"><i class="fas fa-balance-scale"></i>&nbsp;<i
+              class="fas fa-info-circle"></i>&nbsp;Two (Prompts + Two Generations)</div>
+        </div>
+      </div>
+
+ <div class="modal" id="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <img src="" alt="Generated Image" id="generated-image">
+            <button id="download-btn" class="download-btn">Download Image</button>
+          </div>
+        </div>
+
+        <div id="settingsModal-gen" class="modal-gen">
+          <div class="modal-content-gen" id="modal-content-gen">
+            <div class="modal-header-gen">
+              <div class="modal-buttons-gen">
+                <button id="saveOptions-gen">
+                  <i class="fas fa-save"></i>
+                </button>
+                <button id="closeSettingsModal-gen" title="Close">&#x2715;</button>
+              </div>
+              <h3>API Key Settings</h3>
+            </div>
+            <div class="api-key-settings">
+              <label for="textbox-gen">Open AI API Key:</label>
+              <input type="text" id="textbox-gen" />
+            </div>
+          </div>
+        </div>
+
+          <div id="optionsModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button id="saveOptions" class="modal-button" title="Save">
+            <i class="fas fa-save"></i>
+          </button>
+          <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
+          <h3 class="modal-title">Edit Explanation Categories</h3>
+        </div>
+        <textarea id="optionsTextarea" rows="5"></textarea>
+      </div>
+    </div>
+
+
+      
+      <div class="horizontal-accordion">
+
+       <div class="accordion-heading" id="tab1-header">
+  <span class="rotated-content">
+    <i class="fas fa-balance-scale"></i>&nbsp;Texts
+  </span>
+</div>
+<div class="accordion-content" id="tab1">
+  <div id="t1-text-inputs-compare-new-container"></div>
+</div>
+
+        <div class="accordion-heading" id="tab2-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Text
+          </span>
+        </div>
+
+        <div class="accordion-content" id="tab2">
+          <div class="container-wrapper">
+            <div id="t2-explained-text-input-container"></div>
+            <br>
+            <div class="button-container">
+              <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+              <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
+            </div>
+
+            <div class="visualization" id="visualization"><span class="hidden-trigger" id="hiddenTrigger"
+                style="display: none;"></span></div>
+
+
+          </div>
+        </div>
+       
+
+        <div class="accordion-heading" id="tab2b-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Two Texts
+          </span>
+        </div>
+        <div class="accordion-content" id="tab2b"> 
+        <div class="container-wrapper">
+            <div id="t2b-explained-text-input-container-1"></div>
+          <div id="t2b-explained-text-input-container-2"></div>
+            <br>
+            <div class="button-container">
+              <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+              <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
+            </div>
+
+            <div class="visualization" id="visualization2b"><span class="hidden-trigger" id="hiddenTrigger"
+                style="display: none;"></span></div>
+
+
+          </div>
+        </div>
+
+        <div class="accordion-heading" id="tab3-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Generation
+          </span>
+        </div>
+
+
+
+        <div class="accordion-content" id="tab3">
+        <div class="container-wrapper">
+            <div id="t3-explained-prompt-explained-gen"></div>
+            <br>
+
+
+
+          </div>
+          <div class="button-container">
+            <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+            <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
+          </div>
+          <div class="visualization" id="visualization-tab3"><span class="hidden-trigger" id="hiddenTrigger-tab3"
+              style="display: none;"></span></div>
+        </div>
+
+
+        <div class="accordion-heading" id="tab4-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Two Generations
+          </span>
+        </div>
+        <div class="accordion-content" id="tab4"> </div>
+
+        <div class="accordion-heading" id="tab5-header">
+          <span class="rotated-content">
+            <i class="fas fa-balance-scale"></i>&nbsp;<i class="fas fa-info-circle"></i>&nbsp;Two (Prompts +
+            Generations)
+          </span>
+        </div>
+
+        <div class="accordion-content" id="tab5"> </div>
+        <div class="accordion-heading" id="tab6-header">
+          <span class="rotated-content">
+            <i class="fas fa-balance-scale"></i>&nbsp;<i class="fas fa-info-circle"></i>&nbsp;Two (Prompts +
+            Two Generations)
+          </span>
+        </div>
+
+        <div class="accordion-content" id="tab6"> </div>
+      </div>
+
+    </nav>
+  </main>
+  <footer class="footer">
+    <div class="footer-content">
+      <font color="grey"><i>
+          <p> <b>Known Issues:</b>
+            <br>
+            1. Has not & will not be tested on Safari or Firefox. Use Chromium based browsers.<br> 2. If your highlight
+            color spans multiple lines, it breaks
+            image export<br>3.
+            Works better on large screens.
+          </p>
+        </i></font>
+      <p>&copy; 2023 Text Explanation Designer. All rights reserved.</p>
+      <div class="open-source">
+        <a href="https://github.com/nerdymomocat/prompt-explanation-designer/" target="_blank">
+          <i class="fab fa-github" alt="GitHub" class="github-logo"></i>
+          Open Source
+        </a>
+      </div>
+    </div>
+  </footer>
+  <script type="module" src="scripts/script.js"></script>
+  <script type="module" src="scripts/basic_design.js"></script>
+  <script type="module" src="scripts/tab3_gen.js">
+  </script>
+</body>
+
+</html>
