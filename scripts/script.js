@@ -30,11 +30,15 @@ function updatePlaceholderVisibility() {
   const placeholder = document.querySelector(".item-placeholder");
 
   // Check if the item container has any child elements other than the placeholder
-  const hasItems = Array.from(itemContainer.children).some(child => child !== placeholder);
+  const hasItems = Array.from(itemContainer.children).some(child => {
+    return child !== placeholder && (child.querySelector(".color-index-container") || child.querySelector(".horizontal-line-container"));
+  });
 
   // Show or hide the placeholder based on the presence of items
   placeholder.style.display = hasItems ? "none" : "block";
 }
+
+
 
 textInput.addEventListener('click', (event) => {
   event.stopPropagation(); // Prevent the click event from bubbling up to the document
@@ -59,91 +63,16 @@ function closeModal() {
   modal.style.display = 'none';
 }
 
-
+const hamburgerMenu = document.getElementById("hamburger-menu");
+const dropdownMenu = document.getElementById("dropdown-menu");
+const dropdownItems = document.querySelectorAll(".dropdown-item");
 document.addEventListener("DOMContentLoaded", () => {
-  const accordionHeadings = document.querySelectorAll(".accordion-heading");
-  const accordionContents = document.querySelectorAll(".accordion-content");
-
-  accordionHeadings.forEach((heading) => {
-    heading.addEventListener("click", () => {
-      const target = heading.getAttribute("id").replace("-header", "");
-
-      accordionHeadings.forEach((otherHeading) => {
-        if (otherHeading === heading) {
-          otherHeading.classList.add("active");
-        } else {
-          otherHeading.classList.remove("active");
-        }
-      });
-
-      accordionContents.forEach((content) => {
-        if (content.getAttribute("id") === target) {
-          content.classList.add("active");
-          content.classList.add("visible"); // Add the 'visible' class
-        } else {
-          content.classList.remove("active");
-          content.classList.remove("visible"); // Remove the 'visible' class
-        }
-      });
-    });
+  const visualizeBtn = document.querySelector('.export-viz-btn');
+  visualizeBtn.addEventListener("click", () => {
+    visualization.style.display = 'block';
+    create_viz();
   });
 
-
-  // Set the first heading and content as active
-  accordionHeadings[0].classList.add("active");
-  accordionContents[0].classList.add("active");
-
-  const hamburgerMenu = document.getElementById("hamburger-menu");
-  const dropdownMenu = document.getElementById("dropdown-menu");
-  const dropdownItems = document.querySelectorAll(".dropdown-item");
-
-  hamburgerMenu.addEventListener("click", () => {
-    dropdownMenu.style.display = dropdownMenu.style.display === "block" ? "none" : "block";
-  });
-
-  dropdownItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      event.stopPropagation();
-      const target = item.getAttribute("data-target");
-      document.getElementById(target).click();
-      dropdownMenu.style.display = "none";
-    });
-  });
-
-  const settingsButton = document.querySelector('.settings-button');
-  const closeModalButton = document.querySelector('#closeSettingsModal');
-  const saveOptionsButton = document.querySelector('#saveOptions');
-  const settingsModal = document.querySelector('#settingsModal');
-
-  settingsButton.addEventListener('click', () => {
-    settingsModal.style.display = 'block';
-  });
-
-  closeModalButton.addEventListener('click', () => {
-    settingsModal.style.display = 'none';
-  });
-
-  saveOptionsButton.addEventListener('click', () => {
-    const dropdownValue = document.querySelector('#dropdown').value;
-    const textboxValue = document.querySelector('#textbox').value;
-
-    localStorage.setItem('dropdownValue', dropdownValue);
-    localStorage.setItem('textboxValue', textboxValue);
-
-    settingsModal.style.display = 'none';
-  });
-
-  // Load saved values from local storage
-  const savedDropdownValue = localStorage.getItem('dropdownValue');
-  const savedTextboxValue = localStorage.getItem('textboxValue');
-
-  if (savedDropdownValue) {
-    document.querySelector('#dropdown').value = savedDropdownValue;
-  }
-
-  if (savedTextboxValue) {
-    document.querySelector('#textbox').value = savedTextboxValue;
-  }
 
 
   document.addEventListener('click', (event) => {
@@ -154,21 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
       dropdownMenu.style.display = "none";
     }
   });
-
-  // Add an event listener for the keydown event on the document
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      dropdownMenu.style.display = "none";
-    }
-  });
-
-  const visualizeBtn = document.querySelector('.export-viz-btn');
-  visualizeBtn.addEventListener("click", () => {
-    visualization.style.display = 'block';
-    create_viz();
-  });
-
-
 
   const exportBtn = document.querySelector('.export-btn');
   const downloadBtn = document.getElementById('download-btn');
@@ -267,9 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function compareTextAreas() {
     console.log('compareTextAreas called'); // Debugging line
 
-    const textArea1 = document.getElementById('text-area-1');
-    const textArea2 = document.getElementById('text-area-2');
-    const diffResults = document.getElementById('diff-results');
+    const textArea1 = document.getElementById('tb1-text-area-1');
+    const textArea2 = document.getElementById('tb1-text-area-2');
+    const diffResults = document.getElementById('tb1-diff-results');
     const resultsContainer = document.getElementById('results-container'); // Add this line
 
     const diffs = wordDiff(textArea1.value, textArea2.value);
@@ -321,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const copyToDesignerBtn = document.querySelector(".copy-to-designer-btn");
+  const copyToDesignerBtn = document.querySelector("#tb1-copy-to-designer-btn");
 
   copyToDesignerBtn.addEventListener("click", copyToDesigner);
 
@@ -331,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     removeAllItemsFromSidebar();
 
     // Get the input text
-    const diffResults = document.getElementById('diff-results');
+    const diffResults = document.getElementById('tb1-diff-results');
     if (diffResults.textContent.trim() === '') {
       diffResults.setAttribute('data-placeholder', 'Comparison Output Will Appear Here');
     }
@@ -381,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
     outputTextArea.innerHTML = tempDiv.innerHTML;
   }
 
-  const compareButton = document.querySelector(".compare-btn");
+  const compareButton = document.querySelector("#tb1-compare-btn");
   compareButton.addEventListener("click", compareTextAreas);
 
 
@@ -468,25 +382,10 @@ document.addEventListener("DOMContentLoaded", () => {
     strikethroughOption.classList.add("strikethrough-option");
     strikethroughOption.addEventListener("click", () => applyStrikethrough(selectedRanges));
 
-    const strikethroughIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    strikethroughIcon.classList.add("icon", "line-color");
-    strikethroughIcon.setAttribute("width", "24");
-    strikethroughIcon.setAttribute("height", "24");
-    strikethroughIcon.setAttribute("viewBox", "0 0 24 24");
-    strikethroughIcon.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const strikethroughIcon = document.createElement('i');
+    strikethroughIcon.classList.add('fas', 'fa-strikethrough', 'icon', 'line-color', 'fa-2x');
 
-    const sPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    sPath.setAttribute("d", "M18 7.5A4.49 4.49 0 0 0 13.5 3h-3.43A4.07 4.07 0 0 0 6 7.07h0a4.08 4.08 0 0 0 2.78 3.86l6.44 2.14A4.08 4.08 0 0 1 18 16.93h0A4.07 4.07 0 0 1 13.93 21H10.5A4.49 4.49 0 0 1 6 16.5");
-    sPath.setAttribute("style", "fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-width:2");
-
-    const linePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    linePath.setAttribute("d", "M3 12h18");
-    linePath.setAttribute("style", "fill:none;stroke:#2ca9bc;stroke-linecap:round;stroke-linejoin:round;stroke-width:2");
-
-    strikethroughIcon.appendChild(sPath);
-    strikethroughIcon.appendChild(linePath);
     strikethroughOption.appendChild(strikethroughIcon);
-
     popup.appendChild(strikethroughOption);
 
     const strikethroughOptionStyle = document.createElement("style");
@@ -711,6 +610,8 @@ const addHorizontalLine = () => {
   const itemContainer = document.querySelector('.item-container');
   itemContainer.appendChild(wrapper);
 
+  updatePlaceholderVisibility();
+
 };
 
 
@@ -748,7 +649,7 @@ function handleTextInputChange() {
       !span.textContent.trim()
     ) {
       const colorCode = span.classList.value.split("-").pop();
-      const deleteButton = document.querySelector(`.delete-button-${colorCode}`);
+      const deleteButton = document.querySelector(`.delete-button-${colorCode}:not(.horizontal-line-delete)`);
       if (deleteButton) {
         deleteButton.click();
       }
@@ -758,7 +659,7 @@ function handleTextInputChange() {
     }
   });
 
-  const allDeleteButtons = document.querySelectorAll(".delete-button");
+  const allDeleteButtons = document.querySelectorAll(".delete-button:not(.horizontal-line-delete)");
   allDeleteButtons.forEach((deleteButton) => {
     const colorCode = deleteButton.classList.value.split("-").pop();
     if (!foundColors.has(colorCode)) {
@@ -767,8 +668,6 @@ function handleTextInputChange() {
   });
   updatePlaceholderVisibility();
 }
-
-
 
 // Function to update the sidebar with color indexes
 function updateSidebar(color, isStrikethrough = false) {
