@@ -4,8 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/gen_settings.css">
+  <link rel="stylesheet" href="css/sidebars.css">
+  <link rel="stylesheet" href="css/media_queries.css">
+  <link rel="stylesheet" href="css/style_text_inputs.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.3/d3.min.js"></script>
@@ -20,7 +28,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
 
 
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico" />
 
 
 
@@ -36,22 +44,65 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 <body>
   <header class="header">
     <div class="logo-container">
-      <img class="logo" src="logo.png" alt="Logo">
+      <img class="logo" src="images/logo.png" alt="Logo">
     </div>
     <div class="header-background">
-      <img class="header-bg" src="header-background.jpg" alt="Header Background">
+      <img class="header-bg" src="images/header-background.jpg" alt="Header Background">
     </div>
   </header>
   <main>
-    <div id="optionsModal" class="modal">
+    <nav class="main-navigation">
+      <div class="hamburger-menu" id="hamburger-menu">
+        <i class="fas fa-bars"></i>
+        <div class="dropdown-menu" id="dropdown-menu">
+          <div class="dropdown-item current" data-target="tab1-header"><i class="fas fa-balance-scale"></i>&nbsp;Texts
+          </div>
+          <div class="dropdown-item" data-target="tab2-header"><i class="fas fa-info-circle"></i>&nbsp;Text</div>
+          <div class="dropdown-item" data-target="tab2b-header"><i class="fas fa-info-circle"></i>&nbsp;Two Texts
+          </div>
+          <div class="dropdown-item" data-target="tab3-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt +
+            Generation</div>
+          <div class="dropdown-item" data-target="tab4-header"><i class="fas fa-info-circle"></i>&nbsp;Prompt + Two
+            Generations
+          </div>
+          <div class="dropdown-item" data-target="tab5-header"><i class="fas fa-balance-scale"></i>&nbsp;<i
+              class="fas fa-info-circle"></i>&nbsp;Two (Prompts + Generations)</div>
+                    <div class="dropdown-item" data-target="tab6-header"><i class="fas fa-balance-scale"></i>&nbsp;<i
+              class="fas fa-info-circle"></i>&nbsp;Two (Prompts + Two Generations)</div>
+        </div>
+      </div>
+
+ <div class="modal" id="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <img src="" alt="Generated Image" id="generated-image">
+            <button id="download-btn" class="download-btn">Download Image</button>
+          </div>
+        </div>
+
+        <div id="settingsModal-gen" class="modal-gen">
+          <div class="modal-content-gen" id="modal-content-gen">
+            <div class="modal-header-gen">
+              <div class="modal-buttons-gen">
+                <button id="saveOptions-gen">
+                  <i class="fas fa-save"></i>
+                </button>
+                <button id="closeSettingsModal-gen" title="Close">&#x2715;</button>
+              </div>
+              <h3>API Key Settings</h3>
+            </div>
+            <div class="api-key-settings">
+              <label for="textbox-gen">Open AI API Key:</label>
+              <input type="text" id="textbox-gen" />
+            </div>
+          </div>
+        </div>
+
+          <div id="optionsModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
           <button id="saveOptions" class="modal-button" title="Save">
-            <svg width="800" height="800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
-              class="save-icon">
-              <path
-                d="m20.71 9.29-6-6a1 1 0 0 0-.32-.21A1.09 1.09 0 0 0 14 3H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a1 1 0 0 0-.29-.71ZM9 5h4v2H9Zm6 14H9v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1Zm4-1a1 1 0 0 1-1 1h-1v-3a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3v3H6a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V6.41l4 4Z" />
-            </svg>
+            <i class="fas fa-save"></i>
           </button>
           <button id="closeModal" class="modal-button" title="Close">&#x2715;</button>
           <h3 class="modal-title">Edit Explanation Categories</h3>
@@ -59,78 +110,33 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <textarea id="optionsTextarea" rows="5"></textarea>
       </div>
     </div>
-    <nav class="main-navigation">
-      <div class="hamburger-menu" id="hamburger-menu">
-        <i class="fas fa-bars"></i>
-        <div class="dropdown-menu" id="dropdown-menu">
-          <div class="dropdown-item" data-target="tab1-header">Compare: Texts</div>
-          <div class="dropdown-item" data-target="tab2-header">Explain: Text</div>
-          <!--       <div class="dropdown-item" data-target="tab3-header">Explain: Prompt + Output</div> -->
-        </div>
-      </div>
+
+
+      
       <div class="horizontal-accordion">
 
-        <div class="accordion-heading" id="tab1-header" data-text="Compare: Texts"></div>
-        <div class="accordion-content" id="tab1">
-          <div class="text-comparison-container">
-            <div class="text-area-container">
-              <textarea class="text-area" id="text-area-1" placeholder="Original Prompt"></textarea>
-              <textarea class="text-area" id="text-area-2" placeholder="New Prompt"></textarea>
-            </div>
-            <div class="output-container">
-              <button class="compare-btn"><svg width="16" height="16" viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="m10.08 7 1 1 3.44-3.45L11 1l-1 1 1.8 1.8H2v1.4h9.82ZM5.86 9l-1-1-3.44 3.5L4.91 15l1-1-1.81-1.8H14v-1.4H4.1Z" />
-                </svg> Compare</button>
-              <div id="results-container">
-                <div id="diff-results"></div>
-              </div>
-              <button class="copy-to-designer-btn"><svg width="16" height="16" viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="M21 8.94a1.31 1.31 0 0 0-.06-.27v-.09a1.07 1.07 0 0 0-.19-.28l-6-6a1.07 1.07 0 0 0-.28-.19.32.32 0 0 0-.09 0 .88.88 0 0 0-.33-.11H10a3 3 0 0 0-3 3v1H6a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3v-1h1a3 3 0 0 0 3-3V8.94Zm-6-3.53L17.59 8H16a1 1 0 0 1-1-1ZM15 19a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h1v7a3 3 0 0 0 3 3h5Zm4-4a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3v3a3 3 0 0 0 3 3h3Z" />
-                </svg> Copy to Designer</button>
-            </div>
-          </div>
-        </div>
+       <div class="accordion-heading" id="tab1-header">
+  <span class="rotated-content">
+    <i class="fas fa-balance-scale"></i>&nbsp;Texts
+  </span>
+</div>
+<div class="accordion-content" id="tab1">
+  <div id="t1-text-inputs-compare-new-container"></div>
+</div>
 
-        <div class="accordion-heading" id="tab2-header" data-text="Explain: Text"></div>
+        <div class="accordion-heading" id="tab2-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Text
+          </span>
+        </div>
 
         <div class="accordion-content" id="tab2">
           <div class="container-wrapper">
-            <div class="container flex-container">
-              <div class="text-input-wrapper">
-                <div class="text-input" id="text-input" contenteditable="true" spellcheck="false"
-                  data-placeholder="Final Prompt Goes Here"></div>
-              </div>
-              <div id="sidebar" class="sidebar">
-                <div class="plus-button-container">
-                  <button class="plus-button">— + —</button>
-                  <button class="settings-button">
-                    <i class="fas fa-cog"></i>
-                  </button>
-                </div>
-                <div id="sidebar-content" class="sidebar-content">
-                  <div class="item-container">
-                    <span class="item-placeholder"> Add a highlight or strikethrough to the text area to explain that
-                      prompt segment here.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div id="t2-explained-text-input-container"></div>
             <br>
             <div class="button-container">
-              <button class="export-btn"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                  viewBox="0 0 16 16" fill="currentColor">
-                  <path fill-rule="evenodd"
-                    d="M14 9a1 1 0 0 1 1 1v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a1 1 0 0 1 2 0v3h10v-3a1 1 0 0 1 1-1ZM8 1a1 1 0 0 1 1 1v4.586l1.293-1.293a1 1 0 1 1 1.414 1.414L8 10.414 4.293 6.707a1 1 0 0 1 1.414-1.414L7 6.586V2a1 1 0 0 1 1-1Z" />
-                </svg> Download Indexed Explanation</button>
-              <button class="export-viz-btn"><svg width="16" height="16" viewBox="0 0 16 16"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path
-                    d="M0 5h3v1H0V5zm5-5h1v3H5V0zm1 11H5V8.5l1 1zm5-5H9.5l-1-1H11zM3.131 7.161l.707.707-2.97 2.97-.707-.707 2.97-2.97zm7-7 .707.707-2.97 2.97-.707-.707 2.97-2.97zM.836.199l3.465 3.465-.707.707L.129.906.836.199zM6.1 4.1 4 6.1l9.8 9.9 2.2-2.1-9.9-9.8zm0 1.4L8.5 8l-.6.6-2.5-2.5.7-.6z" />
-                </svg> Generate Canvas Visualization</button>
+              <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+              <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
             </div>
 
             <div class="visualization" id="visualization"><span class="hidden-trigger" id="hiddenTrigger"
@@ -138,43 +144,107 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
 
           </div>
-          <div class="modal" id="modal">
-            <div class="modal-content">
-              <span class="close">&times;</span>
-              <img src="" alt="Generated Image" id="generated-image">
-              <button id="download-btn" class="download-btn">Download Image</button>
+        </div>
+       
+
+        <div class="accordion-heading" id="tab2b-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Two Texts
+          </span>
+        </div>
+        <div class="accordion-content" id="tab2b"> 
+        <div class="container-wrapper">
+            <div id="t2b-explained-text-input-container-1"></div>
+          <div id="t2b-explained-text-input-container-2"></div>
+            <br>
+            <div class="button-container">
+              <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+              <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
             </div>
+
+            <div class="visualization" id="visualization2b"><span class="hidden-trigger" id="hiddenTrigger"
+                style="display: none;"></span></div>
+
+
           </div>
         </div>
-        <!--         
-        <div class="accordion-heading" id="tab3-header" data-text="Explain: Prompt + Output"></div>
+
+        <div class="accordion-heading" id="tab3-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Generation
+          </span>
+        </div>
+
+
 
         <div class="accordion-content" id="tab3">
+        <div class="container-wrapper">
+            <div id="t3-explained-prompt-explained-gen"></div>
+            <br>
 
-        </div> 
+
+
+          </div>
+          <div class="button-container">
+            <button class="export-btn"><i class="fas fa-download"></i>&nbsp;Download Indexed Explanation</button>
+            <button class="export-viz-btn"><i class="fas fa-magic"></i>&nbsp;Generate Canvas Visualization</button>
+          </div>
+          <div class="visualization" id="visualization-tab3"><span class="hidden-trigger" id="hiddenTrigger-tab3"
+              style="display: none;"></span></div>
+        </div>
+
+
+        <div class="accordion-heading" id="tab4-header">
+          <span class="rotated-content">
+            <i class="fas fa-info-circle"></i>&nbsp;Prompt + Two Generations
+          </span>
+        </div>
+        <div class="accordion-content" id="tab4"> </div>
+
+        <div class="accordion-heading" id="tab5-header">
+          <span class="rotated-content">
+            <i class="fas fa-balance-scale"></i>&nbsp;<i class="fas fa-info-circle"></i>&nbsp;Two (Prompts +
+            Generations)
+          </span>
+        </div>
+
+        <div class="accordion-content" id="tab5"> </div>
+        <div class="accordion-heading" id="tab6-header">
+          <span class="rotated-content">
+            <i class="fas fa-balance-scale"></i>&nbsp;<i class="fas fa-info-circle"></i>&nbsp;Two (Prompts +
+            Two Generations)
+          </span>
+        </div>
+
+        <div class="accordion-content" id="tab6"> </div>
       </div>
-        -->
 
-
-      </div>
     </nav>
   </main>
   <footer class="footer">
     <div class="footer-content">
       <font color="grey"><i>
-          <p> <b>Known Issues:</b> <br> 1. If your highlight color spans multiple lines, it breaks image export<br>2. Works better on large screens. </p>
+          <p> <b>Known Issues:</b>
+            <br>
+            1. Has not & will not be tested on Safari or Firefox. Use Chromium based browsers.<br> 2. If your highlight
+            color spans multiple lines, it breaks
+            image export<br>3.
+            Works better on large screens.
+          </p>
         </i></font>
-      <p>&copy; 2023 Prompt Explanation Designer. All rights reserved.</p>
+      <p>&copy; 2023 Text Explanation Designer. All rights reserved.</p>
       <div class="open-source">
         <a href="https://github.com/nerdymomocat/prompt-explanation-designer/" target="_blank">
-          <img src="https://cdnjs.cloudflare.com/ajax/libs/octicons/8.5.0/svg/mark-github.svg" alt="GitHub"
-            class="github-logo" />
+          <i class="fab fa-github" alt="GitHub" class="github-logo"></i>
           Open Source
         </a>
       </div>
     </div>
   </footer>
-  <script type="module" src="script.js"></script>
+  <script type="module" src="scripts/script.js"></script>
+  <script type="module" src="scripts/basic_design.js"></script>
+  <script type="module" src="scripts/tab3_gen.js">
+  </script>
 </body>
 
 </html>
