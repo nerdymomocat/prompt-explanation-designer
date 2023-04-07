@@ -567,7 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tempHighlightClassApplier.toggleRange(range);
         selection.removeAllRanges();
 
-        if (selectedRanges.length >= 1 && !isCmdKeyDown) {
+        if (selectedRanges.length === 1 || isCmdKeyDown) {
           showColorPopup(event);
         }
       }
