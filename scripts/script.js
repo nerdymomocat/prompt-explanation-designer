@@ -1,33 +1,39 @@
 rangy.init();
 import { getUniqueRandomColor } from './module_color.js'
 import { wordDiff } from './module_diff.js'
-import { create_viz } from './module_viz.js'
+import { tab_create_viz } from './module_viz.js'
+import { hideVisWhenSidebarIsUpdated, internalCompareButtonClick, convertInputToSidebar } from './setup.js'
+
+const savedOptionsCateg = ["", "Hypothetical", "Mathematics", "Causation"];
+
+const colors = ["#E9E5E3", "#FAEBDD", "#FBF3DB", "#DDEDEA", "#DDEBF1", "#EAE4F2", "#F4DFEB", "#FBE4E4"];
+
+
+
+const activeTabNumber = () => {
+  const accordionContents = document.querySelectorAll(".accordion-content");
+  let activeAccordionContent;
+
+  accordionContents.forEach((content) => {
+    if (content.classList.contains("active")) {
+      activeAccordionContent = content;
+    }
+  });
+  let activeAccordionContentid = activeAccordionContent.getAttribute("id");
+  const tabNumber = activeAccordionContentid.replace("tab", "");
+  return tabNumber;
+}
 
 window.addEventListener('resize', () => {
-  // Call create_viz to update the visualization when the screen width changes
-  create_viz();
+  const tabNumber = activeTabNumber();
+  const vizElementId = `tb${tabNumber}-visualization`;
+  tab_create_viz(vizElementId, tabId);
 });
 
-
-const visualization = document.getElementById('visualization');
-const sidebar_content = document.getElementById('sidebar-content');
-
-// Attach an event listener to the sidebar
-sidebar_content.addEventListener('input', (event) => {
-  // Check if the event target is an input element or one of its children
-  if (event.target.matches('input, input *')) {
-    // Perform your desired action
-    visualization.style.display = 'none';
-  }
-});
-
-
-const textInput = document.querySelector('.text-input');
-
-
-function updatePlaceholderVisibility() {
-  const itemContainer = document.querySelector(".item-container");
-  const placeholder = document.querySelector(".item-placeholder");
+function updatePlaceholderVisibility(containerid) {
+  const sidebarcontainer = document.querySelector("#" + containerid)
+  const itemContainer = sidebarcontainer.querySelector(".item-container");
+  const placeholder = sidebarcontainer.querySelector(".item-placeholder");
 
   // Check if the item container has any child elements other than the placeholder
   const hasItems = Array.from(itemContainer.children).some(child => {
@@ -39,19 +45,11 @@ function updatePlaceholderVisibility() {
 }
 
 
-
-textInput.addEventListener('click', (event) => {
-  event.stopPropagation(); // Prevent the click event from bubbling up to the document
-  textInput.classList.add('active');
-});
-
 // Remove the active class when clicking outside the text input
-
-document.querySelector("#text-input").addEventListener("input", handleTextInputChange);
 
 
 function showModal(imageSrc) {
-  const modal = document.getElementById('modal');
+  const modal = document.getElementById('modalImg');
   const generatedImage = document.getElementById('generated-image');
   generatedImage.src = imageSrc;
   modal.style.display = 'block';
@@ -59,49 +57,88 @@ function showModal(imageSrc) {
 
 // Close the modal
 function closeModal() {
-  const modal = document.getElementById('modal');
+  const modal = document.getElementById('modalImg');
   modal.style.display = 'none';
 }
 
 const hamburgerMenu = document.getElementById("hamburger-menu");
 const dropdownMenu = document.getElementById("dropdown-menu");
-const dropdownItems = document.querySelectorAll(".dropdown-item");
 document.addEventListener("DOMContentLoaded", () => {
-  const visualizeBtn = document.querySelector('.export-viz-btn');
-  visualizeBtn.addEventListener("click", () => {
-    visualization.style.display = 'block';
-    create_viz();
+
+  const sidebars = document.querySelectorAll(".sidebar");
+
+  sidebars.forEach(sidebar => {
+    sidebar.addEventListener("dragover", onDragOver);
+    sidebar.addEventListener("drop", onDrop);
   });
 
 
+  hideVisWhenSidebarIsUpdated();
 
-  document.addEventListener('click', (event) => {
-    if (!textInput.contains(event.target) && textInput.classList.contains('active')) {
-      textInput.classList.remove('active');
-    }
-    if (!hamburgerMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
-      dropdownMenu.style.display = "none";
+  internalCompareButtonClick();
+
+
+  function addVisualizeBtnListener(btnClass, vizId, tabName) {
+    console.log(btnClass, vizId, tabName);
+    const visualizeBtn = document.querySelector(btnClass);
+    visualizeBtn.addEventListener("click", () => {
+      const visualization = document.getElementById(vizId);
+      visualization.style.display = 'block';
+      tab_create_viz(vizId, tabName);
+    });
+  }
+
+  const visualizeBtnData = [
+    { btnClass: '#tb2-export-viz-btn', vizId: 'tb2-visualization', tabName: 'tab2' },
+    { btnClass: '#tb3-export-viz-btn', vizId: 'tb3-visualization', tabName: 'tab3' },
+    { btnClass: '#tb4-export-viz-btn', vizId: 'tb4-visualization', tabName: 'tab4' },
+  ];
+
+  visualizeBtnData.forEach(data => addVisualizeBtnListener(data.btnClass, data.vizId, data.tabName));
+
+
+
+  window.addEventListener("click", (event) => {
+    const comparisonModal = document.querySelector("#comparisonModal");
+    if (event.target === comparisonModal) {
+      comparisonModal.style.display = "none";
     }
   });
 
-  const exportBtn = document.querySelector('.export-btn');
+  window.addEventListener("keydown", (event) => {
+    const comparisonModal = document.querySelector("#comparisonModal");
+    if (event.key === "Escape") {
+      comparisonModal.style.display = "none";
+    }
+  });
+
+  //HERE1
+
   const downloadBtn = document.getElementById('download-btn');
   const closeModalBtn = document.querySelector('.close');
 
-  // Capture the container and show the image in the modal
-  exportBtn.addEventListener('click', () => {
-    const container = document.querySelector('.container');
-    const desiredWidth = 1200;
-    const desiredHeight = 675;
-    const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+  function setupExportButton(exportBtnSelector, containerSelector, desiredHeightFactor) {
+    const exportBtn = document.querySelector(exportBtnSelector);
 
-    html2canvas(container, {
-      scale: scaleFactor,
-    }).then((canvas) => {
-      const imageSrc = canvas.toDataURL('image/png');
-      showModal(imageSrc);
+    // Capture the container and show the image in the modal
+    exportBtn.addEventListener('click', () => {
+      const container = document.querySelector(containerSelector);
+      const desiredWidth = 1200;
+      const desiredHeight = 675 * desiredHeightFactor;
+      const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+
+      html2canvas(container, {
+        scale: scaleFactor,
+      }).then((canvas) => {
+        const imageSrc = canvas.toDataURL('image/png');
+        showModal(imageSrc);
+      });
     });
-  });
+  }
+
+  setupExportButton('#tb2-export-btn', '#tb1-container', 1);
+  setupExportButton('#tb3-export-btn', '#tb3-container', 2);
+  setupExportButton('#tb4-export-btn', '#tb4-container', 3);
 
   // Download the image when the download button is clicked
   downloadBtn.addEventListener('click', () => {
@@ -118,15 +155,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener('click', (event) => {
-    const modal = document.getElementById('modal');
+    const modal = document.getElementById('modalImg');
+    const comparisonModal = document.querySelector("#comparisonModal");
+    // console.log(event, event.target, event.currentTarget);
     if (event.target === modal) {
       closeModal();
     }
+    else if (event.target === comparisonModal) {
+      comparisonModal.style.display = "none";
+    }
+
   });
 
 
 
-  document.querySelector('.text-input').setAttribute('tabindex', '0');
 
   function editDropdownOptions() {
     const optionsModal = document.getElementById("optionsModal");
@@ -137,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load saved options or use defaults.
     let savedOptions = JSON.parse(localStorage.getItem("dropdownOptions"));
     if (!savedOptions) {
-      savedOptions = ["", "Logical", "Spatial", "Material"];
+      savedOptions = savedOptionsCateg;
     }
 
     // Ensure there is at least one empty option.
@@ -174,9 +216,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Event listener for the settings button.
-  document.querySelector(".settings-button").addEventListener("click", () => {
-    editDropdownOptions();
+  document.querySelectorAll(".settings-button").forEach(button => {
+    button.addEventListener("click", () => {
+      editDropdownOptions();
+    });
   });
+
 
   function compareTextAreas() {
     console.log('compareTextAreas called'); // Debugging line
@@ -184,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const textArea1 = document.getElementById('tb1-text-area-1');
     const textArea2 = document.getElementById('tb1-text-area-2');
     const diffResults = document.getElementById('tb1-diff-results');
-    const resultsContainer = document.getElementById('results-container'); // Add this line
 
     const diffs = wordDiff(textArea1.value, textArea2.value);
 
@@ -201,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     diffResults.innerHTML = diffHTML;
   }
 
-  const applyColorWithRanges = (color, ranges) => {
+  const applyColorWithRanges = (color, ranges, sidebarcontainerid) => {
     const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
     const style = document.createElement("style");
     style.textContent = `
@@ -224,11 +268,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Update the sidebar with color indexes
-    updateSidebar(color);
+    updateSidebar(color, sidebarcontainerid);
   };
 
-  function removeAllItemsFromSidebar() {
-    const deleteButtons = document.querySelectorAll(".delete-button, .horizontal-line-delete-button");
+  function removeAllItemsFromSidebar(cid) {
+    const sidebar_container = document.querySelector("#" + cid);
+
+    const deleteButtons = sidebar_container.querySelectorAll(".delete-button, .horizontal-line-delete-button");
 
     deleteButtons.forEach((deleteButton) => {
       deleteButton.onclick();
@@ -241,8 +287,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function copyToDesigner() {
-    console.log('copyToDesigner called');
-    removeAllItemsFromSidebar();
+    //console.log('copyToDesigner called');
+    const comparisonModal = document.querySelector("#comparisonModal");
+    removeAllItemsFromSidebar(comparisonModal.dataset.sidebarContainerId);
 
     // Get the input text
     const diffResults = document.getElementById('tb1-diff-results');
@@ -260,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     delElements.forEach((delElement) => {
       const selectedRange = rangy.createRange();
       selectedRange.selectNodeContents(delElement);
-      applyStrikethrough([selectedRange]);
+      applyStrikethrough([selectedRange], comparisonModal.dataset.sidebarContainerId);
     });
 
     // Handle <ins> elements
@@ -268,8 +315,8 @@ document.addEventListener("DOMContentLoaded", () => {
     insElements.forEach((insElement) => {
       const selectedRange = rangy.createRange();
       selectedRange.selectNodeContents(insElement);
-      const randomColor = getUniqueRandomColor();
-      applyColorWithRanges(randomColor, [selectedRange]);
+      const randomColor = getUniqueRandomColor(comparisonModal.dataset.sidebarContainerId);
+      applyColorWithRanges(randomColor, [selectedRange], comparisonModal.dataset.sidebarContainerId);
     });
 
     // Unwrap <del> elements
@@ -291,32 +338,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Add the formatted text to the text-input area in the next collapsible
-    const outputTextArea = document.querySelector(".text-input");
+    const outputTextArea = document.querySelector("#" + comparisonModal.dataset.relatedTextInput);
     outputTextArea.innerHTML = tempDiv.innerHTML;
+    comparisonModal.style.display = "none";
   }
 
   const compareButton = document.querySelector("#tb1-compare-btn");
   compareButton.addEventListener("click", compareTextAreas);
 
 
-  const textInput = document.querySelector(".text-input");
+  const textInputs = document.querySelectorAll('.text-input');
 
-  textInput.addEventListener('paste', function(e) {
-    e.preventDefault(); // Prevent the default paste action
+  textInputs.forEach(textInput => {
+    textInput.addEventListener('click', (event) => {
+      event.stopPropagation();
+      textInput.classList.add('active');
+    });
 
-    var plainText = '';
+    textInput.addEventListener("mouseup", (event) => {
+      const selection = rangy.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (!range.collapsed) {
+          //selectedRanges.push(range);
+          tempHighlightClassApplier.toggleRange(range);
+          selection.removeAllRanges();
 
-    if (e.clipboardData && e.clipboardData.getData) {
-      plainText = e.clipboardData.getData('text/plain');
-    } else if (window.clipboardData && window.clipboardData.getData) {
-      plainText = window.clipboardData.getData('Text');
+          if (selectedRanges.length === 1) {
+            showColorPopup(event, textInput.getAttribute("id"), convertInputToSidebar(textInput.getAttribute("id")));
+          }
+        }
+      }
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    textInputs.forEach(textInput => {
+      if (!textInput.contains(event.target) && textInput.classList.contains('active')) {
+        textInput.classList.remove('active');
+      }
+    });
+    if (!hamburgerMenu.contains(event.target) && !dropdownMenu.contains(event.target)) {
+      dropdownMenu.style.display = "none";
     }
+  });
 
-    document.execCommand('insertText', false, plainText);
+  textInputs.forEach(textInput => {
+    textInput.addEventListener('paste', function(e) {
+      e.preventDefault(); // Prevent the default paste action
+
+      var plainText = '';
+
+      if (e.clipboardData && e.clipboardData.getData) {
+        plainText = e.clipboardData.getData('text/plain');
+      } else if (window.clipboardData && window.clipboardData.getData) {
+        plainText = window.clipboardData.getData('Text');
+      }
+
+      document.execCommand('insertText', false, plainText);
+    });
   });
 
   let selectedRanges = [];
-  let isCmdKeyDown = false;
+  //let isCmdKeyDown = false;
 
   // Create a temporary highlight class
   const tempHighlightClassName = "temp-highlight";
@@ -325,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.head.appendChild(tempHighlightStyle);
   const tempHighlightClassApplier = rangy.createClassApplier(tempHighlightClassName, { normalize: true });
 
-  const showColorPopup = (event) => {
+  const showColorPopup = (event, textinputid, sidebarid) => {
     if (document.querySelector(".color-popup")) {
       return;
     }
@@ -346,12 +430,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Create the color options
-    const colors = ["#E8DFF5", "#BED6DC", "#F3E2CE", "#F4EADE", "#D9DECB", "#FCE8E1", "#B2DCF3"];
+
     colors.forEach((color) => {
       const colorOption = document.createElement("button");
       colorOption.classList.add("color-option");
       colorOption.style.backgroundColor = color;
-      colorOption.addEventListener("click", () => applyColor(color));
+      colorOption.addEventListener("click", () => applyColor(color, sidebarid));
       popup.appendChild(colorOption);
     });
     const colorOptionStyle = document.createElement("style");
@@ -380,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add a strikethrough option
     const strikethroughOption = document.createElement("button");
     strikethroughOption.classList.add("strikethrough-option");
-    strikethroughOption.addEventListener("click", () => applyStrikethrough(selectedRanges));
+    strikethroughOption.addEventListener("click", () => applyStrikethrough(selectedRanges, sidebarid));
 
     const strikethroughIcon = document.createElement('i');
     strikethroughIcon.classList.add('fas', 'fa-strikethrough', 'icon', 'line-color', 'fa-2x');
@@ -410,7 +494,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.head.appendChild(strikethroughOptionStyle);
     document.body.appendChild(popup);
 
-    colorInput.addEventListener("change", () => applyColor(colorInput.value));
+    colorInput.addEventListener("change", () => applyColor(colorInput.value, sidebarid));
 
     const handleClose = () => {
       handleColorPopupClosing();
@@ -428,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 0);
   };
 
-  const applyColor = (color) => {
+  const applyColor = (color, sidebarcontainerid) => {
     const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
     const style = document.createElement("style");
     style.textContent = `
@@ -451,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Update the sidebar with color indexes
-    updateSidebar(color);
+    updateSidebar(color, sidebarcontainerid);
 
     // Clear the selectedRanges array and close the color popup
     selectedRanges = [];
@@ -475,36 +559,8 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedRanges = [];
   };
 
-  textInput.addEventListener("keydown", (event) => {
-    if (event.key === "Meta" || event.key === "Control") {
-      isCmdKeyDown = true;
-    }
-  });
 
-  textInput.addEventListener("keyup", (event) => {
-    if (event.key === "Meta" || event.key === "Control") {
-      isCmdKeyDown = false;
-      if (selectedRanges.length) {
-        showColorPopup(event);
-      }
-    }
-  });
 
-  textInput.addEventListener("mouseup", (event) => {
-    const selection = rangy.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      if (!range.collapsed) {
-        selectedRanges.push(range);
-        tempHighlightClassApplier.toggleRange(range);
-        selection.removeAllRanges();
-
-        if (selectedRanges.length === 1 || isCmdKeyDown) {
-          showColorPopup(event);
-        }
-      }
-    }
-  });
 
   const strikethroughClassName = "strikethrough";
   const strikethroughStyle = document.createElement("style");
@@ -512,9 +568,9 @@ document.addEventListener("DOMContentLoaded", () => {
   document.head.appendChild(strikethroughStyle);
   const strikethroughClassApplier = rangy.createClassApplier(strikethroughClassName, { normalize: true });
 
-  const applyStrikethrough = (selectedRanges) => {
+  const applyStrikethrough = (selectedRanges, sidebarcontainerid) => {
     // Generate a unique random color for the strikethrough line
-    const color = getUniqueRandomColor();
+    const color = getUniqueRandomColor(sidebarcontainerid);
 
     // Create a new CSS class for the strikethrough effect
     const className = `strikethrough-${color.replace('#', '').toLowerCase()}`;
@@ -539,17 +595,48 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Update the sidebar with the new strikethrough color index
-    updateSidebar(color, true);
+    updateSidebar(color, sidebarcontainerid, true);
 
     // Clear the selectedRanges array and close the color popup
     selectedRanges = [];
     handleColorPopupClosing();
   };
+  function addButtonClickListener(buttonSelector, targetSidebar) {
+    document.querySelector(buttonSelector).addEventListener('click', () => {
+      addHorizontalLine(targetSidebar);
+    });
+  }
+
+  addButtonClickListener('#tb2-plus-button', 'tb2-sidebar');
+  addButtonClickListener('#tb3-plus-button-1', 'tb3-sidebar-1');
+  addButtonClickListener('#tb3-plus-button-2', 'tb3-sidebar-2');
+  addButtonClickListener('#tb4-plus-button-1', 'tb4-sidebar-1');
+  addButtonClickListener('#tb4-plus-button-2', 'tb4-sidebar-2');
+  addButtonClickListener('#tb4-plus-button-3', 'tb4-sidebar-3');
+
+
+  function addInputEventListener(inputId, sidebarId, visualizationId) {
+    document.getElementById(inputId).addEventListener("input", () => handleTextInputChange(inputId, sidebarId, visualizationId));
+  }
+
+  const inputElements = [
+    { inputId: "tb2-text-input", sidebarId: "tb2-sidebar", visualizationId: "tb2-visualization" },
+    { inputId: "tb3-text-input-1", sidebarId: "tb3-sidebar-1", visualizationId: "tb3-visualization" },
+    { inputId: "tb3-text-input-2", sidebarId: "tb3-sidebar-2", visualizationId: "tb3-visualization" },
+    { inputId: "tb4-text-input-1", sidebarId: "tb4-sidebar-1", visualizationId: "tb4-visualization" },
+    { inputId: "tb4-text-input-2", sidebarId: "tb4-sidebar-2", visualizationId: "tb4-visualization" },
+    { inputId: "tb4-text-input-3", sidebarId: "tb4-sidebar-3", visualizationId: "tb4-visualization" },
+  ];
+
+  inputElements.forEach(({ inputId, sidebarId, visualizationId }) => {
+    addInputEventListener(inputId, sidebarId, visualizationId);
+  });
 
 
 });
 
-const addHorizontalLine = () => {
+const addHorizontalLine = (sidebarcontainerid) => {
+  const sidebarcontainer = document.getElementById(sidebarcontainerid);
   const wrapper = document.createElement("div");
   wrapper.classList.add("item-wrapper");
   wrapper.id = `item-${Date.now()}`; // Assign a unique ID to the wrapper
@@ -607,10 +694,10 @@ const addHorizontalLine = () => {
 
   wrapper.appendChild(extraWrapper);
   // Append the horizontal line wrapper to the end of the item container
-  const itemContainer = document.querySelector('.item-container');
+  const itemContainer = sidebarcontainer.querySelector('.item-container');
   itemContainer.appendChild(wrapper);
 
-  updatePlaceholderVisibility();
+  updatePlaceholderVisibility(sidebarcontainerid);
 
 };
 
@@ -618,9 +705,6 @@ const addHorizontalLine = () => {
 // const addHorizontalLineButton = document.getElementById("add-horizontal-line");
 // addHorizontalLineButton.addEventListener("click", addHorizontalLine);
 
-document.querySelector('.plus-button').addEventListener('click', () => {
-  addHorizontalLine();
-});
 
 
 
@@ -636,9 +720,14 @@ const updateInputSize = (input) => {
   document.body.removeChild(temp);
 };
 
-function handleTextInputChange() {
+function handleTextInputChange(textinputid, sidebarid, visualizationid) {
+  //console.log(textinputid, sidebarid, visualizationid);
+  const visualization = document.getElementById(visualizationid);
   visualization.style.display = 'none';
-  const textInput = document.querySelector("#text-input");
+
+  const sidebar = document.getElementById(sidebarid);
+
+  const textInput = document.getElementById(textinputid);
   const spans = textInput.querySelectorAll("span");
   const foundColors = new Set();
 
@@ -649,7 +738,7 @@ function handleTextInputChange() {
       !span.textContent.trim()
     ) {
       const colorCode = span.classList.value.split("-").pop();
-      const deleteButton = document.querySelector(`.delete-button-${colorCode}:not(.horizontal-line-delete)`);
+      const deleteButton = sidebar.querySelector(`.delete-button-${colorCode}:not(.horizontal-line-delete)`);
       if (deleteButton) {
         deleteButton.click();
       }
@@ -659,25 +748,25 @@ function handleTextInputChange() {
     }
   });
 
-  const allDeleteButtons = document.querySelectorAll(".delete-button:not(.horizontal-line-delete)");
+  const allDeleteButtons = sidebar.querySelectorAll(".delete-button:not(.horizontal-line-delete)");
   allDeleteButtons.forEach((deleteButton) => {
     const colorCode = deleteButton.classList.value.split("-").pop();
     if (!foundColors.has(colorCode)) {
       deleteButton.click();
     }
   });
-  updatePlaceholderVisibility();
+  updatePlaceholderVisibility(sidebarid);
 }
 
 // Function to update the sidebar with color indexes
-function updateSidebar(color, isStrikethrough = false) {
+function updateSidebar(color, containerid, isStrikethrough = false) {
   const wrapper = document.createElement("div");
+  const sidebarcontainer = document.querySelector("#" + containerid)
   wrapper.classList.add("item-wrapper");
   wrapper.id = `item-${Date.now()}`;
-  const sidebar = document.querySelector(".sidebar");
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
 
-  if (!document.getElementById(colorIndexId)) {
+  if (!sidebarcontainer.getElementById(colorIndexId)) {
     const colorIndexContainer = document.createElement("div");
     colorIndexContainer.id = colorIndexId;
     colorIndexContainer.classList.add("color-index-container");
@@ -698,12 +787,12 @@ function updateSidebar(color, isStrikethrough = false) {
     deleteButton.classList.add("delete-button", `delete-button-${color.replace("#", "").toLowerCase()}`);
     deleteButton.style.visibility = "hidden";
     deleteButton.onclick = () => {
-      deleteColor(color, isStrikethrough);
+      deleteColor(color, containerid, isStrikethrough);
 
       if (isStrikethrough) {
         const className = `strikethrough-${color.replace("#", "").toLowerCase()}`;
         const classApplier = rangy.createClassApplier(className, { normalize: true });
-        removeStrikethroughStyle(className);
+        removeStrikethroughStyle(className, containerid);
       }
     };
 
@@ -834,7 +923,7 @@ function updateSidebar(color, isStrikethrough = false) {
     colorIndexContainer.appendChild(descriptionInputsContainer);
 
     wrapper.appendChild(colorIndexContainer);
-    const itemContainer = document.querySelector(".item-container");
+    const itemContainer = sidebarcontainer.querySelector(".item-container");
     itemContainer.appendChild(wrapper);
 
     function handleMouseOver() {
@@ -864,12 +953,14 @@ function updateSidebar(color, isStrikethrough = false) {
     wrapper.addEventListener("mouseover", handleMouseOver);
     wrapper.addEventListener("mouseout", handleMouseOut);
   }
-  updatePlaceholderVisibility();
+  updatePlaceholderVisibility(containerid);
 }
 
+//LEAVING AT 4AM HERE!
+function removeStrikethroughStyle(className, textinputsidebarid) {
+  const textinputsidebaridcont = document.getElementById(textinputsidebarid);
 
-function removeStrikethroughStyle(className) {
-  const elements = document.querySelectorAll(`.${className}`);
+  const elements = textinputsidebaridcont.querySelectorAll(`.${className}`);
   elements.forEach((element) => {
     element.classList.remove(className);
   });
@@ -910,12 +1001,16 @@ const onDrop = (e) => {
 };
 
 
-const deleteColor = (color, isStrikethrough = false) => {
+const deleteColor = (color, textinputsidebarid, isStrikethrough = false) => {
+
+  const textinputsidebaridcont = document.getElementById(textinputsidebarid);
+
+
   const prefix = isStrikethrough ? 'strikethrough' : 'color-highlight';
   const className = `${prefix}-${color.replace("#", "").toLowerCase()}`;
 
   // Remove the colored highlights or strikethroughs from the text
-  const highlightedElements = document.getElementsByClassName(className);
+  const highlightedElements = textinputsidebaridcont.getElementsByClassName(className);
 
   while (highlightedElements.length > 0) {
     const element = highlightedElements[0];
@@ -927,7 +1022,7 @@ const deleteColor = (color, isStrikethrough = false) => {
 
   // Remove the color index container from the sidebar
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
-  const colorIndexContainer = document.getElementById(colorIndexId);
+  const colorIndexContainer = textinputsidebaridcont.getElementById(colorIndexId);
   if (colorIndexContainer) {
     const itemWrapper = colorIndexContainer.closest('.item-wrapper');
 
@@ -941,12 +1036,27 @@ const deleteColor = (color, isStrikethrough = false) => {
   }
 
   // Remove the CSS class from the document
-  const style = Array.from(document.getElementsByTagName('style')).find(style => style.textContent.includes(`.${className}`));
+
+
+  //explain it
+  //   This code is written in JavaScript and is used to remove a specific style element from the HTML document based on a given class name.
+
+  // Here's a step-by-step explanation of the code:
+
+  // 1. `document.getElementsByTagName('style')`: This line selects all the `<style>` elements in the HTML document.
+
+  // 2. `Array.from(...)`: This line converts the collection of `<style>` elements into an array, which allows the use of array methods like `find()`.
+
+  // 3. `.find(style => style.textContent.includes(`.${className}`))`: This line uses the `find()` method to search for a `<style>` element that contains the given `className` in its text content. The `.${className}` syntax is used to search for a class selector in the CSS code (e.g., `.my-class`). If a matching `<style>` element is found, it is assigned to the `style` variable; otherwise, `style` will be `undefined`.
+
+  // 4. `if (style) { ... }`: This conditional statement checks if a matching `<style>` element was found.
+
+  // 5. `style.remove();`: If a matching `<style>` element was found, this line removes it from the HTML document.
+
+  // In summary, this code snippet searches for a `<style>` element containing a specific class name and removes it from the HTML document if found.
+  const style = Array.from(textinputsidebaridcont.getElementsByTagName('style')).find(style => style.textContent.includes(`.${className}`));
   if (style) {
     style.remove();
   }
 };
 
-const sidebar = document.querySelector(".sidebar");
-sidebar.addEventListener("dragover", onDragOver);
-sidebar.addEventListener("drop", onDrop);
