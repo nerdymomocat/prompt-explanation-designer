@@ -3,8 +3,6 @@
   .export-viz-btn {
     margin-left: 0;
     margin-right: 0;
-    padding-left: 0;
-    padding-right: 0;
     width: auto;
     max-width: none;
   }
@@ -32,7 +30,11 @@
   }
   .text-input-wrapper {
     flex: 1;
-    margin-right: 20px;
+/*     margin-right: 20px; */
+  }
+  .flex-container
+  {
+    flex-direction:column;
   }
   
  .text-input-wrapper,
@@ -41,8 +43,8 @@
   .export-viz-btn{
  margin-left: auto;
  margin-right: auto;
- padding-left: 20px;
- padding-right: 20px;
+/*  padding-left: 20px;
+ padding-right: 20px; */
  width: 100%;
  max-width: 500px;
  box-sizing: border-box
