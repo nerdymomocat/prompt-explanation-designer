@@ -2,16 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const apiKey = localStorage.getItem("apiKey");
   const apiKeyTextbox = document.getElementById("textbox-gen");
-  const textInput3 = document.getElementById("text-input-3");
+  const textInput2 = document.getElementById("tb3-text-input-2");
+
+  //console.log(textInput2)
 
   if (apiKey) {
     apiKeyTextbox.value = apiKey;
-    textInput3.setAttribute("data-placeholder", "Generation Appears Here");
+    textInput2.setAttribute("data-placeholder", "Generation Appears Here");
   } else {
-    textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+    textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
   }
 
-  document.querySelector(".settings-button-gen").addEventListener("click", function() {
+  document.querySelector("#tb3-settings-button-gen").addEventListener("click", function() {
     event.stopPropagation();
     document.getElementById("settingsModal-gen").style.display = "block";
   });
@@ -30,24 +32,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // Temperature
-  document.querySelector("#temperature-button").addEventListener("click", function() {
+  document.querySelector("#tb3-temperature-button").addEventListener("click", function() {
     event.stopPropagation();
-    const temperatureSliderPopup = document.getElementById("temperature-slider-popup");
+    const temperatureSliderPopup = document.getElementById("tb3-temperature-slider-popup");
     temperatureSliderPopup.style.display = "block";
   });
 
-  const temperatureSlider = document.getElementById("temperature-slider");
-  const temperatureValueIcon = document.getElementById("temperature-value-icon");
+  const temperatureSlider = document.getElementById("tb3-temperature-slider");
+  const temperatureValueIcon = document.getElementById("tb3-temperature-value-icon");
 
   temperatureSlider.addEventListener("input", function() {
-    temperatureValueIcon.textContent = temperatureSlider.value;
+        temperatureValueIcon.textContent = parseFloat(temperatureSlider.value).toFixed(1);
   });
 
 
 
   // Close settingsModal-gen when clicking outside or pressing Escape
   document.addEventListener("click", function(event) {
-    const temperatureSliderPopup = document.getElementById("temperature-slider-popup");
+    const temperatureSliderPopup = document.getElementById("tb3-temperature-slider-popup");
     if (!temperatureSliderPopup.contains(event.target)) {
       temperatureSliderPopup.style.display = "none";
     }
@@ -63,19 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("keydown", function(event) {
     const settingsModal = document.getElementById("settingsModal-gen");
-    const temperatureSliderPopup = document.getElementById("temperature-slider-popup");
+    const temperatureSliderPopup = document.getElementById("tb3-temperature-slider-popup");
     if (event.key === "Escape") {
       settingsModal.style.display = "none";
       temperatureSliderPopup.style.display = "none";
     }
   });
 
-  document.querySelector(".generate-button").addEventListener("click", function() {
+  document.querySelector("#tb3-generate-button").addEventListener("click", function() {
     const apiKey = localStorage.getItem("apiKey");
-    const modelName = document.getElementById("dropdown-gen").value;
-    const prompt = document.getElementById("text-input-1").innerText;
-    const temperature = document.getElementById("temperature-slider").value;
-    const textInput3 = document.getElementById("text-input-3");
+    const modelName = document.getElementById("tb3-dropdown-gen").value;
+    const prompt = document.getElementById("tb3-text-input-1").innerText;
+    const temperature = document.getElementById("tb3-temperature-slider").value;
+    const textInput2 = document.getElementById("tb3-text-input-2");
     const current_date = new Date().toLocaleDateString();
     let system_content;
 
@@ -90,20 +92,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Clear the text-input-3 and change the placeholder to "Loading..."
-    textInput3.innerText = "";
-    textInput3.setAttribute("data-placeholder", "Loading...");
+    // Clear the tb3-text-input-2 and change the placeholder to "Loading..."
+    textInput2.innerText = "";
+    textInput2.setAttribute("data-placeholder", "Loading...");
 
     getChatCompletion(apiKey, modelName, prompt, temperature, system_content)
       .then((assistantMessage) => {
         // Revert the placeholder and display the assistant's message
-        textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
-        textInput3.innerText = assistantMessage;
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.innerText = assistantMessage;
       })
       .catch((error) => {
         // Revert the placeholder and display an error message
-        textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
-        textInput3.innerText = "Error: " + error.message;
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.innerText = "Error: " + error.message;
       });
   });
 
