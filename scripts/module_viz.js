@@ -1,3 +1,61 @@
+export const tab_create_viz = (visualizationid, tabid)=> {
+    const tabDOM = document.querySelector('#'+tabid);
+    if (tabid==="tab2")
+    {
+      const { canvas, svgs } = createCanvasGrid(1, 1, 600, 335, 20);
+      canvas = create_viz('tb2-text-input','tb2-sidebar');
+      addDownloadButton(canvas,visualizationid);
+    }
+  else if (tabid==="tab3")
+  {
+    const { canvas, svgs } = createCanvasGrid(2, 1, 600, 335, 20);
+    create_viz(svgs[0],'tb3-text-input-1','tb3-sidebar-1');
+    create_viz(svgs[1],'tb3-text-input-2','tb3-sidebar-2');
+    addDownloadButton(canvas,visualizationid);
+  }
+  else if (tabid==="tab4")
+  {
+    const { canvas, svgs } = createCanvasGrid(2, 2, 600, 335, 20);
+    create_viz(svgs[1],'tb4-text-input-1','tb4-sidebar-1');
+    canvas2 = create_viz(svgs[2],'tb4-text-input-2','tb4-sidebar-2');
+    canvas3 = create_viz(svgs[3],'tb4-text-input-3','tb4-sidebar-3');
+    addDownloadButton(canvas,visualizationid);
+  }
+};
+
+function createCanvasGrid(rows, cols, cellWidth, cellHeight, padding) {
+  const canvasWidth = cols * cellWidth + (cols + 1) * padding;
+  const canvasHeight = rows * cellHeight + (rows + 1) * padding;
+
+  const canvas = d3.select("#" + visualizationid)
+    .append('svg')
+    .attr('width', '100%')
+    .attr('height', '100%')
+    .attr('viewBox', `0 0 ${canvasWidth} ${canvasHeight}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const svgs = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const x = col * cellWidth + (col + 1) * padding;
+      const y = row * cellHeight + (row + 1) * padding;
+
+      const svg = canvas.append('g')
+        .attr('transform', `translate(${x}, ${y})`)
+        .append('svg')
+        .attr('width', cellWidth)
+        .attr('height', cellHeight)
+        .attr('viewBox', `0 0 ${cellWidth} ${cellHeight}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      svgs.push(svg);
+    }
+  }
+
+  return { canvas, svgs };
+}
+
 function darkenColor(color) {
   // Hardcoded factor
   const factor = 0.2;
@@ -18,12 +76,14 @@ function darkenColor(color) {
   return darkerColor.toString();
 }
 
-const visualization = document.getElementById('visualization');
-visualization.style.display = 'none';
+const visualizations = document.querySelectorAll('.visualization');
+visualizations.forEach(visualization => {
+  visualization.style.display = 'none';
+});
 
 
-const clearVisualization = () => {
-  const visualization = document.querySelector('#visualization');
+const clearVisualization = (visualizationid) => {
+  const visualization = document.querySelector('#'+visualizationid);
   while (visualization.firstChild) {
     visualization.removeChild(visualization.firstChild);
   }
@@ -70,16 +130,10 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
 };
 
 
-export const create_viz = () => {
-  clearVisualization();
-  const textInputDOM = document.querySelector('#text-input');
-  const sidebarDOM = document.querySelector('#sidebar-content');
-  const canvas = d3.select('#visualization')
-    .append('svg')
-    .attr('width', '100%')
-    .attr('height', '100%')
-    .attr('viewBox', '0 0 600 335')
-    .attr('preserveAspectRatio', 'xMidYMid meet');
+const create_viz = (canvas, textid, sidebarid) => {
+  clearVisualization(visualizationid);
+  const textInputDOM = document.querySelector('#'+textid);
+  const sidebarDOM = document.querySelector('#'+sidebarid);
 
   const plot = canvas.append('g');
 
@@ -94,7 +148,7 @@ export const create_viz = () => {
     const inputs = item.querySelectorAll('.color-description-input');
     const dropdowns = item.querySelectorAll('.description-dropdown');
     const annotationText = Array.from(inputs).map((input, index) => {
-      const prefix = dropdowns[index].value;
+      const prefix = dropdowns[index].value != "" ? dropdowns[index].value + ": " : "";
       return `${prefix} ${input.value}`.trim();
     }).join('\n');
 
@@ -309,7 +363,7 @@ export const create_viz = () => {
       const handleRadius = 4;
 
       const textHandle = annotationGroup.append('circle')
-        .attr('class', 'drag-handle')
+        .attr('class', 'drag-handle draggable')
         .attr('cx', closestCenter.x)
         .attr('cy', closestCenter.y)
         .attr('r', handleRadius)
@@ -376,7 +430,7 @@ export const create_viz = () => {
       }));
 
       const lineEndHandle = annotationGroup.append('circle')
-        .attr('class', 'drag-handle')
+        .attr('class', 'drag-handle draggable')
         .attr('cx', middleWordX - 6)
         .attr('cy', currentY)
         .attr('r', handleRadius)
@@ -409,9 +463,8 @@ export const create_viz = () => {
   const translateX = padding - plotBBox.x;
   const translateY = padding - plotBBox.y;
   plot.attr('transform', `translate(${translateX}, ${translateY})`);
-  addDownloadButton(canvas);
+  //return canvas;
 };
-
 
 // Helper function to create drag behavior
 function createDragBehavior(onDrag, onDragEnd) {
@@ -444,21 +497,21 @@ function hideDragHandles(annotationGroup) {
 
 
 
-function addDownloadButton(svg) {
+function addDownloadButton(svg, visualizationid) {
   console.log("Adding download button...");
-  const visualization = document.getElementById("visualization");
+  const visualizationcontainer = document.getElementById(visualizationid);
   const downloadButton = document.createElement("button");
   downloadButton.className = "download-svg-btn"; // Add the CSS class
 
   // Add the SVG download icon
   downloadButton.innerHTML = `
-  <object type="image/svg+xml" data="svgs/download.svg" width="24" height="24" fill="currentColor"></object>`;
+  <i class="fas fa-download fa-lg"></i>`;
 
   downloadButton.onclick = () => {
     console.log("Download button clicked...");
     downloadVisualization(svg);
   };
-  visualization.appendChild(downloadButton);
+  visualizationcontainer.appendChild(downloadButton);
 }
 
 function downloadVisualization(svg) {
