@@ -11,6 +11,38 @@
   --very-dark-tealish: #536373;
 }
 
+.button-input-container { display: flex; flex-direction: column; }
+
+.overlay-button-input-container {
+	position: relative;
+}
+
+.compare-btn-container {
+    position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.compare-btn-int {
+	position: relative;
+	width: 30px;
+	height: 30px;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.compare-btn-int:hover i {
+	color: red; /* Change the icon color on hover */
+}
+
+.compare-btn-int i {
+	position: relative;
+	z-index: 1;
+	color: black;
+}
+
+
 
 .text-border {
  border: 2px solid var(--dark-yellowish);
@@ -418,10 +450,10 @@ ins {
 .accordion-heading {
   position: relative;
   cursor: pointer;
-  padding: 10px;
+  padding: 5px;
   font-size: 14px;
   color: var(--dark-tealish);
-  width: 30px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -532,7 +564,7 @@ main {
  padding: 20px 10px 10px 10px
 }
 
-.output-container {
+.comp-output-container {
  display: flex;
  flex-direction: column;
  align-items: center
@@ -570,7 +602,7 @@ main {
  background-color: var(--dark-tealish)
 }
 
-#diff-results {
+.diff-results {
  border: 1px solid var(--dark-silverish);
  padding: 10px;
  width: 300px;
@@ -582,7 +614,7 @@ main {
  margin-left: 10px
 }
 
-#diff-results::before {
+.diff-results::before {
   content: attr(data-placeholder);
   display: block;
   pointer-events: none;
@@ -590,7 +622,7 @@ main {
   color: var(--dark-silverish);
 }
 
-#diff-results:not(:empty)::before {
+.diff-results:not(:empty)::before {
   content: "";
 }
 
@@ -877,7 +909,8 @@ text {
 .generate-button{
     display: inline-flex; 
     align-items: center; 
-    justify-content: center; 
+    justify-content: center;
+    padding: 5px;
 }
 
 .tab-container {
