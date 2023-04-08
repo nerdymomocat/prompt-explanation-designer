@@ -166,6 +166,18 @@ body {
  width: 100%
 }
 
+.tb2-container,
+.tb3-container,
+.tb4-container
+{
+  align-items: center;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+   padding: 20px;
+}
+
 
 
 
