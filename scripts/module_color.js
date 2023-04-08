@@ -1,7 +1,7 @@
 const lowerLightnessThreshold = 0.5; // You can adjust this value to change the lower lightness constraint
 export const upperLightnessThreshold = 0.8; // You can adjust this value to change the upper lightness constraint
 
-const predefinedColors = ["#E9E5E3", "#FAEBDD", "#FBF3DB", "#DDEDEA", "#DDEBF1", "#EAE4F2", "#F4DFEB", "#FBE4E4"];
+export const predefinedColors = ["#E9E5E3", "#FAEBDD", "#FBF3DB", "#DDEDEA", "#DDEBF1", "#EAE4F2", "#F4DFEB", "#FBE4E4"];
 
 
 const isColorCloseToPredefinedColors = (color) => {
