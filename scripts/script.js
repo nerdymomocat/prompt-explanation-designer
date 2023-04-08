@@ -117,28 +117,46 @@ document.addEventListener("DOMContentLoaded", () => {
   const downloadBtn = document.getElementById('download-btn');
   const closeModalBtn = document.querySelector('.close');
 
-  function setupExportButton(exportBtnSelector, containerSelector, desiredHeightFactor) {
-    const exportBtn = document.querySelector(exportBtnSelector);
+  function setupExportButton(exportBtnSelector, containerSelector, desiredHeightFactor, elementsToHideSelectors) {
+  const exportBtn = document.querySelector(exportBtnSelector);
 
-    // Capture the container and show the image in the modal
-    exportBtn.addEventListener('click', () => {
-      const container = document.querySelector(containerSelector);
-      const desiredWidth = 1200;
-      const desiredHeight = 675 * desiredHeightFactor;
-      const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
-
-      html2canvas(container, {
-        scale: scaleFactor,
-      }).then((canvas) => {
-        const imageSrc = canvas.toDataURL('image/png');
-        showModal(imageSrc);
-      });
+  // Function to show or hide elements
+  const setElementsVisibility = (selectors, visibility) => {
+    selectors.forEach((selector) => {
+      const element = document.querySelector(selector);
+      if (element) {
+        element.style.visibility = visibility;
+      }
     });
-  }
+  };
 
-  setupExportButton('#tb2-export-btn', '#tb1-container', 1);
-  setupExportButton('#tb3-export-btn', '#tb3-container', 2);
-  setupExportButton('#tb4-export-btn', '#tb4-container', 3);
+  // Capture the container and show the image in the modal
+  exportBtn.addEventListener('click', () => {
+    const container = document.querySelector(containerSelector);
+    const desiredWidth = 1200;
+    const desiredHeight = 675 * desiredHeightFactor;
+    const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+
+    // Hide elements before capturing
+    setElementsVisibility(elementsToHideSelectors, 'hidden');
+
+    html2canvas(container, {
+      scale: scaleFactor,
+    }).then((canvas) => {
+      const imageSrc = canvas.toDataURL('image/png');
+
+      // Show elements again after capturing
+      setElementsVisibility(elementsToHideSelectors, 'visible');
+
+      showModal(imageSrc);
+    });
+  });
+}
+
+  
+  setupExportButton('#tb2-export-btn', '.tb2-container', 1,[['#tb2-compare-btn']]);
+  setupExportButton('#tb3-export-btn', '.tb3-container', 2,['#tb3-compare-btn', '#tb3-settings-button-gen', '#tb3-generate-button']);
+  setupExportButton('#tb4-export-btn', '.tb4-container', 3,['#tb4-compare-btn', '#tb4-settings-button-gen-1', '#tb4-generate-button-1','#tb4-settings-button-gen-2', '#tb4-generate-button-2']);
 
   // Download the image when the download button is clicked
   downloadBtn.addEventListener('click', () => {
