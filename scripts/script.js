@@ -1,13 +1,10 @@
 rangy.init();
-import { getUniqueRandomColor } from './module_color.js'
+import { getUniqueRandomColor, predefinedColors } from './module_color.js'
 import { wordDiff } from './module_diff.js'
 import { tab_create_viz } from './module_viz.js'
 import { hideVisWhenSidebarIsUpdated, internalCompareButtonClick, convertInputToSidebar } from './setup.js'
 
 const savedOptionsCateg = ["", "Hypothetical", "Mathematics", "Causation"];
-
-const colors = ["#E9E5E3", "#FAEBDD", "#FBF3DB", "#DDEDEA", "#DDEBF1", "#EAE4F2", "#F4DFEB", "#FBE4E4"];
-
 
 
 const activeTabNumber = () => {
@@ -118,45 +115,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.querySelector('.close');
 
   function setupExportButton(exportBtnSelector, containerSelector, desiredHeightFactor, elementsToHideSelectors) {
-  const exportBtn = document.querySelector(exportBtnSelector);
+    const exportBtn = document.querySelector(exportBtnSelector);
 
-  // Function to show or hide elements
-  const setElementsVisibility = (selectors, visibility) => {
-    selectors.forEach((selector) => {
-      const element = document.querySelector(selector);
-      if (element) {
-        element.style.visibility = visibility;
-      }
+    // Function to show or hide elements
+    const setElementsVisibility = (selectors, visibility) => {
+      selectors.forEach((selector) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          element.style.visibility = visibility;
+        }
+      });
+    };
+
+    // Capture the container and show the image in the modal
+    exportBtn.addEventListener('click', () => {
+      const container = document.querySelector(containerSelector);
+      const desiredWidth = 1200;
+      const desiredHeight = 675 * desiredHeightFactor;
+      const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+
+      // Hide elements before capturing
+      setElementsVisibility(elementsToHideSelectors, 'hidden');
+
+      html2canvas(container, {
+        scale: scaleFactor,
+      }).then((canvas) => {
+        const imageSrc = canvas.toDataURL('image/png');
+
+        // Show elements again after capturing
+        setElementsVisibility(elementsToHideSelectors, 'visible');
+
+        showModal(imageSrc);
+      });
     });
-  };
+  }
 
-  // Capture the container and show the image in the modal
-  exportBtn.addEventListener('click', () => {
-    const container = document.querySelector(containerSelector);
-    const desiredWidth = 1200;
-    const desiredHeight = 675 * desiredHeightFactor;
-    const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
 
-    // Hide elements before capturing
-    setElementsVisibility(elementsToHideSelectors, 'hidden');
-
-    html2canvas(container, {
-      scale: scaleFactor,
-    }).then((canvas) => {
-      const imageSrc = canvas.toDataURL('image/png');
-
-      // Show elements again after capturing
-      setElementsVisibility(elementsToHideSelectors, 'visible');
-
-      showModal(imageSrc);
-    });
-  });
-}
-
-  
-  setupExportButton('#tb2-export-btn', '.tb2-container', 1,[['#tb2-compare-btn']]);
-  setupExportButton('#tb3-export-btn', '.tb3-container', 2,['#tb3-compare-btn', '#tb3-settings-button-gen', '#tb3-generate-button']);
-  setupExportButton('#tb4-export-btn', '.tb4-container', 3,['#tb4-compare-btn', '#tb4-settings-button-gen-1', '#tb4-generate-button-1','#tb4-settings-button-gen-2', '#tb4-generate-button-2']);
+  setupExportButton('#tb2-export-btn', '.tb2-container', 1, [['#tb2-compare-btn']]);
+  setupExportButton('#tb3-export-btn', '.tb3-container', 2, ['#tb3-compare-btn', '#tb3-settings-button-gen', '#tb3-generate-button']);
+  setupExportButton('#tb4-export-btn', '.tb4-container', 3, ['#tb4-compare-btn', '#tb4-settings-button-gen-1', '#tb4-generate-button-1', '#tb4-settings-button-gen-2', '#tb4-generate-button-2']);
 
   // Download the image when the download button is clicked
   downloadBtn.addEventListener('click', () => {
@@ -449,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create the color options
 
-    colors.forEach((color) => {
+    predefinedColors.forEach((color) => {
       const colorOption = document.createElement("button");
       colorOption.classList.add("color-option");
       colorOption.style.backgroundColor = color;
