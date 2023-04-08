@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="css/sidebars.css">
   <link rel="stylesheet" href="css/media_queries.css">
   <link rel="stylesheet" href="css/style_text_inputs.css">
-<!--   <link rel="stylesheet" href="css/combined.css"> -->
+  <!--   <link rel="stylesheet" href="css/combined.css"> -->
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -56,15 +56,15 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
     <div class="modal" id="comparisonModal" data-related-text-input="" data-sidebar-container-id="">
       <div class="modal-content">
         <div class=".comp-output-container ">
-            <textarea class="text-area" id="tb1-text-area-1" placeholder="Original Text"></textarea>
-            <textarea class="text-area" id="tb1-text-area-2" placeholder="New Text"></textarea>
-            <button id="tb1-compare-btn" class="compare-btn"> <i class="fas fa-balance-scale"></i>&nbsp;Compare</button>
-            <div id="results-container">
-              <div class="diff-results" id="tb1-diff-results" data-placeholder="Comparison Output Will Appear Here">
-              </div>
+          <textarea class="text-area" id="tb1-text-area-1" placeholder="Original Text"></textarea>
+          <textarea class="text-area" id="tb1-text-area-2" placeholder="New Text"></textarea>
+          <button id="tb1-compare-btn" class="compare-btn"> <i class="fas fa-balance-scale"></i>&nbsp;Compare</button>
+          <div id="results-container">
+            <div class="diff-results" id="tb1-diff-results" data-placeholder="Comparison Output Will Appear Here">
             </div>
-            <button id="tb1-copy-to-designer-btn" class="copy-to-designer-btn"> <i class="fas fa-copy"></i>&nbsp;Copy
-              to Designer</button>
+          </div>
+          <button id="tb1-copy-to-designer-btn" class="copy-to-designer-btn"> <i class="fas fa-copy"></i>&nbsp;Copy
+            to Designer</button>
         </div>
 
 
@@ -123,7 +123,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="container flex-container tb2-container">
               <div class="overlay-button-input-container">
                 <div id="tb2-compare-btn-container" class="compare-btn-container">
-                  <button id="tb2-compare-btn" class="compare-btn-int">
+                  <button id="tb2-compare-btn" class="compare-btn-int" title="Compare">
                     <i class="fas fa-balance-scale"></i>
                   </button>
                 </div>
@@ -140,8 +140,9 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                   </button>
                 </div>
                 <div id="tb2-sidebar-content" class="sidebar-content">
-                  <div id ="tb2-item-container" class="item-container">
-                    <span id="tb2-item-placeholder" class="item-placeholder"> Add a highlight or strikethrough to the text area to explain that
+                  <div id="tb2-item-container" class="item-container">
+                    <span id="tb2-item-placeholder" class="item-placeholder"> Add a highlight or strikethrough to the
+                      text area to explain that
                       text segment here.</span>
                   </div>
                 </div>
@@ -149,8 +150,10 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             </div>
             <br>
             <div class="button-container">
-              <button id="tb2-export-btn" class="export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed Explanation</button>
-              <button id="tb2-export-viz-btn" class="export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+              <button id="tb2-export-btn" class="export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
+                Explanation</button>
+              <button id="tb2-export-viz-btn" class="export-viz-btn"><i
+                  class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
             </div>
 
             <div class="visualization" id="tb2-visualization"><span class="hidden-trigger" id="tb2-hiddenTrigger"
@@ -263,81 +266,85 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="accordion-content" id="tab3">
           <div class="container-wrapper">
             <div class="tb3-container">
-            <div class="container flex-container">
-              <div class="overlay-button-input-container">
-                <div id="tb3-compare-btn-container" class="compare-btn-container">
-                  <button id="tb3-compare-btn" class="compare-btn-int">
-                    <i class="fas fa-balance-scale"></i>
-                  </button>
-                </div>
-                <div class="text-input-wrapper">
-                  <div class="text-input" id="tb3-text-input-1" contenteditable="true" spellcheck="false"
-                    data-placeholder="Add Prompt Here"></div>
-                </div>
-              </div>
-              <div id="tb3-sidebar-1" class="sidebar">
-                <div id = "tb3-plus-button-container-1" class="plus-button-container">
-                  <button id="tb3-plus-button-1" class="plus-button">— + —</button>
-                  <button id="tb3-settings-button-1" class="settings-button">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                </div>
-                <div id="tb3-sidebar-content-1" class="sidebar-content">
-                  <div id = "tb3-item-container" class="item-container">
-                    <span id = "tb3-item-placeholder" class="item-placeholder"> Add a highlight or strikethrough to the text area to explain that
-                      text segment here.</span>
+              <div class="container flex-container">
+                <div class="overlay-button-input-container">
+                  <div id="tb3-compare-btn-container" class="compare-btn-container">
+                    <button id="tb3-compare-btn" class="compare-btn-int" title="Compare">
+                      <i class="fas fa-balance-scale"></i>
+                    </button>
+                  </div>
+                  <div class="text-input-wrapper">
+                    <div class="text-input" id="tb3-text-input-1" contenteditable="true" spellcheck="false"
+                      data-placeholder="Add Prompt Here"></div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="container flex-container">
-              <div class="button-input-container">
-                <div class="grid-item-buttons">
-                  <button class="settings-button-gen" id="tb3-settings-button-gen" title="Open AI API Key">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                  <select class="dropdown-gen" id="tb3-dropdown-gen">
-                    <option value="gpt-3.5-turbo">GPT 3.5</option>
-                    <option value="gpt-4">GPT 4</option>
-                  </select>
-                  <button class="temperature-button" id="tb3-temperature-button">
-                    <span class="temperature-value" id="tb3-temperature-value-icon">0.5</span>&nbsp;
-                    <i class="fas fa-thermometer-half"></i>
-                  </button>
-                  <div class="popup-container">
-                    <div class="temperature-slider-popup" id="tb3-temperature-slider-popup" style="display: none;">
-                      <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb3-temperature-slider"
-                        class="temperature-slider" />
+                <div id="tb3-sidebar-1" class="sidebar">
+                  <div id="tb3-plus-button-container-1" class="plus-button-container">
+                    <button id="tb3-plus-button-1" class="plus-button">— + —</button>
+                    <button id="tb3-settings-button-1" class="settings-button">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                  </div>
+                  <div id="tb3-sidebar-content-1" class="sidebar-content">
+                    <div id="tb3-item-container" class="item-container">
+                      <span id="tb3-item-placeholder" class="item-placeholder"> Add a highlight or strikethrough to the
+                        text area to explain that
+                        text segment here.</span>
                     </div>
                   </div>
-                  <button class="generate-button" id="tb3-generate-button"><i class="fas fa-robot"></i></button>
-                </div>
-                <div class="text-input-wrapper">
-                  <div class="text-input" id="tb3-text-input-2" contenteditable="true" spellcheck="false"
-                    data-placeholder="Generation Appears Here. Add the API key in settings."></div>
                 </div>
               </div>
-
-              <div id="tb3-sidebar-2" class="sidebar">
-                <div id ="tb3-plus-button-container-2" class="plus-button-container">
-                  <button id="tb3-plus-button-2" class="plus-button">— + —</button>
-                  <button id = "tb3-settings-button-2" class="settings-button">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
+              <div class="container flex-container">
+                <div class="button-input-container">
+                  <div class="grid-item-buttons">
+                    <button class="settings-button-gen" id="tb3-settings-button-gen" title="Open AI API Key">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                    <select class="dropdown-gen" id="tb3-dropdown-gen">
+                      <option value="gpt-3.5-turbo">GPT 3.5</option>
+                      <option value="gpt-4">GPT 4</option>
+                    </select>
+                    <button class="temperature-button" id="tb3-temperature-button">
+                      <span class="temperature-value" id="tb3-temperature-value-icon">0.5</span>&nbsp;
+                      <i class="fas fa-thermometer-half"></i>
+                    </button>
+                    <div class="popup-container">
+                      <div class="temperature-slider-popup" id="tb3-temperature-slider-popup" style="display: none;">
+                        <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb3-temperature-slider"
+                          class="temperature-slider" />
+                      </div>
+                    </div>
+                    <button class="generate-button" id="tb3-generate-button"><i class="fas fa-robot"></i></button>
+                  </div>
+                  <div class="text-input-wrapper">
+                    <div class="text-input" id="tb3-text-input-2" contenteditable="true" spellcheck="false"
+                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                  </div>
                 </div>
-                <div id="tb3-sidebar-content-2" class="sidebar-content">
-                  <div id ="tb3-item-container-2" class="item-container">
-                    <span class="item-placeholder" id ="tb3-item-placeholder-2"> Add a highlight or strikethrough to the text area to explain that
-                      text segment here.</span>
+
+                <div id="tb3-sidebar-2" class="sidebar">
+                  <div id="tb3-plus-button-container-2" class="plus-button-container">
+                    <button id="tb3-plus-button-2" class="plus-button">— + —</button>
+                    <button id="tb3-settings-button-2" class="settings-button">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                  </div>
+                  <div id="tb3-sidebar-content-2" class="sidebar-content">
+                    <div id="tb3-item-container-2" class="item-container">
+                      <span class="item-placeholder" id="tb3-item-placeholder-2"> Add a highlight or strikethrough to
+                        the text area to explain that
+                        text segment here.</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
           <div class="button-container">
-            <button class="export-btn" id="tb3-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed Explanation</button>
-            <button class="export-viz-btn" id = "tb3-export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+            <button class="export-btn" id="tb3-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
+              Explanation</button>
+            <button class="export-viz-btn" id="tb3-export-viz-btn"><i
+                class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
           </div>
           <div class="visualization" id="tb3-visualization"><span class="hidden-trigger" id="tb3-hiddenTrigger"
               style="display: none;"></span></div>
@@ -352,129 +359,136 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="accordion-content" id="tab4">
           <div class="container-wrapper">
             <div class="tb4-container">
-            <div class="container flex-container">
-              <div class="overlay-button-input-container">
-                <div class="compare-btn-container">
-                  <button id="tb4-compare-btn" class="compare-btn-int">
-                    <i class="fas fa-balance-scale"></i>
-                  </button>
-                </div>
-                <div id="tb4-text-input-wrapper" class="text-input-wrapper">
-                  <div class="text-input" id="tb4-text-input-1" contenteditable="true" spellcheck="false"
-                    data-placeholder="Add Prompt Here"></div>
-                </div>
-              </div>
-              <div id="tb4-sidebar-1" class="sidebar">
-                <div class="plus-button-container">
-                  <button id="tb4-plus-button-1" class="plus-button">— + —</button>
-                  <button id="tb4-settings-button-1" class="settings-button">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                </div>
-                <div id="tb4-sidebar-content-1" class="sidebar-content">
-                  <div id="tb4-item-container-1" class="item-container">
-                    <span id="tb4-item-placeholder-1" class="item-placeholder"> Add a highlight or strikethrough to the
-                      text area to explain that
-                      text segment here.</span>
+              <div class="container flex-container">
+                <div class="overlay-button-input-container">
+                  <div class="compare-btn-container">
+                    <button id="tb4-compare-btn" class="compare-btn-int" title="Compare">
+                      <i class="fas fa-balance-scale"></i>
+                    </button>
+                  </div>
+                  <div id="tb4-text-input-wrapper" class="text-input-wrapper">
+                    <div class="text-input" id="tb4-text-input-1" contenteditable="true" spellcheck="false"
+                      data-placeholder="Add Prompt Here"></div>
                   </div>
                 </div>
+                <div id="tb4-sidebar-1" class="sidebar">
+                  <div class="plus-button-container">
+                    <button id="tb4-plus-button-1" class="plus-button">— + —</button>
+                    <button id="tb4-settings-button-1" class="settings-button">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                  </div>
+                  <div id="tb4-sidebar-content-1" class="sidebar-content">
+                    <div id="tb4-item-container-1" class="item-container">
+                      <span id="tb4-item-placeholder-1" class="item-placeholder"> Add a highlight or strikethrough to
+                        the
+                        text area to explain that
+                        text segment here.</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+              <div class="container flex-container">
+                <div class="button-input-container">
 
-            </div>
-            <div class="container flex-container">
-              <div class="button-input-container">
-
-                <div id="tb4-grid-item-buttons-1" class="grid-item-buttons">
-                  <button class="settings-button-gen" id="tb4-settings-button-gen-1">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                  <select class="dropdown-gen" id="tb4-dropdown-gen-1">
-                    <option value="gpt-3.5-turbo">GPT 3.5</option>
-                    <option value="gpt-4">GPT 4</option>
-                  </select>
-                  <button class="temperature-button" id="tb4-temperature-button-1">
-                    <span class="temperature-value" id="tb4-temperature-value-icon-1">0.5</span>&nbsp;
+                  <div id="tb4-grid-item-buttons-1" class="grid-item-buttons">
+                    <button class="settings-button-gen" id="tb4-settings-button-gen-1">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                    <select class="dropdown-gen" id="tb4-dropdown-gen-1">
+                      <option value="gpt-3.5-turbo">GPT 3.5</option>
+                      <option value="gpt-4">GPT 4</option>
+                    </select>
+                    <button class="temperature-button" id="tb4-temperature-button-1">
+                      <span class="temperature-value" id="tb4-temperature-value-icon-1">0.5</span>&nbsp;
                       <i class="fas fa-thermometer-half"></i>
-                      
-                  </button>
-                  <div class="popup-container" id="tb4-popup-container-1">
-                    <div class="temperature-slider-popup" id="tb4-temperature-slider-popup-1" style="display: none;">
-                      <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb4-temperature-slider-1" class="temperature-slider"/>
-                    </div>
-                  </div>
-                  <button class="generate-button" id="tb4-generate-button-1"><i class="fas fa-robot"></i></button>
-                </div>
-                <div id="tb4-text-input-wrapper-2" class="text-input-wrapper">
-                  <div class="text-input" id="tb4-text-input-2" contenteditable="true" spellcheck="false"
-                    data-placeholder="Generation Appears Here. Add the API key in settings."></div>
-                </div>
-              </div>
-              <div id="tb4-sidebar-2" class="sidebar">
-                <div id="tb4-plus-button-container-2" class="plus-button-container">
-                  <button id="tb4-plus-button-2" class="plus-button">— + —</button>
-                  <button id="tb4-settings-button-2" class="settings-button">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                </div>
-                <div id="tb4-sidebar-content-2" class="sidebar-content">
-                  <div id="tb4-item-container-2" class="item-container">
-                    <span id="tb4-item-placeholder-2" class="item-placeholder"> Add a highlight or strikethrough to the
-                      text area to explain that
-                      text segment here.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="container flex-container">
-              <div class="button-input-container">
 
-                <div id="tb4-grid-item-buttons-2" class="grid-item-buttons">
-                  <button class="settings-button-gen" id="tb4-settings-button-gen-2">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
-                  <select class="dropdown-gen" id="tb4-dropdown-gen-2">
-                    <option value="gpt-3.5-turbo">GPT 3.5</option>
-                    <option value="gpt-4">GPT 4</option>
-                  </select>
-                  <button class="temperature-button" id="tb4-temperature-button-2">
-                   
-                    <span class="temperature-value" id="tb4-temperature-value-icon-2">0.5</span>&nbsp;
-                    <i class="fas fa-thermometer-half"></i>
-                  </button>
-                  <div class="popup-container" id="tb4-popup-container-2">
-                    <div class="temperature-slider-popup" id="tb4-temperature-slider-popup-2" style="display: none;">
-                      <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb4-temperature-slider-2" class="temperature-slider"/>
+                    </button>
+                    <div class="popup-container" id="tb4-popup-container-1">
+                      <div class="temperature-slider-popup" id="tb4-temperature-slider-popup-1" style="display: none;">
+                        <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb4-temperature-slider-1"
+                          class="temperature-slider" />
+                      </div>
+                    </div>
+                    <button class="generate-button" id="tb4-generate-button-1"><i class="fas fa-robot"></i></button>
+                  </div>
+                  <div id="tb4-text-input-wrapper-2" class="text-input-wrapper">
+                    <div class="text-input" id="tb4-text-input-2" contenteditable="true" spellcheck="false"
+                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                  </div>
+                </div>
+                <div id="tb4-sidebar-2" class="sidebar">
+                  <div id="tb4-plus-button-container-2" class="plus-button-container">
+                    <button id="tb4-plus-button-2" class="plus-button">— + —</button>
+                    <button id="tb4-settings-button-2" class="settings-button">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                  </div>
+                  <div id="tb4-sidebar-content-2" class="sidebar-content">
+                    <div id="tb4-item-container-2" class="item-container">
+                      <span id="tb4-item-placeholder-2" class="item-placeholder"> Add a highlight or strikethrough to
+                        the
+                        text area to explain that
+                        text segment here.</span>
                     </div>
                   </div>
-                  <button class="generate-button" id="tb4-generate-button-2"><i class="fas fa-robot"></i></button>
-                </div>
-                <div id="tb4-text-input-wrapper-3" class="text-input-wrapper">
-                  <div class="text-input" id="tb4-text-input-3" contenteditable="true" spellcheck="false"
-                    data-placeholder="Generation Appears Here. Add the API key in settings."></div>
                 </div>
               </div>
-              <div id="tb4-sidebar-3" class="sidebar">
-                <div id="tb4-plus-button-container-3" class="plus-button-container">
-                  <button id="tb4-plus-button-3" class="plus-button">— + —</button>
-                  <button id="tb4-settings-button-3" class="settings-button">
-                    <i class="fas fa-cog fa-sm"></i>
-                  </button>
+              <div class="container flex-container">
+                <div class="button-input-container">
+
+                  <div id="tb4-grid-item-buttons-2" class="grid-item-buttons">
+                    <button class="settings-button-gen" id="tb4-settings-button-gen-2">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                    <select class="dropdown-gen" id="tb4-dropdown-gen-2">
+                      <option value="gpt-3.5-turbo">GPT 3.5</option>
+                      <option value="gpt-4">GPT 4</option>
+                    </select>
+                    <button class="temperature-button" id="tb4-temperature-button-2">
+
+                      <span class="temperature-value" id="tb4-temperature-value-icon-2">0.5</span>&nbsp;
+                      <i class="fas fa-thermometer-half"></i>
+                    </button>
+                    <div class="popup-container" id="tb4-popup-container-2">
+                      <div class="temperature-slider-popup" id="tb4-temperature-slider-popup-2" style="display: none;">
+                        <input type="range" min="0.1" max="1.0" step="0.1" value="0.5" id="tb4-temperature-slider-2"
+                          class="temperature-slider" />
+                      </div>
+                    </div>
+                    <button class="generate-button" id="tb4-generate-button-2"><i class="fas fa-robot"></i></button>
+                  </div>
+                  <div id="tb4-text-input-wrapper-3" class="text-input-wrapper">
+                    <div class="text-input" id="tb4-text-input-3" contenteditable="true" spellcheck="false"
+                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                  </div>
                 </div>
-                <div id="tb4-sidebar-content-3" class="sidebar-content">
-                  <div id="tb4-item-container-3" class="item-container">
-                    <span id="tb4-item-placeholder-3" class="item-placeholder"> Add a highlight or strikethrough to the
-                      text area to explain that
-                      text segment here.</span>
+                <div id="tb4-sidebar-3" class="sidebar">
+                  <div id="tb4-plus-button-container-3" class="plus-button-container">
+                    <button id="tb4-plus-button-3" class="plus-button">— + —</button>
+                    <button id="tb4-settings-button-3" class="settings-button">
+                      <i class="fas fa-cog fa-sm"></i>
+                    </button>
+                  </div>
+                  <div id="tb4-sidebar-content-3" class="sidebar-content">
+                    <div id="tb4-item-container-3" class="item-container">
+                      <span id="tb4-item-placeholder-3" class="item-placeholder"> Add a highlight or strikethrough to
+                        the
+                        text area to explain that
+                        text segment here.</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
 
           <div class="button-container">
-            <button class="export-btn" id="tb4-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed Explanation</button>
-            <button class="export-viz-btn" id="tb4-export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+            <button class="export-btn" id="tb4-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
+              Explanation</button>
+            <button class="export-viz-btn" id="tb4-export-viz-btn"><i
+                class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
           </div>
           <div class="visualization" id="tb4-visualization"><span class="hidden-trigger" id="tb4-hiddenTrigger"
               style="display: none;"></span></div>
