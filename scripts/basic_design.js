@@ -28,11 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-
-  // Set the first heading and content as active
-  accordionHeadings[0].classList.add("active");
-  accordionContents[0].classList.add("active");
-
   const hamburgerMenu = document.getElementById("hamburger-menu");
   const dropdownMenu = document.getElementById("dropdown-menu");
   const dropdownItems = document.querySelectorAll(".dropdown-item");
