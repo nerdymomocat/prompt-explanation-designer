@@ -912,7 +912,7 @@ text {
 .download-svg-btn,
 .download-svg-combined-btn {
   position: absolute;
-  z-index: 10; /* Change this value to ensure the button is above the SVG */
+  z-index: 2; /* Change this value to ensure the button is above the SVG */
     border: none;
   background: none;
   cursor: pointer;
