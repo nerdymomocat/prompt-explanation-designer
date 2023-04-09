@@ -819,6 +819,11 @@ text {
 .visualization{
     border: 1px solid var(--very-light-tealish);
   border-radius: 10px;
+  margin-left: auto;
+ margin-right: auto;
+ width: 100%;
+ max-width: 600px;
+ box-sizing: border-box;
 }
 
 .subvisualization {
