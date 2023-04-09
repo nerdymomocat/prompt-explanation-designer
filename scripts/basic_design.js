@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+
   const hamburgerMenu = document.getElementById("hamburger-menu");
   const dropdownMenu = document.getElementById("dropdown-menu");
   const dropdownItems = document.querySelectorAll(".dropdown-item");

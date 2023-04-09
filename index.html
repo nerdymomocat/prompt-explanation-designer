@@ -14,7 +14,6 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.3/d3.min.js"></script>
@@ -66,11 +65,10 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
           <button id="tb1-copy-to-designer-btn" class="copy-to-designer-btn"> <i class="fas fa-copy"></i>&nbsp;Copy
             to Designer</button>
         </div>
-
-
-
       </div>
     </div>
+
+
     <div id="optionsModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -121,7 +119,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
 
         <div class="accordion-content active" id="tab2">
           <div class="container-wrapper">
-            <div class="container flex-container tb2-container">
+            <div class="container flex-container tb2-container" id="tb2-textsidebar">
               <div class="overlay-button-input-container">
                 <div id="tb2-compare-btn-container" class="compare-btn-container">
                   <button id="tb2-compare-btn" class="compare-btn-int" title="Compare">
@@ -153,12 +151,15 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
             <div class="button-container">
               <button id="tb2-export-btn" class="export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
                 Explanation</button>
-              <button id="tb2-export-viz-btn" class="export-viz-btn"><i
-                  class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+              <button id="tb2-export-viz-btn" class="export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Draw Visualization On Canvas
+</button>
             </div>
 
-            <div class="visualization" id="tb2-visualization"><span class="hidden-trigger" id="tb2-hiddenTrigger"
-                style="display: none;"></span></div>
+            <div class="visualization" id="tb2-visualization">
+
+              <div class="subvisualization" id="tb2-visualization-1"></div>
+              <span class="hidden-trigger" id="tb2-hiddenTrigger" style="display: none;"></span>
+            </div>
 
 
           </div>
@@ -267,7 +268,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="accordion-content" id="tab3">
           <div class="container-wrapper">
             <div class="tb3-container">
-              <div class="container flex-container">
+              <div class="container flex-container" id="tb3-textsidebar-1">
                 <div class="overlay-button-input-container">
                   <div id="tb3-compare-btn-container" class="compare-btn-container">
                     <button id="tb3-compare-btn" class="compare-btn-int" title="Compare">
@@ -295,7 +296,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                   </div>
                 </div>
               </div>
-              <div class="container flex-container">
+              <div class="container flex-container" id="tb3-textsidebar-2">
                 <div class="button-input-container">
                   <div class="grid-item-buttons">
                     <button class="settings-button-gen" id="tb3-settings-button-gen" title="Open AI API Key">
@@ -318,8 +319,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                     <button class="generate-button" id="tb3-generate-button"><i class="fas fa-robot"></i></button>
                   </div>
                   <div class="text-input-wrapper">
-                    <div class="text-input" id="tb3-text-input-2" contenteditable="true" spellcheck="false"
-                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                    <div class="text-input" id="tb3-text-input-2" contenteditable="false" spellcheck="false"
+                      data-placeholder="Generation Appears Here.&#10Add the API key in settings."></div>
                   </div>
                 </div>
 
@@ -344,11 +345,15 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
           <div class="button-container">
             <button class="export-btn" id="tb3-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
               Explanation</button>
-            <button class="export-viz-btn" id="tb3-export-viz-btn"><i
-                class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+            <button class="export-viz-btn" id="tb3-export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Draw Visualization On Canvas
+</button>
           </div>
           <div class="visualization" id="tb3-visualization"><span class="hidden-trigger" id="tb3-hiddenTrigger"
-              style="display: none;"></span></div>
+              style="display: none;"></span>
+            <div class="subvisualization" id="tb3-visualization-1"></div>
+            <div class="subvisualization" id="tb3-visualization-2"></div>
+
+          </div>
         </div>
 
 
@@ -360,7 +365,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
         <div class="accordion-content" id="tab4">
           <div class="container-wrapper">
             <div class="tb4-container">
-              <div class="container flex-container">
+              <div class="container flex-container" id="tb4-textsidebar-1">
                 <div class="overlay-button-input-container">
                   <div class="compare-btn-container">
                     <button id="tb4-compare-btn" class="compare-btn-int" title="Compare">
@@ -390,7 +395,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                 </div>
 
               </div>
-              <div class="container flex-container">
+              <div class="container flex-container" id="tb4-textsidebar-2">
                 <div class="button-input-container">
 
                   <div id="tb4-grid-item-buttons-1" class="grid-item-buttons">
@@ -415,8 +420,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                     <button class="generate-button" id="tb4-generate-button-1"><i class="fas fa-robot"></i></button>
                   </div>
                   <div id="tb4-text-input-wrapper-2" class="text-input-wrapper">
-                    <div class="text-input" id="tb4-text-input-2" contenteditable="true" spellcheck="false"
-                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                    <div class="text-input" id="tb4-text-input-2" contenteditable="false" spellcheck="false"
+                      data-placeholder="Generation Appears Here.&#10Add the API key in settings."></div>
                   </div>
                 </div>
                 <div id="tb4-sidebar-2" class="sidebar">
@@ -436,7 +441,7 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                   </div>
                 </div>
               </div>
-              <div class="container flex-container">
+              <div class="container flex-container" id="tb4-textsidebar-3">
                 <div class="button-input-container">
 
                   <div id="tb4-grid-item-buttons-2" class="grid-item-buttons">
@@ -461,8 +466,8 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
                     <button class="generate-button" id="tb4-generate-button-2"><i class="fas fa-robot"></i></button>
                   </div>
                   <div id="tb4-text-input-wrapper-3" class="text-input-wrapper">
-                    <div class="text-input" id="tb4-text-input-3" contenteditable="true" spellcheck="false"
-                      data-placeholder="Generation Appears Here. Add the API key in settings."></div>
+                    <div class="text-input" id="tb4-text-input-3" contenteditable="false" spellcheck="false"
+                      data-placeholder="Generation Appears Here.&#10Add the API key in settings."></div>
                   </div>
                 </div>
                 <div id="tb4-sidebar-3" class="sidebar">
@@ -486,13 +491,18 @@ https://cdn.jsdelivr.net/npm/d3-color@3.1.0/dist/d3-color.min.js
           </div>
 
           <div class="button-container">
-            <button class="export-btn" id="tb4-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed
-              Explanation</button>
-            <button class="export-viz-btn" id="tb4-export-viz-btn"><i
-                class="fas fa-paint-brush fa-sm"></i>&nbsp;Generate Canvas Visualization</button>
+            <button class="export-btn" id="tb4-export-btn"><i class="fas fa-download fa-sm"></i>&nbsp;Download Indexed Explanation</button>
+            <button class="export-viz-btn" id="tb4-export-viz-btn"><i class="fas fa-paint-brush fa-sm"></i>&nbsp;Draw Visualization On Canvas
+</button>
           </div>
           <div class="visualization" id="tb4-visualization"><span class="hidden-trigger" id="tb4-hiddenTrigger"
-              style="display: none;"></span></div>
+              style="display: none;"></span>
+            <div class="subvisualization" id="tb4-visualization-1"></div>
+            <div class="subvisualization" id="tb4-visualization-2"></div>
+            <div class="subvisualization" id="tb4-visualization-3"></div>
+
+
+          </div>
         </div>
 
         <!--         <div class="accordion-heading" id="tab5-header">

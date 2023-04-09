@@ -9,12 +9,18 @@
   --dark-tealish: #698F97;
   --dark-silverish: #B4B8BD;
   --very-dark-tealish: #536373;
+  --light-off-white: #fffcf5;
+}
+
+.fa-lg{
+  line-height: normal !important;
 }
 
 .button-input-container { display: flex; flex-direction: column; }
 
 .overlay-button-input-container {
-	position: relative;
+position: relative;
+  display: flex;
 }
 
 .compare-btn-container {
@@ -33,13 +39,13 @@
 }
 
 .compare-btn-int:hover i {
-	color: red; /* Change the icon color on hover */
+	color: var(--dark-pinkish); /* Change the icon color on hover */
 }
 
 .compare-btn-int i {
 	position: relative;
 	z-index: 1;
-	color: black;
+	color: var(--very-light-tealish);
 }
 
 
@@ -175,7 +181,8 @@ body {
     max-width: 100%;
     display: flex;
     flex-direction: column;
-   padding: 20px;
+   padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 
@@ -229,7 +236,7 @@ body {
 
 .color-popup {
  position: absolute;
- background-color: var(--light-silverish);
+ background-color: var(--light-off-white);
  border: 1px solid var(--dark-yellowish);
  padding: 10px;
  border-radius: 5px;
@@ -465,7 +472,7 @@ ins {
   padding: 5px;
   font-size: 14px;
   color: var(--dark-tealish);
-  width: 20px;
+  width: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,11 +518,12 @@ ins {
   cursor: pointer;
   font-size: 24px;
   z-index: 10;
-    padding: 5px;
-  background: linear-gradient(to right, var(--light-tealish), var(--dark-tealish));
-  -webkit-background-clip: text; /* Clip the background to the text for WebKit browsers */
-  background-clip: text; /* Clip the background to the text */
-  color: transparent; /* Make the original text color transparent */
+  padding: 5px;
+}
+
+.hamburger-menu i {
+  color: var(--light-off-white);
+  text-shadow: -1.5px 0 var(--very-dark-tealish), 0 1.5px var(--very-dark-tealish), 1.5px 0 var(--very-dark-tealish), 0 -1.5px var(--very-dark-tealish);
 }
 
 .dropdown-menu {
@@ -542,7 +550,7 @@ ins {
 
 
 .dropdown-item:hover {
-  background-color: rgba(206, 238, 210, 0.7);
+  background-color: rgba(250, 225, 168, 0.7);
   color: var(--very-dark-tealish);
   cursor: pointer;
 }
@@ -617,13 +625,18 @@ main {
 .diff-results {
  border: 1px solid var(--dark-silverish);
  padding: 10px;
- width: 300px;
  height: 200px;
  overflow: auto;
  border-radius: 4px;
  line-height: 1.6;
- margin-bottom: 20px;
- margin-left: 10px
+}
+
+#results-container
+{
+   display: flex;
+ flex-direction: column;
+ justify-content: space-between;
+  width:95%;
 }
 
 .diff-results::before {
@@ -802,15 +815,19 @@ text {
 .annotation-circle {
   fill-opacity: 1;
 }
-#visualization {
-  border: 1px solid var(--very-light-tealish);
+
+.visualization{
+    border: 1px solid var(--very-light-tealish);
   border-radius: 10px;
+}
+
+.subvisualization {
   width: 100%;
   padding-bottom: 55.83%; /* (335 / 600) * 100 */
   position: relative;
 }
 
-#visualization > svg {
+.subvisualization > svg {
   width: 100%;
 /*   height: 100%; */
   position: absolute;
@@ -892,26 +909,36 @@ text {
   left: 0;
 }
 
-.download-svg-btn {
+.download-svg-btn,
+.download-svg-combined-btn {
   position: absolute;
   z-index: 10; /* Change this value to ensure the button is above the SVG */
-}
-
-.download-svg-btn {
-  border: none;
+    border: none;
   background: none;
   cursor: pointer;
   padding: 3px;
-  color: var(--dark-tealish); /* Set the color of the SVG icon */
+  color: var(--very-light-tealish); /* Set the color of the SVG icon */
 }
 
-.download-svg-btn svg {
+.download-svg-btn {
+  left: 5px;
+  top: 5px;
+}
+
+.download-svg-combined-btn {
+  right: 5px;
+  top: 5px;
+}
+
+.download-svg-btn svg,
+.download-svg-combined-btn svg{
   width: 24px; /* Adjust the size of the SVG icon */
   height: 24px;
 }
 
-.download-svg-btn:hover {
-  color: var(--very-dark-tealish); /* Set the color of the SVG icon on hover */
+.download-svg-btn:hover,
+.download-svg-combined-btn:hover{
+  color: var(--light-pinkish); /* Set the color of the SVG icon on hover */
 }
 
 .export-btn,

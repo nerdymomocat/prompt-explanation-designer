@@ -1,0 +1,84 @@
+To add an option to the popup to collapse or expand the selected text, you can follow these steps:
+
+1. Create a new button for the collapse/expand option in the popup.
+2. Add an event listener to the button to toggle the collapse/expand state of the selected text.
+3. Create a new CSS class for the collapsed state and apply it to the selected text when the button is clicked.
+4. Add a click event listener to the collapsed text (three dots) to expand the text again.
+
+Here's the updated code:
+
+```javascript
+// Add a collapse/expand option
+const collapseExpandOption = document.createElement("button");
+collapseExpandOption.classList.add("collapse-expand-option");
+collapseExpandOption.addEventListener("click", () => toggleCollapseExpand(selectedRanges));
+
+const collapseExpandIcon = document.createElement('i');
+collapseExpandIcon.classList.add('fas', 'fa-compress-arrows-alt', 'icon', 'collapse-expand', 'fa-2x');
+
+collapseExpandOption.appendChild(collapseExpandIcon);
+popup.appendChild(collapseExpandOption);
+
+const collapseExpandOptionStyle = document.createElement("style");
+collapseExpandOptionStyle.textContent = `
+  .collapse-expand-option {
+    background: none;
+    border: none;
+    position: relative;
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+  .collapse-expand-option:hover {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow when hovering over the color option */
+  }
+`;
+
+document.head.appendChild(collapseExpandOptionStyle);
+
+const collapsedClassName = "collapsed";
+const collapsedStyle = document.createElement("style");
+collapsedStyle.textContent = `
+  .${collapsedClassName} {
+    display: inline-block;
+    cursor: pointer;
+  }
+  .${collapsedClassName}:before {
+    content: "...";
+  }
+`;
+document.head.appendChild(collapsedStyle);
+const collapsedClassApplier = rangy.createClassApplier(collapsedClassName, { normalize: true });
+
+const toggleCollapseExpand = (selectedRanges) => {
+  selectedRanges.forEach((range) => {
+    // Remove the temporary highlight
+    tempHighlightClassApplier.undoToRange(range);
+
+    // Toggle the collapse/expand state
+    collapsedClassApplier.toggleRange(range);
+  });
+
+  // Clear the selectedRanges array and close the color popup
+  selectedRanges = [];
+  handleColorPopupClosing();
+};
+
+textInput.addEventListener("click", (event) => {
+  const target = event.target;
+  if (target.classList.contains(collapsedClassName)) {
+    // Expand the collapsed text
+    const range = rangy.createRange();
+    range.selectNodeContents(target);
+    collapsedClassApplier.undoToRange(range);
+  }
+});
+```
+
+This code adds a new button with a collapse/expand icon to the popup. When clicked, it toggles the collapse/expand state of the selected text by applying the `collapsed` CSS class. The collapsed text is represented by three dots, and when clicked, it expands the text again.
+
+Note that this implementation assumes that you are no longer doing non-continuous selection ranges.

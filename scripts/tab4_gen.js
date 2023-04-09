@@ -1,3 +1,5 @@
+import {removeAllItemsFromSidebar} from './setup.js'
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const apiKey = localStorage.getItem("apiKey");
@@ -12,15 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     textInput2.setAttribute("data-placeholder", "Generation Appears Here");
     textInput3.setAttribute("data-placeholder", "Generation Appears Here");
   } else {
-    textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
-    textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+    textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
+    textInput3.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
   }
 
   document.querySelector("#tb4-settings-button-gen-1").addEventListener("click", function() {
     event.stopPropagation();
     document.getElementById("settingsModal-gen").style.display = "block";
   });
-    document.querySelector("#tb4-settings-button-gen-2").addEventListener("click", function() {
+  document.querySelector("#tb4-settings-button-gen-2").addEventListener("click", function() {
     event.stopPropagation();
     document.getElementById("settingsModal-gen").style.display = "block";
   });
@@ -52,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     temperatureValueIcon1.textContent = parseFloat(temperatureSlider1.value).toFixed(1);
   });
 
-    document.querySelector("#tb4-temperature-button-2").addEventListener("click", function() {
+  document.querySelector("#tb4-temperature-button-2").addEventListener("click", function() {
     event.stopPropagation();
     const temperatureSliderPopup2 = document.getElementById("tb4-temperature-slider-popup-2");
     temperatureSliderPopup2.style.display = "block";
@@ -90,16 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keydown", function(event) {
     const settingsModal = document.getElementById("settingsModal-gen");
     const temperatureSliderPopup1 = document.getElementById("tb4-temperature-slider-popup-1");
-        const temperatureSliderPopup2 = document.getElementById("tb4-temperature-slider-popup-2");
+    const temperatureSliderPopup2 = document.getElementById("tb4-temperature-slider-popup-2");
 
     if (event.key === "Escape") {
       settingsModal.style.display = "none";
-      temperatureSliderPopup.style.display = "none";
+      temperatureSliderPopup1.style.display = "none";
       temperatureSliderPopup2.style.display = "none";
     }
   });
 
   document.querySelector("#tb4-generate-button-1").addEventListener("click", function() {
+    removeAllItemsFromSidebar("tb4-sidebar-content-2");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb4-dropdown-gen-1").value;
     const prompt = document.getElementById("tb4-text-input-1").innerText;
@@ -126,17 +129,18 @@ document.addEventListener("DOMContentLoaded", () => {
     getChatCompletion(apiKey, modelName, prompt, temperature, system_content)
       .then((assistantMessage) => {
         // Revert the placeholder and display the assistant's message
-        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput2.innerText = assistantMessage;
       })
       .catch((error) => {
         // Revert the placeholder and display an error message
-        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput2.innerText = "Error: " + error.message;
       });
   });
 
   document.querySelector("#tb4-generate-button-2").addEventListener("click", function() {
+    removeAllItemsFromSidebar("tb4-sidebar-content-3");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb4-dropdown-gen-2").value;
     const prompt = document.getElementById("tb4-text-input-1").innerText;
@@ -163,12 +167,12 @@ document.addEventListener("DOMContentLoaded", () => {
     getChatCompletion(apiKey, modelName, prompt, temperature, system_content)
       .then((assistantMessage) => {
         // Revert the placeholder and display the assistant's message
-        textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput3.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput3.innerText = assistantMessage;
       })
       .catch((error) => {
         // Revert the placeholder and display an error message
-        textInput3.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput3.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput3.innerText = "Error: " + error.message;
       });
   });

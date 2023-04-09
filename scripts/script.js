@@ -2,7 +2,7 @@ rangy.init();
 import { getUniqueRandomColor, predefinedColors } from './module_color.js'
 import { wordDiff } from './module_diff.js'
 import { tab_create_viz } from './module_viz.js'
-import { hideVisWhenSidebarIsUpdated, internalCompareButtonClick, convertInputToSidebar } from './setup.js'
+import { hideVisWhenSidebarIsUpdated, internalCompareButtonClick, convertInputToSidebar, getParentId,removeAllItemsFromSidebar} from './setup.js'
 
 const savedOptionsCateg = ["", "Hypothetical", "Mathematics", "Causation"];
 
@@ -24,7 +24,11 @@ const activeTabNumber = () => {
 window.addEventListener('resize', () => {
   const tabNumber = activeTabNumber();
   const vizElementId = `tb${tabNumber}-visualization`;
-  tab_create_viz(vizElementId, tabId);
+  const visualization = document.getElementById(vizElementId);
+
+  if (visualization.style.display !== 'none') {
+    tab_create_viz(vizElementId, "tab" + tabNumber);
+  }
 });
 
 function updatePlaceholderVisibility(containerid) {
@@ -76,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function addVisualizeBtnListener(btnClass, vizId, tabName) {
-    console.log(btnClass, vizId, tabName);
+    //console.log(btnClass, vizId, tabName);
     const visualizeBtn = document.querySelector(btnClass);
     visualizeBtn.addEventListener("click", () => {
       const visualization = document.getElementById(vizId);
@@ -130,9 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Capture the container and show the image in the modal
     exportBtn.addEventListener('click', () => {
       const container = document.querySelector(containerSelector);
+      //console.log(container.getBoundingClientRect());
       const desiredWidth = 1200;
       const desiredHeight = 675 * desiredHeightFactor;
       const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+      //console.log(container.offsetWidth, container.offsetHeight, scaleFactor);
 
       // Hide elements before capturing
       setElementsVisibility(elementsToHideSelectors, 'hidden');
@@ -239,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function compareTextAreas() {
-    console.log('compareTextAreas called'); // Debugging line
+    //console.log('compareTextAreas called'); // Debugging line
 
     const textArea1 = document.getElementById('tb1-text-area-1');
     const textArea2 = document.getElementById('tb1-text-area-2');
@@ -247,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const diffs = wordDiff(textArea1.value, textArea2.value);
 
-    console.log('Diffs:', diffs); // Debugging line
+    //console.log('Diffs:', diffs); // Debugging line
 
     const diffHTML = diffs
       .map(([op, text]) => {
@@ -286,15 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
     updateSidebar(color, sidebarcontainerid);
   };
 
-  function removeAllItemsFromSidebar(cid) {
-    const sidebar_container = document.querySelector("#" + cid);
-
-    const deleteButtons = sidebar_container.querySelectorAll(".delete-button, .horizontal-line-delete-button");
-
-    deleteButtons.forEach((deleteButton) => {
-      deleteButton.onclick();
-    });
-  }
 
   const copyToDesignerBtn = document.querySelector("#tb1-copy-to-designer-btn");
 
@@ -305,6 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //console.log('copyToDesigner called');
     const comparisonModal = document.querySelector("#comparisonModal");
     removeAllItemsFromSidebar(comparisonModal.dataset.sidebarContainerId);
+    console.log(comparisonModal.dataset.sidebarContainerId);
 
     // Get the input text
     const diffResults = document.getElementById('tb1-diff-results');
@@ -371,16 +369,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     textInput.addEventListener("mouseup", (event) => {
+      //console.log("mouseup event here!")
       const selection = rangy.getSelection();
       if (selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         if (!range.collapsed) {
-          //selectedRanges.push(range);
+          selectedRanges.push(range);
           tempHighlightClassApplier.toggleRange(range);
           selection.removeAllRanges();
 
           if (selectedRanges.length === 1) {
-            showColorPopup(event, textInput.getAttribute("id"), convertInputToSidebar(textInput.getAttribute("id")));
+            showColorPopup(event, convertInputToSidebar(textInput.getAttribute("id")));
           }
         }
       }
@@ -424,7 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.head.appendChild(tempHighlightStyle);
   const tempHighlightClassApplier = rangy.createClassApplier(tempHighlightClassName, { normalize: true });
 
-  const showColorPopup = (event, textinputid, sidebarid) => {
+  const showColorPopup = (event, sidebarid) => {
     if (document.querySelector(".color-popup")) {
       return;
     }
@@ -482,7 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     strikethroughOption.addEventListener("click", () => applyStrikethrough(selectedRanges, sidebarid));
 
     const strikethroughIcon = document.createElement('i');
-    strikethroughIcon.classList.add('fas', 'fa-strikethrough', 'icon', 'line-color', 'fa-2x');
+    strikethroughIcon.classList.add('fas', 'fa-strikethrough', 'icon', 'line-color', 'fa-lg');
 
     strikethroughOption.appendChild(strikethroughIcon);
     popup.appendChild(strikethroughOption);
@@ -496,6 +495,9 @@ document.addEventListener("DOMContentLoaded", () => {
     font-size: 12px;
     padding: 0;
     cursor: pointer;
+      display: flex;
+  align-items: center;
+  justify-content: center;
   }
   .icon {
     width: 20px;
@@ -507,6 +509,32 @@ document.addEventListener("DOMContentLoaded", () => {
 `;
 
     document.head.appendChild(strikethroughOptionStyle);
+
+const collapseOption = document.createElement("button");
+collapseOption.classList.add("collapse-option");
+collapseOption.addEventListener("click", () => collapseSelectedText());
+    const collapseOptionIcon = document.createElement('i');
+    collapseOptionIcon.classList.add('fas', 'fa-ellipsis-h', 'icon', 'line-color', 'fa-lg');
+
+    collapseOption.appendChild(collapseOptionIcon);
+
+    const collapseOptionStyle = document.createElement("style");
+collapseOptionStyle.textContent = `
+  .collapse-option {
+    background: none;
+    border: none;
+    position: relative;
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .collapse-option:hover {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+`;
+document.head.appendChild(collapseOptionStyle);
+
+    popup.appendChild(collapseOption);
     document.body.appendChild(popup);
 
     colorInput.addEventListener("change", () => applyColor(colorInput.value, sidebarid));
@@ -556,6 +584,51 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedRanges = [];
     handleColorPopupClosing();
   };
+
+const collapseSelectedText = () => {
+  // 1. Decide a class name for collapsed content
+  const collapsedContentClassName = "collapsed-content";
+  const collapsibleContentClassName = "collapsible-content";
+
+  // 2. Create a rangy class applier for the new class name
+  const collapsedContentClassApplier = rangy.createClassApplier(collapsedContentClassName, { normalize: true });
+  const collapsibleContentClassApplier = rangy.createClassApplier(collapsibleContentClassName, { normalize: true });
+
+  // 3. Iterate through the selectedRanges array
+  selectedRanges.forEach((range) => {
+    // a. Remove the temporary highlight
+    tempHighlightClassApplier.undoToRange(range);
+
+    // b. Collapse the content into ellipses using the class applier
+    const collapsedContent = document.createElement("span");
+    collapsedContent.textContent = "...";
+    collapsedContent.setAttribute("data-original-text", range.toString());
+    collapsedContent.classList.add(collapsedContentClassName);
+    collapsedContent.style.cursor = "pointer"; // Add hand pointer on hover
+
+    // c. Apply a click event to the ellipses
+    collapsedContent.addEventListener("click", function () {
+      // Remove the applied class completely
+      collapsedContentClassApplier.undoToRange(range);
+      collapsibleContentClassApplier.undoToRange(range);
+
+      // Fill the normal text in that class previously back into the text input
+      range.deleteContents();
+      range.insertNode(document.createTextNode(collapsedContent.getAttribute("data-original-text")));
+
+      // Remove the collapsed content span including the ellipses
+      collapsedContent.remove();
+    });
+
+    // Insert the collapsed content into the range
+    range.deleteContents();
+    range.insertNode(collapsedContent);
+  });
+
+  // 4. Clear the selectedRanges array and close the color popup
+  selectedRanges = [];
+  handleColorPopupClosing();
+};
 
   const closeColorPopup = () => {
     document.querySelectorAll(".color-popup").forEach((popup) => popup.remove());
@@ -744,6 +817,7 @@ function handleTextInputChange(textinputid, sidebarid, visualizationid) {
 
   const textInput = document.getElementById(textinputid);
   const spans = textInput.querySelectorAll("span");
+  //console.log(spans);
   const foundColors = new Set();
 
   spans.forEach((span) => {
@@ -771,17 +845,21 @@ function handleTextInputChange(textinputid, sidebarid, visualizationid) {
     }
   });
   updatePlaceholderVisibility(sidebarid);
+  if (textInput.innerHTML === '<br>') {
+    textInput.innerHTML = '';
+  }
 }
 
 // Function to update the sidebar with color indexes
-function updateSidebar(color, containerid, isStrikethrough = false) {
+function updateSidebar(color, sidebarcontainerid, isStrikethrough = false) {
   const wrapper = document.createElement("div");
-  const sidebarcontainer = document.querySelector("#" + containerid)
+  const sidebarcontainer = document.getElementById(sidebarcontainerid);
+  //console.log(sidebarcontainer);
   wrapper.classList.add("item-wrapper");
   wrapper.id = `item-${Date.now()}`;
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
 
-  if (!sidebarcontainer.getElementById(colorIndexId)) {
+  if (!sidebarcontainer.querySelector("#" + colorIndexId)) {
     const colorIndexContainer = document.createElement("div");
     colorIndexContainer.id = colorIndexId;
     colorIndexContainer.classList.add("color-index-container");
@@ -802,12 +880,13 @@ function updateSidebar(color, containerid, isStrikethrough = false) {
     deleteButton.classList.add("delete-button", `delete-button-${color.replace("#", "").toLowerCase()}`);
     deleteButton.style.visibility = "hidden";
     deleteButton.onclick = () => {
-      deleteColor(color, containerid, isStrikethrough);
+      const pid = getParentId(sidebarcontainerid);
+      deleteColor(color, pid, isStrikethrough);
 
       if (isStrikethrough) {
         const className = `strikethrough-${color.replace("#", "").toLowerCase()}`;
         const classApplier = rangy.createClassApplier(className, { normalize: true });
-        removeStrikethroughStyle(className, containerid);
+        removeStrikethroughStyle(className, pid);
       }
     };
 
@@ -968,7 +1047,7 @@ function updateSidebar(color, containerid, isStrikethrough = false) {
     wrapper.addEventListener("mouseover", handleMouseOver);
     wrapper.addEventListener("mouseout", handleMouseOut);
   }
-  updatePlaceholderVisibility(containerid);
+  updatePlaceholderVisibility(sidebarcontainerid);
 }
 
 //LEAVING AT 4AM HERE!
@@ -1025,19 +1104,24 @@ const deleteColor = (color, textinputsidebarid, isStrikethrough = false) => {
   const className = `${prefix}-${color.replace("#", "").toLowerCase()}`;
 
   // Remove the colored highlights or strikethroughs from the text
-  const highlightedElements = textinputsidebaridcont.getElementsByClassName(className);
+  let highlightedElements = textinputsidebaridcont.querySelectorAll("." + className);
+
+  //console.log(highlightedElements);
 
   while (highlightedElements.length > 0) {
     const element = highlightedElements[0];
     const parent = element.parentNode;
+    // console.log("ELEMENT:",element);
+    // console.log("PARENT:",parent);
 
     // Replace the highlighted element with its original content
     parent.replaceChild(document.createTextNode(element.textContent), element);
+    highlightedElements = textinputsidebaridcont.querySelectorAll("." + className);
   }
 
   // Remove the color index container from the sidebar
   const colorIndexId = `color-index-${color.replace("#", "").toLowerCase()}`;
-  const colorIndexContainer = textinputsidebaridcont.getElementById(colorIndexId);
+  const colorIndexContainer = textinputsidebaridcont.querySelector("#" + colorIndexId);
   if (colorIndexContainer) {
     const itemWrapper = colorIndexContainer.closest('.item-wrapper');
 
@@ -1074,4 +1158,3 @@ const deleteColor = (color, textinputsidebarid, isStrikethrough = false) => {
     style.remove();
   }
 };
-

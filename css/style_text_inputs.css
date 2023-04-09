@@ -1,5 +1,4 @@
-.text-input,
-.text-input-tab3 {
+.text-input{
  flex: 1;
  min-height: 100px;
  padding: 10px;
@@ -13,21 +12,19 @@
   border-color: var(--light-yellowish);
 }
 
-.text-input.active,
-.text-input-tab3.active{
- border-color: var(--deep-yellowish);
- background-color: var(--light-silverish)
+.text-input.active{
+ border-color: var(--dark-yellowish);
+ background-color: var(--light-off-white)
 }
 
-.text-input[data-placeholder]:empty::before,
-.text-input-tab3[data-placeholder]:empty::before{
+.text-input[data-placeholder]:empty::before{
  content: attr(data-placeholder);
  color: var(--dark-silverish);
- pointer-events: none
+ pointer-events: none;
+  white-space: pre-wrap; /* Add this line */
 }
 
-.text-input:focus[data-placeholder]:empty::before,
-.text-input-tab3:focus[data-placeholder]:empty::before{
+.text-input:focus[data-placeholder]:empty::before{
  content: none
 }
 
@@ -46,22 +43,6 @@
  min-width: 300px
 }
 
-.text-input-tab3-wrapper {
- display: flex;
- flex-direction: column;
- flex: 1;
- min-width: 300px
-}
-
-.text-area-container {
- display: flex;
- flex-direction: column;
- justify-content: space-between;
- margin-right: 20px;
- margin-left: 10px;
- gap: 10px
-}
-
 .text-area-container {
  display: flex;
  flex-direction: column;
@@ -74,7 +55,7 @@
 .text-area {
   font-family: Arial, sans-serif;
   font-size: 16px;
-width: 300px;  
+width:90%;  
   height: 200px; 
   resize: none;
   border: 1px solid var(--dark-silverish);

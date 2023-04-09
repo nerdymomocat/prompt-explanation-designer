@@ -1,3 +1,6 @@
+import {removeAllItemsFromSidebar} from './setup.js'
+
+
 document.addEventListener("DOMContentLoaded", () => {
 
   const apiKey = localStorage.getItem("apiKey");
@@ -10,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     apiKeyTextbox.value = apiKey;
     textInput2.setAttribute("data-placeholder", "Generation Appears Here");
   } else {
-    textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+    textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
   }
 
   document.querySelector("#tb3-settings-button-gen").addEventListener("click", function() {
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const temperatureValueIcon = document.getElementById("tb3-temperature-value-icon");
 
   temperatureSlider.addEventListener("input", function() {
-        temperatureValueIcon.textContent = parseFloat(temperatureSlider.value).toFixed(1);
+    temperatureValueIcon.textContent = parseFloat(temperatureSlider.value).toFixed(1);
   });
 
 
@@ -73,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.querySelector("#tb3-generate-button").addEventListener("click", function() {
+    removeAllItemsFromSidebar("tb3-sidebar-content-2");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb3-dropdown-gen").value;
     const prompt = document.getElementById("tb3-text-input-1").innerText;
@@ -99,12 +103,12 @@ document.addEventListener("DOMContentLoaded", () => {
     getChatCompletion(apiKey, modelName, prompt, temperature, system_content)
       .then((assistantMessage) => {
         // Revert the placeholder and display the assistant's message
-        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput2.innerText = assistantMessage;
       })
       .catch((error) => {
         // Revert the placeholder and display an error message
-        textInput2.setAttribute("data-placeholder", "Generation Appears Here. Add the API key in settings.");
+        textInput2.setAttribute("data-placeholder", "Generation Appears Here.\nAdd the API key in settings.");
         textInput2.innerText = "Error: " + error.message;
       });
   });
