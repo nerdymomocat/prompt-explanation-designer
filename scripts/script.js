@@ -384,6 +384,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     });
+    
+    textInput.addEventListener("touchend", (event) => {
+      //console.log("mouseup event here!")
+      const selection = rangy.getSelection();
+      if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (!range.collapsed) {
+          selectedRanges.push(range);
+          tempHighlightClassApplier.toggleRange(range);
+          selection.removeAllRanges();
+
+          if (selectedRanges.length === 1) {
+            showColorPopup(event, convertInputToSidebar(textInput.getAttribute("id")));
+          }
+        }
+      }
+    });
   });
 
   document.addEventListener('click', (event) => {
