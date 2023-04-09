@@ -39087,7 +39087,7 @@ This code adds a `requestBody` variable to store the request payload and then lo
 ---
 me: nope, so it does not work with curl too.
 
-curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer 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" -d '{"model":"gpt-3.5-turbo\t","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"dsdssds"}],"max_tokens":50,"n":1,"temperature":0.5}' returns the same error. figure out what is wrong.
+curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer " -d '{"model":"gpt-3.5-turbo\t","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"dsdssds"}],"max_tokens":50,"n":1,"temperature":0.5}' returns the same error. figure out what is wrong.
 ---
 raycast ai 4: I apologize for the inconvenience. Based on the cURL command you provided, it seems like there's a tab character `\t` appended to the model name `"gpt-3.5-turbo\t"`. This is likely causing the issue with the API request.
 
@@ -39096,11 +39096,11 @@ To fix the issue, please ensure that there are no extra characters in the model 
 Here's the corrected cURL command:
 
 ```bash
-curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer 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" -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"dsdssds"}],"max_tokens":50,"n":1,"
+curl https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer " -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"dsdssds"}],"max_tokens":50,"n":1,"
 ---
 me: it works in curl but it outputs undefined in the text input 3. this is the output from curl:
 
-url https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer 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" -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"Hi, hello!"}],"max_tokens":50,"n":1,"temperature":0.5}'
+url https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer  " -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"Hi, hello!"}],"max_tokens":50,"n":1,"temperature":0.5}'
 {"id":"chatcmpl-71UbOMvXE1eHYMAHX1Y3DWYOx4kja","object":"chat.completion","created":1680590318,"model":"gpt-3.5-turbo-0301","usage":{"prompt_tokens":23,"completion_tokens":9,"total_tokens":32},"choices":[{"message":{"role":"assistant","content":"Hello! How can I assist you today?"},"finish_reason":"stop","index":0}]}
 ---
 raycast ai 4: The issue is likely due to the response format being different for the `v1/chat/completions` endpoint compared to the previous `v1/engines` endpoint. In the new response format, the generated output is located at `response.choices[0].message.content`.
@@ -39154,7 +39154,7 @@ me:   async function getChatCompletion(apiKey, modelName, prompt, temperature) {
 
 it works in curl but it outputs undefined in the text input 3. this is the output from curl:
 
-url https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer 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" -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"Hi, hello!"}],"max_tokens":50,"n":1,"temperature":0.5}'
+url https://api.openai.com/v1/chat/completions -H "Content-Type: application/json" -H "Authorization: Bearer  " -d '{"model":"gpt-3.5-turbo","messages":[{"role":"system","content":"You are a helpful assistant."},{"role":"user","content":"Hi, hello!"}],"max_tokens":50,"n":1,"temperature":0.5}'
 {"id":"chatcmpl-71UbOMvXE1eHYMAHX1Y3DWYOx4kja","object":"chat.completion","created":1680590318,"model":"gpt-3.5-turbo-0301","usage":{"prompt_tokens":23,"completion_tokens":9,"total_tokens":32},"choices":[{"message":{"role":"assistant","content":"Hello! How can I assist you today?"},"finish_reason":"stop","index":0}]}
 ---
 raycast ai 4: It looks like you're able to get a response from the API using `curl`, but you're having trouble displaying the response in your text input.
