@@ -1,0 +1,311 @@
+  let selectedRanges = [];
+  let isCmdKeyDown = false;
+
+  // Create a temporary highlight class
+  const tempHighlightClassName = "temp-highlight";
+  const tempHighlightStyle = document.createElement("style");
+  tempHighlightStyle.textContent = `.${tempHighlightClassName} { background-color: rgba(0, 0, 0, 0.1); }`;
+  document.head.appendChild(tempHighlightStyle);
+  const tempHighlightClassApplier = rangy.createClassApplier(tempHighlightClassName, { normalize: true });  
+
+const showColorPopup = (event) => {
+    if (document.querySelector(".color-popup")) {
+      return;
+    }
+    const popup = document.createElement("div");
+    popup.classList.add("color-popup");
+    popup.style.top = `${event.pageY}px`;
+    popup.style.left = `${event.pageX}px`;
+
+    const colorInputWrapper = document.createElement("div");
+    colorInputWrapper.classList.add("color-input-wrapper");
+    popup.appendChild(colorInputWrapper);
+
+    const colorInput = document.createElement("input");
+    colorInput.type = "color";
+    colorInput.classList.add("color-input");
+    colorInputWrapper.appendChild(colorInput);
+
+
+
+    // Create the color options
+    const colors = ["#E8DFF5", "#BED6DC", "#F3E2CE", "#F4EADE", "#D9DECB", "#FCE8E1", "#B2DCF3"];
+    colors.forEach((color) => {
+      const colorOption = document.createElement("button");
+      colorOption.classList.add("color-option");
+      colorOption.style.backgroundColor = color;
+      colorOption.addEventListener("click", () => applyColor(color));
+      popup.appendChild(colorOption);
+    });
+    const colorOptionStyle = document.createElement("style");
+    colorOptionStyle.textContent = `
+  .color-popup {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Add space between the color options */
+    padding: 5px;
+  }
+  .color-option {
+    width: 20px; /* Set the width of the color option circle */
+    height: 20px; /* Set the height of the color option circle */
+    border-radius: 50%; /* Make the color option a circle */
+    border: none; 
+    cursor: pointer; /* Change the cursor to a pointer when hovering over the color option */
+    outline: none; /* Remove the default focus outline */
+    margin: 5px; /* Add space between the color options */
+  }
+  .color-option:hover {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow when hovering over the color option */
+  }
+`;
+    document.head.appendChild(colorOptionStyle);
+
+    // Add a strikethrough option
+    const strikethroughOption = document.createElement("button");
+    strikethroughOption.classList.add("strikethrough-option");
+    strikethroughOption.addEventListener("click", () => applyStrikethrough(selectedRanges));
+
+    const strikethroughIcon = document.createElement('i');
+    strikethroughIcon.classList.add('fas', 'fa-strikethrough', 'icon', 'line-color', 'fa-2x');
+
+    strikethroughOption.appendChild(strikethroughIcon);
+    popup.appendChild(strikethroughOption);
+
+    const strikethroughOptionStyle = document.createElement("style");
+    strikethroughOptionStyle.textContent = `
+  .strikethrough-option {
+    background: none;
+    border: none;
+    position: relative;
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+    .strikethrough-option:hover {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow when hovering over the color option */
+  }
+`;
+
+    document.head.appendChild(strikethroughOptionStyle);
+    document.body.appendChild(popup);
+
+    colorInput.addEventListener("change", () => applyColor(colorInput.value));
+
+    const handleClose = () => {
+      handleColorPopupClosing();
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+    const handleClickOutside = (e) => {
+      if (!popup.contains(e.target)) {
+        handleClose();
+      }
+    };
+
+    setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+    }, 0);
+  };
+
+  const applyColor = (color) => {
+    const className = `color-highlight-${color.replace("#", "").toLowerCase()}`;
+    const style = document.createElement("style");
+    style.textContent = `
+    .${className} {
+      background-color: ${color};
+      border-radius: 3px;
+      padding: 1px 1px;
+    }
+  `;
+    document.head.appendChild(style);
+
+    const classApplier = rangy.createClassApplier(className, { normalize: true });
+
+    selectedRanges.forEach((range) => {
+      // Remove the temporary highlight
+      tempHighlightClassApplier.undoToRange(range);
+
+      // Apply the new color highlight
+      classApplier.toggleRange(range);
+    });
+
+    // Update the sidebar with color indexes
+    updateSidebar(color);
+
+    // Clear the selectedRanges array and close the color popup
+    selectedRanges = [];
+    handleColorPopupClosing();
+  };
+
+  const closeColorPopup = () => {
+    document.querySelectorAll(".color-popup").forEach((popup) => popup.remove());
+  };
+
+  // Add a new function to handle color popup closing
+  const handleColorPopupClosing = () => {
+    closeColorPopup();
+
+    // Remove temporary highlights
+    selectedRanges.forEach((range) => {
+      tempHighlightClassApplier.undoToRange(range);
+    });
+
+    // Clear the selected ranges
+    selectedRanges = [];
+  };
+
+  textInput.addEventListener("mouseup", (event) => {
+    const selection = rangy.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      if (!range.collapsed) {
+        selectedRanges.push(range);
+        tempHighlightClassApplier.toggleRange(range);
+        selection.removeAllRanges();
+
+        if (selectedRanges.length === 1 || isCmdKeyDown) {
+          showColorPopup(event);
+        }
+      }
+    }
+  });
+
+  const strikethroughClassName = "strikethrough";
+  const strikethroughStyle = document.createElement("style");
+  strikethroughStyle.textContent = `.${strikethroughClassName} { text-decoration: line-through; }`;
+  document.head.appendChild(strikethroughStyle);
+  const strikethroughClassApplier = rangy.createClassApplier(strikethroughClassName, { normalize: true });
+
+  const applyStrikethrough = (selectedRanges,containerid) => {
+    // Generate a unique random color for the strikethrough line
+    const color = getUniqueRandomColor(containerid);
+
+    // Create a new CSS class for the strikethrough effect
+    const className = `strikethrough-${color.replace('#', '').toLowerCase()}`;
+    const style = document.createElement('style');
+    style.textContent = `
+    .${className} {
+      color: lightgrey;
+      font-style: italic;
+      text-decoration: line-through ${color} solid;
+    }
+  `;
+    document.head.appendChild(style);
+
+    const classApplier = rangy.createClassApplier(className, { normalize: true });
+
+    selectedRanges.forEach((range) => {
+      // Remove the temporary highlight
+      tempHighlightClassApplier.undoToRange(range);
+
+      // Apply the new strikethrough effect
+      classApplier.toggleRange(range);
+    });
+
+    // Update the sidebar with the new strikethrough color index
+    updateSidebar(color, true);
+
+    // Clear the selectedRanges array and close the color popup
+    selectedRanges = [];
+    handleColorPopupClosing();
+  };
+
+
+
+add an option to the popup to be able to collapse or expand the selected text. when collapsed, the text shows up as ... in the text input. when clicking on those three dots, it shows up the complete text again.
+
+
+-----------------
+
+To add a collapse and expand option to the popup, you can follow these steps:
+
+1. Create a button for the collapse option in the popup.
+2. Add an event listener to the button that toggles the collapse and expand functionality.
+3. Create a CSS class for the collapsed text.
+4. Use Rangy to apply the CSS class to the selected text.
+5. Add a click event listener to the collapsed text to expand it.
+
+Here's the code to implement this feature:
+
+```javascript
+// Create a collapse option
+const collapseOption = document.createElement("button");
+collapseOption.classList.add("collapse-option");
+collapseOption.addEventListener("click", () => toggleCollapse(selectedRanges));
+
+const collapseIcon = document.createElement("i");
+collapseIcon.classList.add("fas", "fa-ellipsis-h", "icon", "collapse-color", "fa-2x");
+
+collapseOption.appendChild(collapseIcon);
+popup.appendChild(collapseOption);
+
+const collapseOptionStyle = document.createElement("style");
+collapseOptionStyle.textContent = `
+  .collapse-option {
+    background: none;
+    border: none;
+    position: relative;
+    font-size: 12px;
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+  .collapse-option:hover {
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+`;
+document.head.appendChild(collapseOptionStyle);
+
+const collapsedClassName = "collapsed-text";
+const collapsedStyle = document.createElement("style");
+collapsedStyle.textContent = `
+  .${collapsedClassName} {
+    display: none;
+  }
+  .${collapsedClassName}-visible {
+    display: inline;
+  }
+`;
+document.head.appendChild(collapsedStyle);
+const collapsedClassApplier = rangy.createClassApplier(collapsedClassName, { normalize: true });
+
+const toggleCollapse = (selectedRanges) => {
+  selectedRanges.forEach((range) => {
+    // Remove the temporary highlight
+    tempHighlightClassApplier.undoToRange(range);
+
+    // Apply the collapsed class
+    collapsedClassApplier.toggleRange(range);
+
+    // Create the expandable ellipsis
+    const ellipsis = document.createElement("span");
+    ellipsis.classList.add("ellipsis");
+    ellipsis.textContent = "...";
+    ellipsis.style.cursor = "pointer";
+    range.insertNode(ellipsis);
+
+    // Add a click event listener to the ellipsis to expand the text
+    ellipsis.addEventListener("click", () => {
+      const parent = ellipsis.parentNode;
+      const collapsedText = parent.querySelectorAll(`.${collapsedClassName}`);
+      collapsedText.forEach((text) => {
+        text.classList.toggle(`${collapsedClassName}-visible`);
+      });
+      ellipsis.remove();
+    });
+  });
+
+  // Clear the selectedRanges array and close the color popup
+  selectedRanges = [];
+  handleColorPopupClosing();
+};
+```
+
+This code adds a collapse option to the popup, which, when clicked, hides the selected text and shows an ellipsis (`...`). When the ellipsis is clicked, the hidden text is revealed again.

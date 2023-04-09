@@ -1,3 +1,103 @@
+function resize_svg(visualizationnumid, scaleFactor) {
+  const svgContainer = d3.select('#' + visualizationnumid + ' svg').node();
+  const viewBoxWidth = svgContainer.viewBox.baseVal.width;
+  const viewBoxHeight = svgContainer.viewBox.baseVal.height;
+
+  const gElement = d3.select('#' + visualizationnumid + ' svg g').node();
+  const gBBox = gElement.getBBox();
+
+  const gCenterX = gBBox.x + gBBox.width / 2;
+  const gCenterY = gBBox.y + gBBox.height / 2;
+
+  const svgCenterX = viewBoxWidth / 2;
+  const svgCenterY = viewBoxHeight / 2;
+
+  const translateX = svgCenterX - gCenterX * scaleFactor;
+  const translateY = svgCenterY - gCenterY * scaleFactor;
+
+  d3.select('#' + visualizationnumid + ' svg g')
+    .attr('transform', `translate(${translateX}, ${translateY}) scale(${scaleFactor})`);
+}
+
+function scale_svgs(scalevals, num, visualizationid) {
+  if (num === 2) {
+    let scale1 = scalevals[0];
+    let scale2 = scalevals[1];
+    console.log(scale1,scale2);
+    if (scale1 < 1 && scale2 < 1) {
+      const minScale = Math.max(scale1, scale2);
+      if (scale1 < minScale) {
+        const scaleFactor = scale1 / minScale;
+        //console.log(scaleFactor);
+        resize_svg(visualizationid + '-1', scaleFactor);
+      } else if (scale2 < minScale) {
+        const scaleFactor = scale2 / minScale;
+        //console.log(scaleFactor);
+        resize_svg(visualizationid + '-2', scaleFactor);
+
+      }
+    }
+  }
+  else if (num === 3) {
+    let scale1 = scalevals[0];
+    let scale2 = scalevals[1];
+    let scale3 = scalevals[2];
+     console.log(scale1,scale2,scale3);
+    if (scale1 < 1 && scale2 < 1 && scale3 < 1) {
+      const minScale = Math.max(scale1, scale2, scale3);
+      if (scale1 < minScale) {
+        const scaleFactor = scale1 / minScale;
+        //console.log(scaleFactor);
+        resize_svg(visualizationid + '-1', scaleFactor);
+      }
+      if (scale2 < minScale) {
+        const scaleFactor = scale2 / minScale;
+        //console.log(scaleFactor);
+        resize_svg(visualizationid + '-2', scaleFactor);
+
+      }
+      if (scale3 < minScale) {
+        const scaleFactor = scale3 / minScale;
+        //console.log(scaleFactor);
+        resize_svg(visualizationid + '-3', scaleFactor);
+
+      }
+
+    }
+  }
+
+}
+
+export const tab_create_viz = (visualizationid, tabid) => {
+  if (tabid === "tab2") {
+    clearVisualization(visualizationid + '-1');
+    let scale1 = create_viz(visualizationid + '-1', 'tb2-text-input', 'tb2-sidebar');
+  }
+  else if (tabid === "tab3") {
+    clearVisualization(visualizationid + '-1');
+    clearVisualization(visualizationid + '-2');
+    var button = document.getElementById("tb3-visualization-combined-export-btn");
+    if (button !== null) { button.remove(); }
+
+    let scale1 = create_viz(visualizationid + '-1', 'tb3-text-input-1', 'tb3-sidebar-1');
+    let scale2 = create_viz(visualizationid + '-2', 'tb3-text-input-2', 'tb3-sidebar-2');
+    scale_svgs([scale1, scale2], 2, visualizationid);
+    addDownloadCombinedButton(visualizationid, visualizationid + '-1');
+  }
+  else if (tabid === "tab4") {
+    clearVisualization(visualizationid + '-1');
+    clearVisualization(visualizationid + '-2');
+    clearVisualization(visualizationid + '-3');
+    var button = document.getElementById("tb4-visualization-combined-export-btn");
+    if (button !== null) { button.remove(); }
+    let scale1 = create_viz(visualizationid + '-1', 'tb4-text-input-1', 'tb4-sidebar-1');
+    let scale2 = create_viz(visualizationid + '-2', 'tb4-text-input-2', 'tb4-sidebar-2');
+    let scale3 = create_viz(visualizationid + '-3', 'tb4-text-input-3', 'tb4-sidebar-3');
+    scale_svgs([scale1, scale2, scale3], 3, visualizationid);
+    addDownloadCombinedButton(visualizationid, visualizationid + '-1', 3);
+  }
+};
+
 function darkenColor(color) {
   // Hardcoded factor
   const factor = 0.2;
@@ -18,12 +118,14 @@ function darkenColor(color) {
   return darkerColor.toString();
 }
 
-const visualization = document.getElementById('visualization');
-visualization.style.display = 'none';
+const visualizations = document.querySelectorAll('.visualization');
+visualizations.forEach(visualization => {
+  visualization.style.display = 'none';
+});
 
 
-const clearVisualization = () => {
-  const visualization = document.querySelector('#visualization');
+const clearVisualization = (visualizationid) => {
+  const visualization = document.querySelector('#' + visualizationid);
   while (visualization.firstChild) {
     visualization.removeChild(visualization.firstChild);
   }
@@ -61,8 +163,8 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
   const overlapCount1 = checkOverlap(newY1);
   const overlapCount2 = checkOverlap(newY2);
 
-  console.log('Overlap count for newY1:', overlapCount1);
-  console.log('Overlap count for newY2:', overlapCount2);
+  // console.log('Overlap count for newY1:', overlapCount1);
+  // console.log('Overlap count for newY2:', overlapCount2);
 
   const newY = (overlapCount1 === overlapCount2) ? (Math.random() < 0.5 ? newY1 : newY2) : (overlapCount1 < overlapCount2 ? newY1 : newY2);
 
@@ -70,21 +172,21 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
 };
 
 
-export const create_viz = () => {
-  clearVisualization();
-  const textInputDOM = document.querySelector('#text-input');
-  const sidebarDOM = document.querySelector('#sidebar-content');
-  const canvas = d3.select('#visualization')
+const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 600, height = 335) => {
+  const textInputDOM = document.querySelector('#' + textid);
+  const sidebarDOM = document.querySelector('#' + sidebarid);
+  const canvas = d3.select('#' + visualizationid)
     .append('svg')
     .attr('width', '100%')
     .attr('height', '100%')
-    .attr('viewBox', '0 0 600 335')
+    .attr('viewBox', '0 0 ' + width + ' ' + height)
     .attr('preserveAspectRatio', 'xMidYMid meet');
+
 
   const plot = canvas.append('g');
 
   const textNodes = Array.from(textInputDOM.childNodes);
-  const items = sidebarDOM.querySelectorAll('.item-wrapper');
+  const items = sidebarDOM.querySelectorAll('.item-wrapper:not([data-type="horizontal-line"])');
 
   const annotations = {};
 
@@ -94,19 +196,19 @@ export const create_viz = () => {
     const inputs = item.querySelectorAll('.color-description-input');
     const dropdowns = item.querySelectorAll('.description-dropdown');
     const annotationText = Array.from(inputs).map((input, index) => {
-      const prefix = dropdowns[index].value;
+      const prefix = dropdowns[index].value != "" ? dropdowns[index].value + ": " : "";
       return `${prefix} ${input.value}`.trim();
     }).join('\n');
 
     annotations[color] = annotationText;
   });
 
-  console.log('Annotations:', annotations);
+  //console.log('Annotations:', annotations);
 
   let currentX = 0;
   let currentY = 20;
   const lineHeight = 20;
-  const maxLineWidth = 80 * 10;
+  const maxLineWidth = wraplim * 10;
   const annotatedSpans = new Set();
 
   // Add a new array to store the x positions of the words
@@ -229,7 +331,7 @@ export const create_viz = () => {
       return annotationLines.some(line => line.trim() !== '');
     })
     .forEach(({ color, middleWordX, currentY, annotationLines }) => {
-      console.log('Drawing annotation for color:', color);
+      //console.log('Drawing annotation for color:', color);
 
       // Create a group element to hold the annotation elements
       const annotationGroup = plot.append('g')
@@ -259,7 +361,7 @@ export const create_viz = () => {
       annotationText.attr('x', newCoords.x).attr('y', newCoords.y);
 
       // Update the x attribute for each tspan inside annotationText
-annotationText.selectAll('tspan').attr('x', newCoords.x);
+      annotationText.selectAll('tspan').attr('x', newCoords.x);
 
 
 
@@ -309,7 +411,7 @@ annotationText.selectAll('tspan').attr('x', newCoords.x);
       const handleRadius = 4;
 
       const textHandle = annotationGroup.append('circle')
-        .attr('class', 'drag-handle')
+        .attr('class', 'drag-handle draggable')
         .attr('cx', closestCenter.x)
         .attr('cy', closestCenter.y)
         .attr('r', handleRadius)
@@ -376,7 +478,7 @@ annotationText.selectAll('tspan').attr('x', newCoords.x);
       }));
 
       const lineEndHandle = annotationGroup.append('circle')
-        .attr('class', 'drag-handle')
+        .attr('class', 'drag-handle draggable')
         .attr('cx', middleWordX - 6)
         .attr('cy', currentY)
         .attr('r', handleRadius)
@@ -397,6 +499,7 @@ annotationText.selectAll('tspan').attr('x', newCoords.x);
       }));
     });
 
+
   // Get the bounding box of the plot after rendering all the text elements
   const plotBBox = plot.node().getBBox();
 
@@ -409,9 +512,12 @@ annotationText.selectAll('tspan').attr('x', newCoords.x);
   const translateX = padding - plotBBox.x;
   const translateY = padding - plotBBox.y;
   plot.attr('transform', `translate(${translateX}, ${translateY})`);
-  addDownloadButton(canvas);
-};
 
+
+  addDownloadButton(canvas, visualizationid);
+  // console.log((plotBBox.width + padding * 2)/width);
+  return (plotBBox.width + padding * 2) / width;
+};
 
 // Helper function to create drag behavior
 function createDragBehavior(onDrag, onDragEnd) {
@@ -444,28 +550,51 @@ function hideDragHandles(annotationGroup) {
 
 
 
-function addDownloadButton(svg) {
-  console.log("Adding download button...");
-  const visualization = document.getElementById("visualization");
+function addDownloadButton(svg, visualizationid) {
+  //console.log("Adding download button...");
+  const visualizationcontainer = document.getElementById(visualizationid);
   const downloadButton = document.createElement("button");
   downloadButton.className = "download-svg-btn"; // Add the CSS class
+  downloadButton.id = visualizationid + "-export-btn";
+  
 
   // Add the SVG download icon
   downloadButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path fill-rule="evenodd" d="M14 9a1 1 0 0 1 1 1v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3a1 1 0 0 1 2 0v3h10v-3a1 1 0 0 1 1-1ZM8 1a1 1 0 0 1 1 1v4.586l1.293-1.293a1 1 0 1 1 1.414 1.414L8 10.414 4.293 6.707a1 1 0 0 1 1.414-1.414L7 6.586V2a1 1 0 0 1 1-1Z"/>
-    </svg>
-  `;
+  <i class="fas fa-file-download"></i>`;
 
   downloadButton.onclick = () => {
-    console.log("Download button clicked...");
+    //console.log("Download button clicked...");
     downloadVisualization(svg);
   };
-  visualization.appendChild(downloadButton);
+  visualizationcontainer.appendChild(downloadButton);
+}
+
+function addDownloadCombinedButton(visualizationid, subvistoadd, num = 2) {
+  //console.log("Adding download button...");
+  const subvistoaddcontainer = document.getElementById(subvistoadd);
+  const downloadButton = document.createElement("button");
+  downloadButton.className = "download-svg-combined-btn"; // Add the CSS class
+  downloadButton.id = visualizationid + "-combined-export-btn";
+  let outheight = num*670;
+
+  // Add the SVG download icon
+  if (num == 2) {
+    downloadButton.innerHTML = `
+  <i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i>`;
+  }
+  else if (num == 3) {
+    downloadButton.innerHTML = `
+  <i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i>`;
+  }
+  downloadButton.onclick = () => {
+    //console.log("Download button clicked...");
+    downloadCombinedVisualizations(visualizationid);
+  };
+  subvistoaddcontainer.appendChild(downloadButton);
 }
 
 function downloadVisualization(svg) {
-  console.log("Downloading visualization...");
+  //console.log("Downloading visualization...");
 
   // Clone the original SVG element
   const clonedSVG = svg.node().cloneNode(true);
@@ -513,7 +642,7 @@ function downloadVisualization(svg) {
     link.href = pngDataURL;
     link.download = "visualization.png";
     link.click();
-    console.log("Download should have started...");
+    //console.log("Download should have started...");
   };
 }
 
@@ -547,3 +676,108 @@ function getSVGContentBoundingBox(svg) {
   const bbox = content.getBBox();
   return bbox;
 }
+
+
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 600;
+  const totalHeight = subvisualizations.length * 335;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+    //includeStyles(clonedSVG);
+
+    const clientWidth = svg.clientWidth;
+    const clientHeight = svg.clientHeight;
+    const scaleup = outputWidth / clientWidth;
+    const outputHeight = clientHeight * scaleup;
+
+//     const g = clonedSVG.querySelector("g");
+//     const gTransform = g.getAttribute("transform");
+//     const gScale = gTransform.match(/scale\(([^)]+)\)/);
+//     const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+//     const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+
+//     // Update the translate values
+//     const gTranslate = gTransform.match(/translate\(([^)]+)\)/);
+//     if (gTranslate) {
+//       const [translateX, translateY] = gTranslate[1].split(',').map(parseFloat);
+//       const newTranslateX = (translateX + (clientWidth / 2)) * scaleup - (outputWidth / 2);
+// const newTranslateY = (translateY + (clientHeight / 2)) * scaleup - (outputHeight / 2);
+
+//       const newGTranslate = `translate(${newTranslateX},${newTranslateY})`;
+//       g.setAttribute("transform", newGTransform.replace(gTranslate[0], newGTranslate));
+//     } else {
+//       g.setAttribute("transform", newGTransform);
+//     }
+
+    clonedSVG.setAttribute('width', outputWidth);
+    clonedSVG.setAttribute('height', outputHeight);
+    console.log(clonedSVG);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+      if (index === subvisualizations.length - 1) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+  });
+}
+
+// function setupCombinedVizExportButton( containerSelector, desiredHeightFactor, elementsToHideSelectors) {
+
+//     // Function to show or hide elements
+//     const setElementsVisibility = (selectors, visibility) => {
+//       selectors.forEach((selector) => {
+//         const element = document.querySelector(selector);
+//         if (element) {
+//           element.style.visibility = visibility;
+//         }
+//       });
+//     };
+
+//     // Capture the container and show the image in the modal
+//           const container = document.querySelector(containerSelector);
+//       //console.log(container.getBoundingClientRect());
+//       const desiredWidth = 1200;
+//       const desiredHeight = 675 * desiredHeightFactor;
+//       const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
+//       //console.log(container.offsetWidth, container.offsetHeight, scaleFactor);
+
+//       // Hide elements before capturing
+//       setElementsVisibility(elementsToHideSelectors, 'hidden');
+
+//       html2canvas(container, {
+//         scale: scaleFactor,
+//       }).then((canvas) => {
+//         const imageSrc = canvas.toDataURL('image/png');
+
+//         // Show elements again after capturing
+//         setElementsVisibility(elementsToHideSelectors, 'visible');
+
+//         showModal(imageSrc);
+//       });
+//   }
+
+
+//   setupCombinedVizExportButton('#tb3-visualization', 2, [['#tb3-hiddenTrigger','#tb3-visualization-combined-export-btn','#tb3-visualization-1-export-btn','#tb3-visualization-2-export-btn']]);

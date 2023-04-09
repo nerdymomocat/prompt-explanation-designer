@@ -1,0 +1,1819 @@
+i have this:
+
+function downloadVisualization(svg) {
+  //console.log("Downloading visualization...");
+
+  // Clone the original SVG element
+  const clonedSVG = svg.node().cloneNode(true);
+
+  // Include the styles in the cloned SVG
+  includeStyles(clonedSVG);
+
+  // Update the viewBox attribute based on the bounding box of the SVG content
+  const bbox = getSVGContentBoundingBox(svg);
+  clonedSVG.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
+  // Serialize the cloned SVG
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(clonedSVG);
+  const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  // Get the width and height from the SVG's viewBox attribute
+  const viewBox = clonedSVG.getAttribute('viewBox').split(' ').map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  // Calculate the aspect ratio
+  const aspectRatio = width / height;
+
+  // Set the canvas width and height based on the desired output size while preserving the aspect ratio
+  const outputWidth = 1200;
+  const outputHeight = outputWidth / aspectRatio;
+
+  // Create an image element and set its source to the SVG data URL
+  const img = new Image();
+  img.src = svgDataURL;
+
+  // Set up a canvas and draw the image on it
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
+  const ctx = canvas.getContext("2d");
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Convert the canvas to a PNG data URL and download it
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "visualization.png";
+    link.click();
+    //console.log("Download should have started...");
+  };
+}
+
+to download individual sub visualizations.
+
+i want to add a click function to download combined visualizations that downloads the combination of all subvisualizations stacked on top of each other as png. how do i do that?
+
+for example, if this is the div, the download combined visualization button should export an image of size 1200*(670*3) where 3 is the number of sub visualizations.
+
+<div class="visualization" id="tb4-visualization" style="display: block;"><span class="hidden-trigger" id="tb4-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb4-visualization-1"><svg width="100%" height="100%" viewBox="0 0 352.9789123535156 58.39258003234863" preserveAspectRatio="xMidYMid meet"><g transform="translate(40.33775885345423, 16.503307861052992) scale(0.8699565887155932)"><text x="0" y="20">hello</text><text x="38.785587310791016" y="20">check</text><text x="85.56404495239258" y="20">1</text><text x="99.47295093536377" y="20">2</text><text x="113.38185691833496" y="20">3</text><text x="127.29076290130615" y="20">tell</text><text x="152.74891567230225" y="20">me</text><text x="179.96729564666748" y="20">something</text><text x="258.75315380096436" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-2"><svg width="100%" height="100%" viewBox="0 0 405.7431335449219 128.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">the</text><text x="161.04042625427246" y="20">shortest</text><text x="222.9245090484619" y="20">war</text><text x="253.69926643371582" y="20">in</text><text x="271.1465883255005" y="20">history</text><text x="323.2596139907837" y="20">was</text><text x="0" y="55">between</text><text x="65.45842361450195" y="55">Britain</text><text x="115.79325866699219" y="55">and</text><text x="147.48405265808105" y="55">Zanzibar</text><text x="214.70270347595215" y="55">in</text><text x="232.15002536773682" y="55">1896,</text><text x="277.16825580596924" y="55">which</text><text x="323.06660175323486" y="55">lasted</text><text x="0" y="90">only</text><text x="34.349098205566406" y="90">38</text><text x="57.148948669433594" y="90">minutes?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-3"><svg width="100%" height="100%" viewBox="0 0 397.66259765625 93.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">a</text><text x="147.71299076080322" y="20">group</text><text x="193.61133670806885" y="20">of</text><text x="211.95673370361328" y="20">flamingos</text><text x="285.4080276489258" y="20">is</text><text x="301.9572744369507" y="20">called</text><text x="348.7536954879761" y="20">a</text><text x="0" y="55">"flamboyance"?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <button class="export-combined-viz-btn" id="tb4-export-combined-viz-btn"><i class="fas fa-file-download fa-sm"></i>&nbsp;Download Combined Visualization</button>
+
+          </div>
+******
+You can create a new function called `downloadCombinedVisualizations` that will be called when the "Download Combined Visualization" button is clicked. This function will create a new canvas with the desired size, draw each subvisualization on it, and then download the combined image as a PNG.
+
+Here's the modified code with the new function:
+
+```javascript
+// Add this function to your existing code
+function downloadCombinedVisualizations() {
+  const subVisualizations = document.querySelectorAll(".subvisualization");
+  const outputWidth = 1200;
+  let outputHeight = 0;
+
+  // Calculate the total height of the combined visualizations
+  subVisualizations.forEach((subViz) => {
+    const svg = d3.select(subViz).select("svg");
+    const viewBox = svg.attr("viewBox").split(" ").map(parseFloat);
+    const height = viewBox[3];
+    outputHeight += height;
+  });
+
+  // Create a canvas with the desired size
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
+  const ctx = canvas.getContext("2d");
+
+  // Draw each subvisualization on the canvas
+  let yOffset = 0;
+  subVisualizations.forEach((subViz, index) => {
+    const svg = d3.select(subViz).select("svg");
+    downloadVisualization(svg, (img, width, height) => {
+      ctx.drawImage(img, 0, yOffset, width, height);
+      yOffset += height;
+
+      // Download the combined image as a PNG after the last subvisualization is drawn
+      if (index === subVisualizations.length - 1) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    });
+  });
+}
+
+// Modify the existing downloadVisualization function to accept a callback
+function downloadVisualization(svg, callback) {
+  // ... (existing code)
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Call the callback function with the image, width, and height
+    if (callback) {
+      callback(img, canvas.width, canvas.height);
+    } else {
+      // ... (existing code to download the individual visualization)
+    }
+  };
+}
+
+// Add a click event listener to the "Download Combined Visualization" button
+document.getElementById("tb4-export-combined-viz-btn").addEventListener("click", downloadCombinedVisualizations);
+```
+
+Now, when you click the "Download Combined Visualization" button, it will download an image with all the subvisualizations stacked on top of each other.
+
+---------------
+i have this:
+
+function downloadVisualization(svg) {
+  //console.log("Downloading visualization...");
+
+  // Clone the original SVG element
+  const clonedSVG = svg.node().cloneNode(true);
+
+  // Include the styles in the cloned SVG
+  includeStyles(clonedSVG);
+
+  // Update the viewBox attribute based on the bounding box of the SVG content
+  const bbox = getSVGContentBoundingBox(svg);
+  clonedSVG.setAttribute('viewBox', `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
+  // Serialize the cloned SVG
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(clonedSVG);
+  const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  // Get the width and height from the SVG's viewBox attribute
+  const viewBox = clonedSVG.getAttribute('viewBox').split(' ').map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  // Calculate the aspect ratio
+  const aspectRatio = width / height;
+
+  // Set the canvas width and height based on the desired output size while preserving the aspect ratio
+  const outputWidth = 1200;
+  const outputHeight = outputWidth / aspectRatio;
+
+  // Create an image element and set its source to the SVG data URL
+  const img = new Image();
+  img.src = svgDataURL;
+
+  // Set up a canvas and draw the image on it
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = outputHeight;
+  const ctx = canvas.getContext("2d");
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Convert the canvas to a PNG data URL and download it
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "visualization.png";
+    link.click();
+    //console.log("Download should have started...");
+  };
+}
+
+to download individual sub visualizations.
+
+i want to add a click function to download combined visualizations that downloads the combination of all subvisualizations stacked on top of each other as ONE SINGLE png. how do i do that?
+
+for example, if this is the div, the download combined visualization button should export an image of size 1200*(670*3) where 3 is the number of sub visualizations. I DO NOT WANT TO DOWNLOAD INDIVIDUAL PNGS. TRY MAKING A FUNCTION THAT DOES NOT MODIFY downloadVisualization.
+
+here is an example svg with multiple subvisualizations.
+
+<div class="visualization" id="tb4-visualization" style="display: block;"><span class="hidden-trigger" id="tb4-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb4-visualization-1"><svg width="100%" height="100%" viewBox="0 0 352.9789123535156 58.39258003234863" preserveAspectRatio="xMidYMid meet"><g transform="translate(40.33775885345423, 16.503307861052992) scale(0.8699565887155932)"><text x="0" y="20">hello</text><text x="38.785587310791016" y="20">check</text><text x="85.56404495239258" y="20">1</text><text x="99.47295093536377" y="20">2</text><text x="113.38185691833496" y="20">3</text><text x="127.29076290130615" y="20">tell</text><text x="152.74891567230225" y="20">me</text><text x="179.96729564666748" y="20">something</text><text x="258.75315380096436" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-2"><svg width="100%" height="100%" viewBox="0 0 405.7431335449219 128.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">the</text><text x="161.04042625427246" y="20">shortest</text><text x="222.9245090484619" y="20">war</text><text x="253.69926643371582" y="20">in</text><text x="271.1465883255005" y="20">history</text><text x="323.2596139907837" y="20">was</text><text x="0" y="55">between</text><text x="65.45842361450195" y="55">Britain</text><text x="115.79325866699219" y="55">and</text><text x="147.48405265808105" y="55">Zanzibar</text><text x="214.70270347595215" y="55">in</text><text x="232.15002536773682" y="55">1896,</text><text x="277.16825580596924" y="55">which</text><text x="323.06660175323486" y="55">lasted</text><text x="0" y="90">only</text><text x="34.349098205566406" y="90">38</text><text x="57.148948669433594" y="90">minutes?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-3"><svg width="100%" height="100%" viewBox="0 0 397.66259765625 93.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">a</text><text x="147.71299076080322" y="20">group</text><text x="193.61133670806885" y="20">of</text><text x="211.95673370361328" y="20">flamingos</text><text x="285.4080276489258" y="20">is</text><text x="301.9572744369507" y="20">called</text><text x="348.7536954879761" y="20">a</text><text x="0" y="55">"flamboyance"?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <button class="export-combined-viz-btn" id="tb4-export-combined-viz-btn"><i class="fas fa-file-download fa-sm"></i>&nbsp;Download Combined Visualization</button>
+
+          </div>
+
+********
+
+You can create a new function called `downloadCombinedVisualizations` that will combine all the subvisualizations into a single canvas and then download the resulting image as a PNG. Here's how you can do that:
+
+1. First, create a new function called `downloadCombinedVisualizations` and get all the subvisualizations using `querySelectorAll`.
+
+```javascript
+function downloadCombinedVisualizations() {
+  const subvisualizations = document.querySelectorAll(".subvisualization");
+  // ...
+}
+```
+
+2. Calculate the total height of the combined visualizations and create a new canvas with the desired width and total height.
+
+```javascript
+// ...
+const outputWidth = 1200;
+let totalHeight = 0;
+
+subvisualizations.forEach((subviz) => {
+  const svg = subviz.querySelector("svg");
+  const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+  const height = viewBox[3];
+  totalHeight += height;
+});
+
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+```
+
+3. Draw each subvisualization on the canvas, adjusting the vertical position based on the height of the previous visualizations.
+
+```javascript
+// ...
+let currentHeight = 0;
+
+subvisualizations.forEach((subviz, index) => {
+  const svg = subviz.querySelector("svg");
+  const clonedSVG = svg.cloneNode(true);
+  includeStyles(clonedSVG);
+
+  const bbox = getSVGContentBoundingBox(d3.select(svg));
+  clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(clonedSVG);
+  const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  const aspectRatio = width / height;
+  const outputHeight = outputWidth / aspectRatio;
+
+  const img = new Image();
+  img.src = svgDataURL;
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+    currentHeight += outputHeight;
+
+    if (index === subvisualizations.length - 1) {
+      const pngDataURL = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = pngDataURL;
+      link.download = "combined_visualization.png";
+      link.click();
+    }
+  };
+});
+```
+
+4. Finally, add a click event listener to the "Download Combined Visualization" button to call the `downloadCombinedVisualizations` function.
+
+```javascript
+document.getElementById("tb4-export-combined-viz-btn").addEventListener("click", downloadCombinedVisualizations);
+```
+
+Now, when you click the "Download Combined Visualization" button, it will download a single PNG image containing all the subvisualizations stacked on top of each other.
+
+-------
+ME: explain this code step by step:
+
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = vizcont.querySelectorAll(".subvisualization");
+  const outputWidth = 1200;
+let totalHeight = 0;
+
+subvisualizations.forEach((subviz) => {
+  const svg = subviz.querySelector("svg");
+  const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+  const height = viewBox[3];
+  totalHeight += height;
+});
+
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+
+let currentHeight = 0;
+
+subvisualizations.forEach((subviz, index) => {
+  const svg = subviz.querySelector("svg");
+  const clonedSVG = svg.cloneNode(true);
+  includeStyles(clonedSVG);
+
+  const bbox = getSVGContentBoundingBox(d3.select(svg));
+  clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(clonedSVG);
+  const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  const aspectRatio = width / height;
+  const outputHeight = outputWidth / aspectRatio;
+
+  const img = new Image();
+  img.src = svgDataURL;
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+    currentHeight += outputHeight;
+
+    if (index === subvisualizations.length - 1) {
+      const pngDataURL = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = pngDataURL;
+      link.download = "combined_visualization.png";
+      link.click();
+    }
+  };
+});
+}
+---
+Raycast AI 3.5: This is a JavaScript function called `downloadCombinedVisualizations` that takes one argument, `visualizationid`. Here is a step-by-step breakdown of what the function does:
+
+1. It selects an HTML element with the ID specified by `visualizationid` using `document.getElementById()` and assigns it to the variable `vizcont`.
+2. It selects all HTML elements with the class "subvisualization" that are descendants of the `vizcont` element using `vizcont.querySelectorAll()` and assigns them to the variable `subvisualizations`.
+3. It sets the output width of the combined visualizations to 1200 pixels and initializes a variable `totalHeight` to 0.
+4. It loops through each `subvisualization` element using `forEach()` and calculates the total height of all the subvisualizations by getting the height of each subvisualization's SVG element using `getAttribute()` and `map()`, and adding it to `totalHeight`.
+5. It creates a new HTML canvas element using `document.createElement()` and sets its width and height to `outputWidth` and `totalHeight`, respectively. It also gets a 2D rendering context for the canvas using `canvas.getContext("2d")` and assigns it to the variable `ctx`.
+6. It initializes a variable `currentHeight` to 0.
+7. It loops through each `subvisualization` element again and performs the following steps:
+   - It selects the SVG element inside the `subvisualization` using `querySelector()`.
+   - It clones the SVG element using `cloneNode()` and includes any styles applied to it using a helper function `includeStyles()`.
+   - It calculates the bounding box of the SVG content using a helper function `getSVGContentBoundingBox()` and sets the `viewBox` attribute of the cloned SVG element to the bounding box coordinates.
+   - It serializes the cloned SVG element to a string using `XMLSerializer()` and encodes it as a base64 data URL using `btoa()` and `encodeURIComponent()`.
+   - It sets the width and height of the SVG element using the `viewBox` attribute and calculates the output height based on the aspect ratio of the SVG element.
+   - It creates a new `Image` object and sets its source to the SVG data URL.
+   - It waits for the image to load using the `onload` event and then draws the image onto the canvas using `ctx.drawImage()`, updating `currentHeight` by the output height of the image.
+   - If this is the last `subvisualization` element, it converts the canvas to a PNG data URL using `canvas.toDataURL()` and creates a download link for the combined visualization using `document.createElement()` and sets its `href` and `download` attributes to the PNG data URL and the file name "combined_visualization.png", respectively. Finally, it programmatically clicks the download link using `link.click()`.
+---
+ME: right now this code is downloading the first sub visualization twice. figure out why that might be the case. also when you are cloning, make sure to only clone the g class and not the button class. <div class="visualization" id="tb4-visualization" style="display: block;"><span class="hidden-trigger" id="tb4-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb4-visualization-1"><svg width="100%" height="100%" viewBox="0 0 352.9789123535156 58.39258003234863" preserveAspectRatio="xMidYMid meet"><g transform="translate(40.33775885345423, 16.503307861052992) scale(0.8699565887155932)"><text x="0" y="20">hello</text><text x="38.785587310791016" y="20">check</text><text x="85.56404495239258" y="20">1</text><text x="99.47295093536377" y="20">2</text><text x="113.38185691833496" y="20">3</text><text x="127.29076290130615" y="20">tell</text><text x="152.74891567230225" y="20">me</text><text x="179.96729564666748" y="20">something</text><text x="258.75315380096436" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-2"><svg width="100%" height="100%" viewBox="0 0 405.7431335449219 128.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">the</text><text x="161.04042625427246" y="20">shortest</text><text x="222.9245090484619" y="20">war</text><text x="253.69926643371582" y="20">in</text><text x="271.1465883255005" y="20">history</text><text x="323.2596139907837" y="20">was</text><text x="0" y="55">between</text><text x="65.45842361450195" y="55">Britain</text><text x="115.79325866699219" y="55">and</text><text x="147.48405265808105" y="55">Zanzibar</text><text x="214.70270347595215" y="55">in</text><text x="232.15002536773682" y="55">1896,</text><text x="277.16825580596924" y="55">which</text><text x="323.06660175323486" y="55">lasted</text><text x="0" y="90">only</text><text x="34.349098205566406" y="90">38</text><text x="57.148948669433594" y="90">minutes?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb4-visualization-3"><svg width="100%" height="100%" viewBox="0 0 397.66259765625 93.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Did</text><text x="28.99656867980957" y="20">you</text><text x="59.78928756713867" y="20">know</text><text x="102.13125228881836" y="20">that</text><text x="133.80408477783203" y="20">a</text><text x="147.71299076080322" y="20">group</text><text x="193.61133670806885" y="20">of</text><text x="211.95673370361328" y="20">flamingos</text><text x="285.4080276489258" y="20">is</text><text x="301.9572744369507" y="20">called</text><text x="348.7536954879761" y="20">a</text><text x="0" y="55">"flamboyance"?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <button class="export-combined-viz-btn" id="tb4-export-combined-viz-btn"><i class="fas fa-file-download fa-sm"></i>&nbsp;Download Combined Visualization</button>
+
+          </div>
+---
+Raycast AI 3.5: The reason the first subvisualization is being downloaded twice is because it is being included in the `subvisualizations` array twice. This is because there are two elements with the class "subvisualization" in the `vizcont` element, and the `querySelectorAll()` method selects both of them. To fix this, you can modify the selector to only select the direct children of `vizcont` with the class "subvisualization", like this:
+
+```
+const subvisualizations = vizcont.querySelectorAll("> .subvisualization");
+```
+
+To only clone the `g` element and not the `button` element, you can modify this line:
+
+```
+const clonedSVG = svg.cloneNode(true);
+```
+
+to this:
+
+```
+const clonedSVG = svg.querySelector("g").cloneNode(true);
+```
+
+This selects only the `g` element inside the SVG and clones it.
+---
+ME: i want both subvisualization to be selected though
+---
+Raycast AI 3.5: If you want to select both subvisualizations, you can use the `querySelectorAll()` method with a comma-separated list of selectors:
+
+```
+const subvisualizations = vizcont.querySelectorAll(".subvisualization");
+```
+
+This will select all elements with the class "subvisualization" that are descendants of `vizcont`.
+---
+ME: i changed the code to this:
+
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = vizcont.querySelectorAll(".subvisualization");
+  const outputWidth = 1200;
+let totalHeight = 0;
+
+subvisualizations.forEach((subviz) => {
+  const svg = subviz.querySelector("svg");
+  const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+  const height = viewBox[3];
+  totalHeight += height;
+});
+
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+
+let currentHeight = 0;
+
+subvisualizations.forEach((subviz, index) => {
+  const svg = subviz.querySelector("svg");
+const clonedSVG = svg.querySelector("g").cloneNode(true);
+  includeStyles(clonedSVG);
+
+  const bbox = getSVGContentBoundingBox(d3.select(svg));
+  clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+
+  const serializer = new XMLSerializer();
+  const svgString = serializer.serializeToString(clonedSVG);
+  const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+
+  const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+  const width = viewBox[2];
+  const height = viewBox[3];
+
+  const aspectRatio = width / height;
+  const outputHeight = outputWidth / aspectRatio;
+
+  const img = new Image();
+  img.src = svgDataURL;
+
+  img.onload = () => {
+    ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+    currentHeight += outputHeight;
+
+    if (index === subvisualizations.length - 1) {
+      const pngDataURL = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = pngDataURL;
+      link.download = "combined_visualization.png";
+      link.click();
+    }
+  };
+});
+}
+
+now, only the second svg is being downloaded right now. and i can only click it once. clicking it after that nothing is being downloaded. here is the example svg. <div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 162.29076385498047 58.39258003234863" preserveAspectRatio="xMidYMid meet"><g transform="translate(58.22568925343018, 23.7967784593157) scale(0.37486799650110103)"><text x="0" y="20">hello</text><text x="38.785587310791016" y="20">check</text><text x="85.56404495239258" y="20">1</text><text x="99.47295093536377" y="20">2</text><text x="113.38185691833496" y="20">3</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 432.9277648925781 93.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Hello!</text><text x="45.898345947265625" y="20">I</text><text x="55.35279893875122" y="20">can</text><text x="86.14551782608032" y="20">hear</text><text x="123.15291833877563" y="20">you</text><text x="153.94563722610474" y="20">loud</text><text x="189.1928105354309" y="20">and</text><text x="220.88360452651978" y="20">clear.</text><text x="264.10568475723267" y="20">Is</text><text x="281.55300664901733" y="20">there</text><text x="323.0148596763611" y="20">anything</text><text x="388.47328329086304" y="20">I</text><text x="0" y="55">can</text><text x="30.7927188873291" y="55">assist</text><text x="76.6731014251709" y="55">you</text><text x="107.4658203125" y="55">with</text><text x="140.916841506958" y="55">today?</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+            <button class="export-combined-viz-btn" id="tb3-export-combined-viz-btn"><i class="fas fa-file-download fa-sm"></i>&nbsp;Download Combined Visualization</button>
+          </div> 
+---
+Raycast AI 3.5: The reason only the second SVG is being downloaded is because the first SVG is being clipped by the canvas. This is because the `totalHeight` of the canvas is not large enough to accommodate both SVGs. To fix this, you can increase the `totalHeight` by a margin between the SVGs, like this:
+
+```
+totalHeight += height + 10; // add 10 pixels of margin between SVGs
+```
+
+Regarding the issue of only being able to download the combined visualization once, this is because the `link` element is being removed from the DOM after the first download. To fix this, you can create a new `link` element for each download, like this:
+
+```
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+link.remove(); // remove the link from the DOM after download
+```
+
+This creates a new `link` element for each download, and removes it from the DOM after the download is complete. This allows you to download the combined visualization multiple times.
+-----------------
+
+i changed the code to this. as a reminder we are trying to create a function that downloads a png combined of all the svgs here stacked vertically.
+
+
+function downloadCombinedVisualizations(visualizationid) {
+const vizcont = document.getElementById(visualizationid);
+const subvisualizations = vizcont.querySelectorAll(".subvisualization");
+const outputWidth = 1200;
+let totalHeight = 0;
+subvisualizations.forEach((subviz) => {
+const svg = subviz.querySelector("svg");
+const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+const height = viewBox[3];
+totalHeight += height;
+});
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+let currentHeight = 0;
+subvisualizations.forEach((subviz, index) => {
+const svg = subviz.querySelector("svg");
+const clonedSVG = svg.querySelector("g").cloneNode(true);
+includeStyles(clonedSVG);
+const bbox = getSVGContentBoundingBox(d3.select(svg));
+clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(clonedSVG);
+const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+const width = viewBox[2];
+const height = viewBox[3];
+const aspectRatio = width / height;
+const outputHeight = outputWidth / aspectRatio;
+const img = new Image();
+img.src = svgDataURL;
+img.onload = () => {
+ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+currentHeight += outputHeight;
+if (index === subvisualizations.length - 1) {
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+}
+};
+});
+}
+now, only the second svg is being downloaded right now. and i can only click it once. clicking it after that nothing is being downloaded. here is the example svg. <div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+<div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 162.29076385498047 58.39258003234863" preserveAspectRatio="xMidYMid meet"><g transform="translate(58.22568925343018, 23.7967784593157) scale(0.37486799650110103)"><text x="0" y="20">hello</text><text x="38.785587310791016" y="20">check</text><text x="85.56404495239258" y="20">1</text><text x="99.47295093536377" y="20">2</text><text x="113.38185691833496" y="20">3</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button></div>
+<div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 432.9277648925781 93.392578125" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.943970203399658)"><text x="0" y="20">Hello!</text><text x="45.898345947265625" y="20">I</text><text x="55.35279893875122" y="20">can</text><text x="86.14551782608032" y="20">hear</text><text x="123.15291833877563" y="20">you</text><text x="153.94563722610474" y="20">loud</text><text x="189.1928105354309" y="20">and</text><text x="220.88360452651978" y="20">clear.</text><text x="264.10568475723267" y="20">Is</text><text x="281.55300664901733" y="20">there</text><text x="323.0148596763611" y="20">anything</text><text x="388.47328329086304" y="20">I</text><text x="0" y="55">can</text><text x="30.7927188873291" y="55">assist</text><text x="76.6731014251709" y="55">you</text><text x="107.4658203125" y="55">with</text><text x="140.916841506958" y="55">today?</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button></div>
+<button class="export-combined-viz-btn" id="tb3-export-combined-viz-btn"><i class="fas fa-file-download fa-sm"></i>&nbsp;Download Combined Visualization</button>
+</div>
+
+It seems that the issue is related to the asynchronous nature of the `img.onload` function. When you loop through the subvisualizations, the `img.onload` function is not guaranteed to execute in the order you expect. To fix this, you can use `Promise.all` to wait for all images to load before drawing them on the canvas.
+
+Here's the modified version of your function:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = vizcont.querySelectorAll(".subvisualization");
+  const outputWidth = 1200;
+  let totalHeight = 0;
+  subvisualizations.forEach((subviz) => {
+    const svg = subviz.querySelector("svg");
+    const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+    const height = viewBox[3];
+    totalHeight += height;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+
+  const loadImages = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.src = svgDataURL;
+      img.onload = () => {
+        resolve({ img, outputWidth, outputHeight });
+      };
+    });
+  });
+
+  let currentHeight = 0;
+  Promise.all(loadImages).then((images) => {
+    images.forEach(({ img, outputWidth, outputHeight }) => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    });
+
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+```
+
+This should fix the issue of only the second SVG being downloaded and allow you to download the combined image multiple times.
+
+--------
+
+ME: explain this code:
+
+function downloadCombinedVisualizations(visualizationid) {
+  //console.log("Download combined call");
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  console.log(subvisualizations);
+  const outputWidth = 1200;
+  let totalHeight = 0;
+  subvisualizations.forEach((subviz) => {
+    const svg = subviz.querySelector("svg");
+    const viewBox = svg.getAttribute("viewBox").split(" ").map(parseFloat);
+    const height = viewBox[3];
+    totalHeight += height;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+
+  const loadImages = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.src = svgDataURL;
+      img.onload = () => {
+        resolve({ img, outputWidth, outputHeight });
+      };
+    });
+  });
+
+  let currentHeight = 0;
+  Promise.all(loadImages).then((images) => {
+    images.forEach(({ img, outputWidth, outputHeight }) => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    });
+
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+---
+raycast AI 3.5: This is a JavaScript function called `downloadCombinedVisualizations` that takes in a parameter called `visualizationid`. The function first gets the DOM element with the ID of `visualizationid` and finds all of its child elements with the class of `subvisualization`. It then calculates the total height of all the subvisualizations and creates a new canvas element with a specified width and the calculated height. 
+
+The function then creates an array of promises that each load an SVG image from the subvisualizations and resolve with an object containing the loaded image, its output width and output height. Once all promises have resolved, the function draws each image onto the canvas in order, starting at the top and moving down. Finally, the function creates a PNG image from the canvas and downloads it with the filename "combined_visualization.png".
+---
+ME: can you simplify this function if i provide the height in the header?
+---
+raycast AI 3.5: Sure, here's a simplified version of the `downloadCombinedVisualizations` function that takes in a second parameter called `totalHeight` instead of calculating it based on the subvisualizations:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+
+  const loadImages = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.src = svgDataURL;
+      img.onload = () => {
+        resolve({ img, outputWidth, outputHeight });
+      };
+    });
+  });
+
+  let currentHeight = 0;
+  Promise.all(loadImages).then((images) => {
+    images.forEach(({ img, outputWidth, outputHeight }) => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    });
+
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+```
+
+This version of the function assumes that the `totalHeight` parameter is a number representing the desired height of the canvas. It sets the canvas height to this value and skips the code that calculates the total height of the subvisualizations.
+---
+ME: why does it need promises now?
+---
+raycast AI 3.5: The function still needs promises to ensure that all images are loaded before they are drawn onto the canvas. 
+
+The `loadImages` array is an array of promises that each load an SVG image from the subvisualizations and resolve with an object containing the loaded image, its output width, and output height. This is necessary because the images are loaded asynchronously from the server, and we need to wait for all of them to be loaded before we can proceed with drawing them onto the canvas.
+
+The `Promise.all` method is used to wait for all promises in the `loadImages` array to resolve. Once all promises have resolved, the `then` method is called with an array of objects containing the loaded images, their output widths, and output heights. The function then loops through this array and draws each image onto the canvas in order.
+---
+ME: i am calling this function after all images are created, so they will not be loaded asynchronously. how do i fix that then?
+---
+raycast AI 3.5: If you're sure that all the images have already been loaded by the time the `downloadCombinedVisualizations` function is called, you can remove the promises and `Promise.all` method. Instead, you can directly loop through the subvisualizations and draw each image onto the canvas in order. Here's a modified version of the function that doesn't use promises:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.querySelector("g").cloneNode(true);
+    includeStyles(clonedSVG);
+    const bbox = getSVGContentBoundingBox(d3.select(svg));
+    clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+    const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+    const width = viewBox[2];
+    const height = viewBox[3];
+    const aspectRatio = width / height;
+    const outputHeight = outputWidth / aspectRatio;
+    const img = new Image();
+    img.src = svgDataURL;
+    img.onload = () => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+      if (currentHeight >= totalHeight) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    };
+  });
+}
+```
+
+This version of the function directly loops through the `subvisualizations` array and draws each image onto the canvas in order. When an image finishes loading, it is drawn onto the canvas and `currentHeight` is updated. If `currentHeight` is greater than or equal to `totalHeight`, then all images have been drawn onto the canvas and the function proceeds to create and download the PNG image.
+---
+ME: now explain the code you wrote to me
+---
+raycast AI 3.5: This is a modified version of the `downloadCombinedVisualizations` function that doesn't use promises. Instead, it directly loops through the `subvisualizations` array and draws each image onto the canvas in order.
+
+The function first gets the DOM element with the ID of `visualizationid` and finds all of its child elements with the class of `subvisualization`. It then creates a new canvas element with a specified width and height equal to the `totalHeight` parameter.
+
+The function then loops through the `subvisualizations` array and for each subvisualization, it loads the SVG image, clones the SVG element, includes its styles, and sets its viewBox attribute. It then creates a data URL for the SVG image, calculates the output height based on the aspect ratio of the image, and creates a new `Image` object with the data URL as its source.
+
+When an image finishes loading, the `onload` callback is called. In this callback, the image is drawn onto the canvas at the current height (`currentHeight`) and `currentHeight` is updated to include the height of the drawn image. If `currentHeight` is greater than or equal to `totalHeight`, then all images have been drawn onto the canvas and the function proceeds to create and download the PNG image.
+
+The function creates a data URL for the PNG image and creates a new `a` element with the data URL as its `href` attribute and the filename "combined_visualization.png". It then simulates a click on the `a` element to download the PNG image.
+---
+ME: why do we need this if condition?
+
+ if (currentHeight >= totalHeight) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+---
+raycast AI 3.5: We need the `if` condition to check if all images have been drawn onto the canvas before creating and downloading the PNG image. 
+
+The `currentHeight` variable keeps track of the total height of the images that have been drawn onto the canvas so far. We use this variable to check if the total height of the drawn images is greater than or equal to the `totalHeight` parameter. If it is, then all images have been drawn onto the canvas and we can proceed to create and download the PNG image.
+
+If we didn't have this `if` condition, the function would try to create and download the PNG image as soon as the first image finishes loading, even if there are more images that haven't been drawn onto the canvas yet. This would result in an incomplete PNG image that doesn't include all the subvisualizations.
+
+-------
+what is the problem with this. consider all functions are defined and everything correctly exists. why am i getting an empty png. can you fix it?
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+const vizcont = document.getElementById(visualizationid);
+const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+const outputWidth = 1200;
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+let currentHeight = 0;
+subvisualizations.forEach((subviz) => {
+const svg = subviz.querySelector("svg");
+const clonedSVG = svg.querySelector("g").cloneNode(true);
+includeStyles(clonedSVG);
+const bbox = getSVGContentBoundingBox(d3.select(svg));
+clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(clonedSVG);
+const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+const width = viewBox[2];
+const height = viewBox[3];
+const aspectRatio = width / height;
+const outputHeight = outputWidth / aspectRatio;
+const img = new Image();
+img.src = svgDataURL;
+img.onload = () => {
+ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+currentHeight += outputHeight;
+};
+});
+console.log(canvas);
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+}
+
+*******
+
+The issue with the code is that the `img.onload` function is asynchronous, which means that the code execution continues before the images are drawn on the canvas. As a result, the canvas is converted to a PNG data URL and the download link is created before the images are drawn, leading to an empty PNG.
+
+To fix this issue, you can use `Promise.all()` to wait for all the images to be loaded and drawn on the canvas before converting the canvas to a PNG data URL and creating the download link. Here's the modified code:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+
+  const loadAndDrawImagePromises = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.src = svgDataURL;
+      img.onload = () => {
+        ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+        currentHeight += outputHeight;
+        resolve();
+      };
+    });
+  });
+
+  Promise.all(loadAndDrawImagePromises).then(() => {
+    console.log(canvas);
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+```
+
+This code creates an array of promises that load and draw each image
+
+
+---------
+what is the problem with this. consider all functions are defined and everything correctly exists. why am i getting an empty png. can you fix it?
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+const vizcont = document.getElementById(visualizationid);
+const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+const outputWidth = 1200;
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+let currentHeight = 0;
+subvisualizations.forEach((subviz) => {
+const svg = subviz.querySelector("svg");
+const clonedSVG = svg.querySelector("g").cloneNode(true);
+includeStyles(clonedSVG);
+const bbox = getSVGContentBoundingBox(d3.select(svg));
+clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(clonedSVG);
+const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+const width = viewBox[2];
+const height = viewBox[3];
+const aspectRatio = width / height;
+const outputHeight = outputWidth / aspectRatio;
+const img = new Image();
+img.src = svgDataURL;
+img.onload = () => {
+ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+currentHeight += outputHeight;
+};
+});
+console.log(canvas);
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+}
+
+---
+
+i changed it to use promises as suggested. consider all functions are defined and everything correctly exists.
+
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+
+  const loadAndDrawImagePromises = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.src = svgDataURL;
+      img.onload = () => {
+        ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+        currentHeight += outputHeight;
+        resolve();
+      };
+    });
+  });
+
+  Promise.all(loadAndDrawImagePromises).then(() => {
+    console.log(canvas);
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+
+now this is the inspect element html:
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(62.29289946870892, 21.990257711833706) scale(0.4809080199014415)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+  <i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 422.0260009765625 92.98260498046875" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">The</text><text x="32.56544303894043" y="20">average</text><text x="95.37301826477051" y="20">person</text><text x="149.2928066253662" y="20">will</text><text x="176.50487518310547" y="20">spend</text><text x="225.08607864379883" y="20">six</text><text x="249.63624954223633" y="20">months</text><text x="307.09045028686523" y="20">of</text><text x="325.4443111419678" y="20">their</text><text x="361.5737419128418" y="20">life</text><text x="0" y="55">waiting</text><text x="54.792301177978516" y="55">for</text><text x="78.4699592590332" y="55">red</text><text x="106.59890556335449" y="55">lights</text><text x="148.9394359588623" y="55">to</text><text x="167.29329681396484" y="55">turn</text><text x="199.85873985290527" y="55">green.</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+
+          </div>
+
+it seems like the promise is never being fulfilled because nothing i being downloaded. can you fix the code?
+
+
+*********
+
+It seems like the issue is with the `img.onload` event not being triggered. This can happen if the `img.src` is set after the `img.onload` event listener is added. To fix this, you can set the `img.src` after adding the `img.onload` event listener. Here's the updated code:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+
+  const loadAndDrawImagePromises = subvisualizations.map((subviz) => {
+    return new Promise((resolve) => {
+      const svg = subviz.querySelector("svg");
+      const clonedSVG = svg.querySelector("g").cloneNode(true);
+      includeStyles(clonedSVG);
+      const bbox = getSVGContentBoundingBox(d3.select(svg));
+      clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(clonedSVG);
+      const svgDataURL = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgString)));
+      const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+      const width = viewBox[2];
+      const height = viewBox[3];
+      const aspectRatio = width / height;
+      const outputHeight = outputWidth / aspectRatio;
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+        currentHeight += outputHeight;
+        resolve();
+      };
+      img.src = svgDataURL; // Move this line after img.onload
+    });
+  });
+
+  Promise.all(loadAndDrawImagePromises).then(() => {
+    console.log(canvas);
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  });
+}
+```
+
+This should fix the issue and allow the images to be drawn on the canvas and downloaded as a combined PNG.
+--------
+if i use this function:
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+const vizcont = document.getElementById(visualizationid);
+const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+const outputWidth = 1200;
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+let currentHeight = 0;
+subvisualizations.forEach((subviz, index) => {
+const svg = subviz.querySelector("svg");
+const clonedSVG = svg.cloneNode(true);
+includeStyles(clonedSVG);
+const bbox = getSVGContentBoundingBox(d3.select(svg));
+clonedSVG.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
+const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+const width = viewBox[2];
+const height = viewBox[3];
+const aspectRatio = width / height;
+const outputHeight = outputWidth / aspectRatio;
+const img = new Image();
+img.onload = () => {
+console.log(`Image ${index} loaded`);
+ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+currentHeight += outputHeight;
+};
+img.onerror = (error) => {
+console.error(`Error loading image ${index}:`, error);
+};
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(clonedSVG);
+const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+const svgBlobURL = URL.createObjectURL(svgBlob);
+img.src = svgBlobURL;
+console.log(svgBlobURL);
+});
+setTimeout(() => {
+console.log("All images loaded and drawn");
+console.log(canvas);
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+}, 1000);
+}
+with this div:
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+<div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(56.63742072356813, 20.979811986546643) scale(0.5503164394083201)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+<i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+<div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 368.79815673828125 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">Bananas</text><text x="68.14616012573242" y="20">are</text><text x="96.27510643005371" y="20">berries,</text><text x="154.616605758667" y="20">but</text><text x="181.85825157165527" y="20">strawberries</text><text x="273.9762935638428" y="20">are</text><text x="302.10523986816406" y="20">not.</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button></div>
+</div>
+
+i get a png but the g of the svg are being appended. i want the whole svg viewbox to remain the same and basically make it seem like the 2 svgs have been pasted one below another just at different starting y positions. can you fix the function to do that. do not include unncessary extra things.
+***********
+You can fix the function by updating the `viewBox` attribute of the cloned SVG to include the full width and height of the original SVG. Here's the updated function:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+    includeStyles(clonedSVG);
+    const bbox = getSVGContentBoundingBox(d3.select(svg));
+    const fullWidth = parseFloat(svg.getAttribute("width"));
+    const fullHeight = parseFloat(svg.getAttribute("height"));
+    clonedSVG.setAttribute("viewBox", `0 0 ${fullWidth} ${fullHeight}`);
+    const viewBox = clonedSVG.getAttribute("viewBox").split(" ").map(parseFloat);
+    const width = viewBox[2];
+    const height = viewBox[3];
+    const aspectRatio = width / height;
+    const outputHeight = outputWidth / aspectRatio;
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Image ${index} loaded`);
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+    console.log(svgBlobURL);
+  });
+  setTimeout(() => {
+    console.log("All images loaded and drawn");
+    console.log(canvas);
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  }, 1000);
+}
+```
+
+This should now create a PNG with the two SVGs pasted one below another, maintaining their original viewboxes.
+----------
+with this div:
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+<div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(56.63742072356813, 20.979811986546643) scale(0.5503164394083201)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+<i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+<div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 368.79815673828125 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">Bananas</text><text x="68.14616012573242" y="20">are</text><text x="96.27510643005371" y="20">berries,</text><text x="154.616605758667" y="20">but</text><text x="181.85825157165527" y="20">strawberries</text><text x="273.9762935638428" y="20">are</text><text x="302.10523986816406" y="20">not.</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button></div>
+</div>
+
+i have a function that aims to:
+(1) scale up the svgs such that their width is 1200.
+(2) copy them to a new canvas
+(3) stack all svgs in subvisualizations one below another.
+
+but the output is incorrect and not of correct sizing.
+can you fix that?
+
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+const vizcont = document.getElementById(visualizationid);
+const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+const outputWidth = 1200;
+  const outputHeight = 670;
+const canvas = document.createElement("canvas");
+canvas.width = outputWidth;
+canvas.height = totalHeight;
+const ctx = canvas.getContext("2d");
+let currentHeight = 0;
+subvisualizations.forEach((subviz, index) => {
+const svg = subviz.querySelector("svg");
+const clonedSVG = svg.cloneNode(true);
+includeStyles(clonedSVG);
+  
+//   const viewBox = svg.getAttribute('viewBox').split(' ');
+//   const scaleup = outputWidth/viewBox[2];
+// const newViewBox = viewBox.map((value) => parseInt(value) * scaleup);
+clonedSVG.setAttribute('viewBox', '0 0 ' + outputWidth + ' ' + outputHeight);
+// const width = viewBox[2];
+// const height = viewBox[3];
+// const aspectRatio = width / height;
+// const outputHeight = outputWidth / aspectRatio;
+const img = new Image();
+img.onload = () => {
+console.log(`Image ${index} loaded`);
+ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+  console.log(currentHeight, outputWidth, outputHeight);
+currentHeight += outputHeight;
+};
+img.onerror = (error) => {
+console.error(`Error loading image ${index}:`, error);
+};
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(clonedSVG);
+const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+const svgBlobURL = URL.createObjectURL(svgBlob);
+img.src = svgBlobURL;
+console.log(svgBlobURL);
+});
+setTimeout(() => {
+console.log("All images loaded and drawn");
+console.log(canvas);
+const pngDataURL = canvas.toDataURL("image/png");
+const link = document.createElement("a");
+link.href = pngDataURL;
+link.download = "combined_visualization.png";
+link.click();
+}, 1000);
+}
+
+********
+I have made the necessary changes to the function to correctly scale the SVGs and stack them one below another. The changes include calculating the correct scale factor, updating the viewBox, and setting the outputHeight based on the original SVG height.
+
+Here's the updated function:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+    includeStyles(clonedSVG);
+
+    const viewBox = svg.getAttribute('viewBox').split(' ').map(parseFloat);
+    const scaleup = outputWidth / viewBox[2];
+    const newViewBox = [0, 0, viewBox[2] * scaleup, viewBox[3] * scaleup];
+    const outputHeight = viewBox[3] * scaleup;
+    clonedSVG.setAttribute('viewBox', newViewBox.join(' '));
+
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Image ${index} loaded`);
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      console.log(currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+    console.log(svgBlobURL);
+  });
+  setTimeout(() => {
+    console.log("All images loaded and drawn");
+    console.log(canvas);
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  }, 1000);
+}
+```
+
+This should now correctly scale the SVGs, copy them to a new canvas, and stack them one below another.
+----------
+with this div:
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+<div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(56.63742072356813, 20.979811986546643) scale(0.5503164394083201)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+<i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+<div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 368.79815673828125 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">Bananas</text><text x="68.14616012573242" y="20">are</text><text x="96.27510643005371" y="20">berries,</text><text x="154.616605758667" y="20">but</text><text x="181.85825157165527" y="20">strawberries</text><text x="273.9762935638428" y="20">are</text><text x="302.10523986816406" y="20">not.</text></g></svg><button class="download-svg-btn">
+<i class="fas fa-file-download"></i></button></div>
+</div>
+
+i have a function that aims to:
+(1) scale up the svgs such that their width is 1200.
+(2) copy them to a new canvas
+(3) stack all svgs in subvisualizations one below another.
+
+but the output is incorrect and not of correct sizing. the svg is correct in sizing but the internal element g inside the svg is not scaled up. remember that i still want the g to be centered within the svg.
+can you fix that?
+
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+    //includeStyles(clonedSVG);
+
+    const viewBox = svg.getAttribute('viewBox').split(' ').map(parseFloat);
+    const scaleup = outputWidth / viewBox[2];
+    const newViewBox = [0, 0, viewBox[2] * scaleup, viewBox[3] * scaleup];
+    const outputHeight = viewBox[3] * scaleup;
+    clonedSVG.setAttribute('viewBox', newViewBox.join(' '));
+
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Image ${index} loaded`);
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      console.log(currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    console.log(svgString);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+    console.log(svgBlobURL);
+  });
+  setTimeout(() => {
+    console.log("All images loaded and drawn");
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  }, 1000);
+}
+*************
+
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+
+    const viewBox = svg.getAttribute('viewBox').split(' ').map(parseFloat);
+    const scaleup = outputWidth / viewBox[2];
+    const newViewBox = [0, 0, viewBox[2] * scaleup, viewBox[3] * scaleup];
+    const outputHeight = viewBox[3] * scaleup;
+    clonedSVG.setAttribute('viewBox', newViewBox.join(' '));
+
+    const g = clonedSVG.querySelector("g");
+    const gTransform = g.getAttribute("transform");
+    const translateMatch = gTransform.match(/translate\(([^,]+),\s*([^)]+)\)/);
+    const scaleMatch = gTransform.match(/scale\(([^)]+)\)/);
+    const newTranslateX = parseFloat(translateMatch[1]) * scaleup;
+    const newTranslateY = parseFloat(translateMatch[2]) * scaleup;
+    const newScale = parseFloat(scaleMatch[1]) * scaleup;
+    g.setAttribute("transform", `translate(${newTranslateX}, ${newTranslateY}) scale(${newScale})`);
+
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Image ${index} loaded`);
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      console.log(currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    console.log(svgString);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+    console.log(svgBlobURL);
+  });
+  setTimeout(() => {
+    console.log("All images loaded and drawn");
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  }, 1000);
+}
+
+--------
+write a function that creates a temporary canvas, pastes these svgs in the subvisualizations below one another and then downloads it as an image. the canvas size would be 600*(num_of_subviz*335). remember when you clone these, to use the client width and height of svg using code (it might be different based on the size of the window), scale it and all elements inside it up to 600*335 for each svg. g inside the svg should still remain centered. the g may sometimes have and sometimes not have an already existing scale element, so keep that in mind. remember we still want the white space around, so we do not just want to scale up the viewbox or bbox, we want to scale up the whole svg. the final combined svg should then be downloaded as png.
+
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(61.88205691353748, 21.916853828211003) scale(0.4859501982395915)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+  <i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 417.6470947265625 92.98260498046875" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">Giraffes</text><text x="60.72241973876953" y="20">have</text><text x="100.41583633422852" y="20">the</text><text x="127.6574821472168" y="20">same</text><text x="171.77260971069336" y="20">number</text><text x="231.01619720458984" y="20">of</text><text x="249.37005805969238" y="20">neck</text><text x="288.16138648986816" y="20">vertebrae</text><text x="360.7440433502197" y="20">as</text><text x="0" y="55">humans,</text><text x="66.35677337646484" y="55">despite</text><text x="122.93846130371094" y="55">their</text><text x="159.06789207458496" y="55">much</text><text x="203.18301963806152" y="55">longer</text><text x="252.65152168273926" y="55">necks.</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+
+          </div>
+
+Here's a JavaScript function that creates a temporary canvas, pastes the SVGs in the subvisualizations below one another, scales them up, and then downloads the combined SVG as a PNG image.
+
+```javascript
+function downloadCombinedSVG() {
+  const subvisualizations = document.querySelectorAll('.subvisualization');
+  const canvasWidth = 600;
+  const canvasHeight = subvisualizations.length * 335;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  const ctx = canvas.getContext('2d');
+
+  let yOffset = 0;
+
+  function drawSVG(svg, callback) {
+    const img = new Image();
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+
+    img.onload = function () {
+      ctx.drawImage(img, 0, yOffset, canvasWidth, 335);
+      yOffset += 335;
+      URL.revokeObjectURL(svgUrl);
+
+      if (callback) {
+        callback();
+      }
+    };
+
+    img.src = svgUrl;
+  }
+
+  function processSubvisualization(index) {
+    if (index >= subvisualizations.length) {
+      // Download the combined image
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'combined-image.png';
+      link.click();
+      return;
+    }
+
+    const svg = subvisualizations[index].querySelector('svg');
+    const g = svg.querySelector('g');
+    const clientWidth = svg.clientWidth;
+    const clientHeight = svg.clientHeight;
+    const scaleX = canvasWidth / clientWidth;
+    const scaleY = 335 / clientHeight;
+
+    // Scale the SVG and its elements
+    svg.setAttribute('width', canvasWidth);
+    svg.setAttribute('height', 335);
+    g.setAttribute('transform', `translate(${g.getCTM().e}, ${g.getCTM().f}) scale(${scaleX}, ${scaleY})`);
+
+    drawSVG(svg, () => {
+      // Restore the original SVG size and transformation
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      g.setAttribute('transform', `translate(${g.getCTM().e / scaleX}, ${g.getCTM().f / scaleY}) scale(1)`);
+
+      processSubvisualization(index + 1);
+    });
+  }
+
+  processSubvisualization(0);
+}
+
+// Attach the function to the combined export button
+document.getElementById('tb3-visualization-combined-export-btn').addEventListener('click', downloadCombinedSVG);
+```
+
+This function first creates a temporary canvas with the specified size. It then iterates through the subvisualizations, scales up the SVGs and their elements, and draws them on the canvas. After drawing all the SVGs, it downloads the combined image as a PNG file.
+
+------------
+write a function that creates a temporary canvas, pastes these svgs in the subvisualizations below one another and then downloads it as an image. the canvas size would be 600*(num_of_subviz*335). remember when you clone these, to use the client width and height of svg using code (it might be different based on the size of the window), scale it and all elements inside it up to 600*335 for each svg. g inside the svg should still remain centered. the g may sometimes have and sometimes not have an already existing scale element, so keep that in mind. remember we still want the white space around, so we do not just want to scale up the viewbox or bbox, we want to scale up the whole svg. the final combined svg should then be downloaded as png.
+
+i already have this function, modify it to work with the requirements above
+function downloadCombinedVisualizations(visualizationid, totalHeight) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 1200;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+
+    const viewBox = svg.getAttribute('viewBox').split(' ').map(parseFloat);
+    const scaleup = outputWidth / viewBox[2];
+    const newViewBox = [0, 0, viewBox[2] * scaleup, viewBox[3] * scaleup];
+    const outputHeight = viewBox[3] * scaleup;
+    clonedSVG.setAttribute('viewBox', newViewBox.join(' '));
+
+    const g = clonedSVG.querySelector("g");
+    const gTransform = g.getAttribute("transform");
+    const gScale = gTransform.match(/scale\(([^)]+)\)/);
+    const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+    const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+    g.setAttribute("transform", newGTransform);
+
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Image ${index} loaded`);
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      console.log(currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    console.log(svgString);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+    console.log(svgBlobURL);
+  });
+  setTimeout(() => {
+    console.log("All images loaded and drawn");
+    const pngDataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngDataURL;
+    link.download = "combined_visualization.png";
+    link.click();
+  }, 1000);
+}
+
+this is an example svg
+
+<div class="visualization" id="tb3-visualization" style="display: block;"><span class="hidden-trigger" id="tb3-hiddenTrigger" style="display: none;"></span>
+            <div class="subvisualization" id="tb3-visualization-1"><svg width="100%" height="100%" viewBox="0 0 202.9556884765625 57.98260688781738" preserveAspectRatio="xMidYMid meet"><g transform="translate(61.88205691353748, 21.916853828211003) scale(0.4859501982395915)"><text x="0" y="20">say</text><text x="29.903545379638672" y="20">something</text><text x="108.71209335327148" y="20">random</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button><button class="download-svg-combined-btn" id="tb3-visualization-combined-export-btn">
+  <i class="fas fa-file-download"></i><i class="fas fa-plus"></i><i class="fas fa-file-download"></i></button></div>
+            <div class="subvisualization" id="tb3-visualization-2"><svg width="100%" height="100%" viewBox="0 0 417.6470947265625 92.98260498046875" preserveAspectRatio="xMidYMid meet"><g transform="translate(20, 14.196794033050537)"><text x="0" y="20">Giraffes</text><text x="60.72241973876953" y="20">have</text><text x="100.41583633422852" y="20">the</text><text x="127.6574821472168" y="20">same</text><text x="171.77260971069336" y="20">number</text><text x="231.01619720458984" y="20">of</text><text x="249.37005805969238" y="20">neck</text><text x="288.16138648986816" y="20">vertebrae</text><text x="360.7440433502197" y="20">as</text><text x="0" y="55">humans,</text><text x="66.35677337646484" y="55">despite</text><text x="122.93846130371094" y="55">their</text><text x="159.06789207458496" y="55">much</text><text x="203.18301963806152" y="55">longer</text><text x="252.65152168273926" y="55">necks.</text></g></svg><button class="download-svg-btn">
+  <i class="fas fa-file-download"></i></button></div>
+
+          </div>
+
+once you have written the function, explain the code you wrote.
+
+***************
+Here's the modified function that meets the requirements:
+
+```javascript
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 600;
+  const totalHeight = subvisualizations.length * 335;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+
+    const clientWidth = svg.clientWidth;
+    const clientHeight = svg.clientHeight;
+    const scaleup = outputWidth / clientWidth;
+    const outputHeight = clientHeight * scaleup;
+
+    const g = clonedSVG.querySelector("g");
+    const gTransform = g.getAttribute("transform");
+    const gScale = gTransform.match(/scale\(([^)]+)\)/);
+    const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+    const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+    g.setAttribute("transform", newGTransform);
+
+    clonedSVG.setAttribute('width', outputWidth);
+    clonedSVG.setAttribute('height', outputHeight);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+      if (index === subvisualizations.length - 1) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+  });
+}
+
+```
+
+Explanation of the code:
+
+1. The function now takes only one argument, `visualizationid`, as the total height can be calculated from the number of subvisualizations.
+2. The `outputWidth` is set to 600, and the `totalHeight` is calculated by multiplying the number of subvisualizations by 335.
+3. The `clientWidth` and `clientHeight` of the SVG are used to calculate the scaling factor (`scaleup`) and the output height for each SVG.
+4. The scaling factor is applied to the `g` element inside the SVG, taking into account any existing scale value.
+5. The width and height attributes of the cloned SVG are set to the output width and height.
+6. The image is drawn on the canvas at the current height, and the current height is incremented by the output height of the SVG.
+7. Once all images are loaded and drawn, the combined image is downloaded as a PNG.
+
+This function should work with the example SVG provided and create a combined image with the specified dimensions and scaling.
+--------
+fix this function such that center of g is still centered for clonedsvg after the scaleup when drawing onto the canvas. do not write the whole functio, just thew new or corrected lines and where to add or fix them.
+
+
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 600;
+  const totalHeight = subvisualizations.length * 335;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+
+    const clientWidth = svg.clientWidth;
+    const clientHeight = svg.clientHeight;
+    const scaleup = outputWidth / clientWidth;
+    const outputHeight = clientHeight * scaleup;
+
+    const g = clonedSVG.querySelector("g");
+    const gTransform = g.getAttribute("transform");
+    const gScale = gTransform.match(/scale\(([^)]+)\)/);
+    const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+    const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+
+    // Update the translate values
+    const gTranslate = gTransform.match(/translate\(([^)]+)\)/);
+    if (gTranslate) {
+      const [translateX, translateY] = gTranslate[1].split(',').map(parseFloat);
+      const newTranslateX = translateX * scaleup;
+      const newTranslateY = translateY * scaleup;
+      const newGTranslate = `translate(${newTranslateX},${newTranslateY})`;
+      g.setAttribute("transform", newGTransform.replace(gTranslate[0], newGTranslate));
+    } else {
+      g.setAttribute("transform", newGTransform);
+    }
+
+    clonedSVG.setAttribute('width', outputWidth);
+    clonedSVG.setAttribute('height', outputHeight);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+      if (index === subvisualizations.length - 1) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+  });
+}
+******
+To ensure the center of `g` is still centered for `clonedSVG` after the scale-up, you need to adjust the translate values based on the new scale. Here are the corrected lines:
+
+Replace this block:
+
+```javascript
+const newTranslateX = translateX * scaleup;
+const newTranslateY = translateY * scaleup;
+```
+
+With this block:
+
+```javascript
+const newTranslateX = (translateX + (clientWidth / 2)) * scaleup - (outputWidth / 2);
+const newTranslateY = (translateY + (clientHeight / 2)) * scaleup - (outputHeight / 2);
+```
+
+This will adjust the translate values based on the new scale and keep the center of `g` aligned with the center of `clonedSVG`.
+------
+fix this function such that center of g is still centered for cloned svg after the scaleup when drawing onto the canvas. right now, it is almost in center but not completely. here is the rendered svg after translation for example. 
+<svg width="600" height="335.55093555093555" viewBox="0 0 225.1271514892578 57.46487045288086" preserveAspectRatio="xMidYMid meet"><g transform="translate(80.18184402081806,26.481872023306977) scale(0.6506753267089839)"><text x="0" y="20">come</text><text x="44.13027572631836" y="20">on</text><text x="66.92650985717773" y="20">turn</text><text x="99.49800491333008" y="20">the</text><text x="126.74817085266113" y="20">radio</text><text x="167.33089637756348" y="20">on</text></g></svg>
+
+the g is too much to the right in the above svg.
+
+do not write the whole function, just thew new or corrected lines and where to add or fix them. 
+
+
+function downloadCombinedVisualizations(visualizationid) {
+  const vizcont = document.getElementById(visualizationid);
+  const subvisualizations = Array.from(vizcont.querySelectorAll(".subvisualization"));
+  const outputWidth = 600;
+  const totalHeight = subvisualizations.length * 335;
+  const canvas = document.createElement("canvas");
+  canvas.width = outputWidth;
+  canvas.height = totalHeight;
+  const ctx = canvas.getContext("2d");
+  let currentHeight = 0;
+  subvisualizations.forEach((subviz, index) => {
+    const svg = subviz.querySelector("svg");
+    const clonedSVG = svg.cloneNode(true);
+
+    const clientWidth = svg.clientWidth;
+    const clientHeight = svg.clientHeight;
+    const scaleup = outputWidth / clientWidth;
+    const outputHeight = clientHeight * scaleup;
+
+    const g = clonedSVG.querySelector("g");
+    const gTransform = g.getAttribute("transform");
+    const gScale = gTransform.match(/scale\(([^)]+)\)/);
+    const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+    const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+
+    // Update the translate values
+    const gTranslate = gTransform.match(/translate\(([^)]+)\)/);
+    if (gTranslate) {
+      const [translateX, translateY] = gTranslate[1].split(',').map(parseFloat);
+      const newTranslateX = (translateX + (clientWidth / 2)) * scaleup - (outputWidth / 2);
+const newTranslateY = (translateY + (clientHeight / 2)) * scaleup - (outputHeight / 2);
+      const newGTranslate = `translate(${newTranslateX},${newTranslateY})`;
+      g.setAttribute("transform", newGTransform.replace(gTranslate[0], newGTranslate));
+    } else {
+      g.setAttribute("transform", newGTransform);
+    }
+
+    clonedSVG.setAttribute('width', outputWidth);
+    clonedSVG.setAttribute('height', outputHeight);
+
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, currentHeight, outputWidth, outputHeight);
+      currentHeight += outputHeight;
+      if (index === subvisualizations.length - 1) {
+        const pngDataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = pngDataURL;
+        link.download = "combined_visualization.png";
+        link.click();
+      }
+    };
+    img.onerror = (error) => {
+      console.error(`Error loading image ${index}:`, error);
+    };
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSVG);
+    const svgBlob = new Blob([svgString], { type: "image/svg+xml" });
+    const svgBlobURL = URL.createObjectURL(svgBlob);
+    img.src = svgBlobURL;
+  });
+}
+
+
