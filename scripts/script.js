@@ -1093,6 +1093,7 @@ const onDrop = (e) => {
   const draggedId = e.dataTransfer.getData("text/plain");
   draggedElement = document.getElementById(draggedId);
   const dropTarget = e.target.closest(".item-wrapper");
+  const sidebar = e.target.closest(".sidebar-content");
 
   if (dropTarget && sidebar.contains(dropTarget) && draggedElement !== dropTarget) {
     const rect = dropTarget.getBoundingClientRect();
