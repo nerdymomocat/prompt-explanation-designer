@@ -17,7 +17,6 @@
     flex-direction:row;
     display: flex;
     justify-content: space-between;
-    align-items: stretch;
   }
     .overlay-button-input-container,
   .sidebar,
