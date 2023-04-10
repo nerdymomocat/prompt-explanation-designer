@@ -633,7 +633,7 @@ function downloadVisualization(svg) {
   canvas.height = outputHeight;
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#fffcf5";
-  ctx.fillRect(0, 0, outputWidth, totalHeight);
+  ctx.fillRect(0, 0, outputWidth, outputHeight);
 
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
