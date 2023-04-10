@@ -632,8 +632,8 @@ function downloadVisualization(svg) {
   canvas.width = outputWidth;
   canvas.height = outputHeight;
   const ctx = canvas.getContext("2d");
-  ctx.fillStyle = "#fffcf5";
-  ctx.fillRect(0, 0, outputWidth, outputHeight);
+//   ctx.fillStyle = "#fffcf5";
+//   ctx.fillRect(0, 0, outputWidth, outputHeight);
 
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -689,6 +689,8 @@ function downloadCombinedVisualizations(visualizationid) {
   canvas.width = outputWidth;
   canvas.height = totalHeight;
   const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fffcf5";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   let currentHeight = 0;
   subvisualizations.forEach((subviz, index) => {
     const svg = subviz.querySelector("svg");
