@@ -47,12 +47,12 @@ export const getUniqueRandomColor = (containerid) => {
   let lightness;
   do {
     randomColor = generateRandomPastelColor();
-    lightness = chroma(randomColor).get('hsl.l');
+    //lightness = chroma(randomColor).get('hsl.l');
   } while (
     isColorUsedInSidebar(randomColor, containerid) ||
     isColorCloseToPredefinedColors(randomColor) || // Avoid colors close to predefined colors
-    lightness <= lowerLightnessThreshold || // Avoid colors close to black
-    lightness >= upperLightnessThreshold // Avoid colors close to white
+    //lightness <= lowerLightnessThreshold || // Avoid colors close to black
+    //lightness >= upperLightnessThreshold // Avoid colors close to white
   );
   return randomColor;
 };
