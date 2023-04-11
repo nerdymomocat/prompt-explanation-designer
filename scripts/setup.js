@@ -76,6 +76,22 @@ export const  removeAllItemsFromSidebar = (cid) => {
     });
   }
 
+export const getCleanText = () => {
+  const textInput = document.getElementById("tb4-text-input-1");
+  const clone = textInput.cloneNode(true);
+
+  const strikethroughSpans = clone.querySelectorAll('[class^="strikethrough-"]');
+  strikethroughSpans.forEach(span => span.remove());
+
+  const collapsedContentSpans = clone.querySelectorAll('.collapsed-content');
+  collapsedContentSpans.forEach(span => {
+    const originalText = span.getAttribute('data-original-text');
+    span.textContent = originalText;
+  });
+
+  return clone.innerText;
+}
+
 
 
 
