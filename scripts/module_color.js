@@ -17,12 +17,11 @@ const isColorCloseToPredefinedColors = (color) => {
   return false;
 };
 
-const generateRandomColor = () => {
-  let randomColor = '#';
-  for (let i = 0; i < 6; i++) {
-    randomColor += ('0' + Math.floor(Math.random() * 16).toString(16)).slice(-1);
-  }
-  return randomColor;
+const generateRandomPastelColor = () => {
+  const hue = Math.floor(Math.random() * 361);
+  const saturation = 30 + Math.floor(Math.random() * 31); // Saturation range: 30-60
+  const lightness = 70 + Math.floor(Math.random() * 21); // Lightness range: 70-90
+  return chroma.hsl(hue, saturation, lightness).hex();
 };
 
 const isColorUsedInSidebar = (color, containerid) => {
@@ -47,7 +46,7 @@ export const getUniqueRandomColor = (containerid) => {
   let randomColor;
   let lightness;
   do {
-    randomColor = generateRandomColor();
+    randomColor = generateRandomPastelColor();
     lightness = chroma(randomColor).get('hsl.l');
   } while (
     isColorUsedInSidebar(randomColor, containerid) ||
