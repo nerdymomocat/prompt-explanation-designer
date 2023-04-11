@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     removeAllItemsFromSidebar("tb3-sidebar-content-2");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb3-dropdown-gen").value;
-    const prompt = document.getElementById("tb3-text-input-1").innerText;
+    const prompt = getCleanText("tb3-text-input-1");
     const temperature = document.getElementById("tb3-temperature-slider").value;
     const textInput2 = document.getElementById("tb3-text-input-2");
     const current_date = new Date().toLocaleDateString();
