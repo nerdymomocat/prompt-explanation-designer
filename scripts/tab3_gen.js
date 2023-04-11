@@ -1,4 +1,4 @@
-import {removeAllItemsFromSidebar} from './setup.js'
+import { removeAllItemsFromSidebar, getCleanText } from './setup.js'
 
 
 document.addEventListener("DOMContentLoaded", () => {
