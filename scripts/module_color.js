@@ -50,7 +50,7 @@ export const getUniqueRandomColor = (containerid) => {
     //lightness = chroma(randomColor).get('hsl.l');
   } while (
     isColorUsedInSidebar(randomColor, containerid) ||
-    isColorCloseToPredefinedColors(randomColor) || // Avoid colors close to predefined colors
+    isColorCloseToPredefinedColors(randomColor) //|| // Avoid colors close to predefined colors
     //lightness <= lowerLightnessThreshold || // Avoid colors close to black
     //lightness >= upperLightnessThreshold // Avoid colors close to white
   );
