@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
     removeAllItemsFromSidebar("tb4-sidebar-content-2");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb4-dropdown-gen-1").value;
-    const prompt = document.getElementById("tb4-text-input-1").innerText;
+    const prompt = getCleanText("tb4-text-input-1");
     const temperature = document.getElementById("tb4-temperature-slider-1").value;
     const textInput2 = document.getElementById("tb4-text-input-2");
     const current_date = new Date().toLocaleDateString();
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     removeAllItemsFromSidebar("tb4-sidebar-content-3");
     const apiKey = localStorage.getItem("apiKey");
     const modelName = document.getElementById("tb4-dropdown-gen-2").value;
-    const prompt = document.getElementById("tb4-text-input-1").innerText;
+    const prompt = getCleanText("tb4-text-input-1");
     const temperature = document.getElementById("tb4-temperature-slider-2").value;
     const textInput3 = document.getElementById("tb4-text-input-3");
     const current_date = new Date().toLocaleDateString();
