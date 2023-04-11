@@ -1,0 +1,44 @@
+i have this div. i have 2 issues. a new line creates a div inside a div and i want to prevent that. 
+
+<div class="text-input active" id="tb4-text-input-1" contenteditable="true" spellcheck="false" data-placeholder="Add Prompt Here">I make 6 cups of coffee&nbsp;<div>every night before I sleep. Today, my <span class="strikethrough-aed178">boyfriend</span> <span class="color-highlight-749ff7">cat</span> drank 2 cups of coffee while I was <span class="strikethrough-7994a0">sleeping.</span> <span class="color-highlight-3eeb27">sleeping at midnight.</span> How many cups of <span class="strikethrough-e7fa8c">coffee</span> <span class="color-highlight-34ef6a">drinks</span> will I look for when I wake up?</div></div>
+
+and secondly. i am using  const prompt = document.getElementById("tb4-text-input-1").innerText; to get the content. how do i make it so that it does not include the content in spans that have strikethrough-* class. And I want to replace the content in class="collapsed-content" spans with the data-original-text property of the span.
+
+<div class="text-input" id="tb4-text-input-1" contenteditable="true" spellcheck="false" data-placeholder="Add Prompt Here">I make 6 cups of coffee&nbsp;<div>every night before <span data-original-text="I sleep" class="collapsed-content" style="cursor: pointer;">...</span>. Today, my <span class="strikethrough-aed178">boyfriend</span> <span class="color-highlight-749ff7">cat</span> drank 2 cups of coffee while I was <span class="strikethrough-7994a0">sleeping.</span> <span class="color-highlight-3eeb27">sleeping at midnight.</span> How many cups of <span class="strikethrough-e7fa8c">coffee</span> <span class="color-highlight-34ef6a">drinks</span> will I look for when I wake up?</div></div>
+
+*********
+
+To prevent new lines from creating a div inside a div, you can add the following CSS rule to your stylesheet:
+
+```css
+.text-input > div {
+  display: inline;
+}
+```
+
+This will make the inner divs behave like inline elements, preventing them from creating new lines.
+
+For the second issue, you can use the following JavaScript code to get the content without the strikethrough-* class and replace the content in class="collapsed-content" spans with the data-original-text property of the span:
+
+```javascript
+function getCleanText() {
+  const textInput = document.getElementById("tb4-text-input-1");
+  const clone = textInput.cloneNode(true);
+
+  const strikethroughSpans = clone.querySelectorAll('[class^="strikethrough-"]');
+  strikethroughSpans.forEach(span => span.remove());
+
+  const collapsedContentSpans = clone.querySelectorAll('.collapsed-content');
+  collapsedContentSpans.forEach(span => {
+    const originalText = span.getAttribute('data-original-text');
+    span.textContent = originalText;
+  });
+
+  return clone.innerText;
+}
+
+const prompt = getCleanText();
+console.log(prompt);
+```
+
+This code first clones the text input element to avoid modifying the original content. Then, it removes all spans with a class starting with "strikethrough-". After that, it replaces the content of the "collapsed-content" spans with the data-original-text property. Finally, it returns the innerText of the modified clone.
