@@ -112,9 +112,11 @@ document.addEventListener("DOMContentLoaded", () => {
     let system_content;
 
     if (modelName === "gpt-4") {
-      system_content = "You are GPT-4, a large language model trained by OpenAI. Answer as concisely as possible";
+      //system_content = "You are GPT-4, a large language model trained by OpenAI. Answer as concisely as possible";
+      system_content="";
     } else {
-      system_content = "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: 2021-09-01 Current date: " + current_date;
+      //system_content = "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible. Knowledge cutoff: 2021-09-01 Current date: " + current_date;
+      system_content="";
     }
 
     if (!apiKey) {
