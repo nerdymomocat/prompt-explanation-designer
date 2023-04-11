@@ -76,8 +76,8 @@ export const  removeAllItemsFromSidebar = (cid) => {
     });
   }
 
-export const getCleanText = () => {
-  const textInput = document.getElementById("tb4-text-input-1");
+export const getCleanText = (id) => {
+  const textInput = document.getElementById(id);
   const clone = textInput.cloneNode(true);
 
   const strikethroughSpans = clone.querySelectorAll('[class^="strikethrough-"]');
