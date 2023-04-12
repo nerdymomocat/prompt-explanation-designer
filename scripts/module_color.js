@@ -55,5 +55,6 @@ export const getUniqueRandomColor = (containerid) => {
     //lightness <= lowerLightnessThreshold || // Avoid colors close to black
     //lightness >= upperLightnessThreshold // Avoid colors close to white
   );
+  console.log(randomColor);
   return randomColor;
 };
