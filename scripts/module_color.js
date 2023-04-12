@@ -1,5 +1,5 @@
-//const lowerLightnessThreshold = 0.5; // You can adjust this value to change the lower lightness constraint
-export const upperLightnessThreshold = 1; // You can adjust this value to change the upper lightness constraint
+const lowerLightnessThreshold = 0.5; // You can adjust this value to change the lower lightness constraint
+export const upperLightnessThreshold = 0.8; // You can adjust this value to change the upper lightness constraint
 
 export const predefinedColors = ["#E9E5E3", "#FAEBDD", "#FBF3DB", "#DDEDEA", "#DDEBF1", "#EAE4F2", "#F4DFEB", "#FBE4E4"];
 
@@ -17,13 +17,22 @@ const isColorCloseToPredefinedColors = (color) => {
   return false;
 };
 
-const generateRandomPastelColor = () => {
-  const hue = Math.floor(Math.random() * 361);
-  const saturation = 25 + Math.floor(Math.random() * 71); 
-  const lightness = 85 + Math.floor(Math.random() * 11); 
-  console.log(chroma.hsl(hue, saturation, lightness).hex());
-  return chroma.hsl(hue, saturation, lightness).hex();
+const generateRandomColor = () => {
+  let randomColor = '#';
+  for (let i = 0; i < 6; i++) {
+    randomColor += ('0' + Math.floor(Math.random() * 16).toString(16)).slice(-1);
+  }
+  return randomColor;
 };
+
+function generatePastelColor() {
+  const hue = Math.random() * 360; // Choose a random hue
+  const saturation = 0.25 + Math.random() * 0.7; // Choose a random saturation between 25% and 95%
+  const lightness = 0.85 + Math.random() * 0.1; // Choose a random lightness between 85% and 95%
+  const pastelColor = chroma.hsl(hue, saturation, lightness);
+  console.log(pastelColor.hex());
+  return pastelColor.hex();
+}
 
 const isColorUsedInSidebar = (color, containerid) => {
   const sidebarcontainer = document.querySelector("#" + containerid);
@@ -45,16 +54,17 @@ const isColorUsedInSidebar = (color, containerid) => {
 // New helper function to get a unique random color not used in the sidebar
 export const getUniqueRandomColor = (containerid) => {
   let randomColor;
-  let lightness;
+  //let lightness;
   do {
-    randomColor = generateRandomPastelColor();
+    randomColor = generatePastelColor();
+    console.log(randomColor);
     //lightness = chroma(randomColor).get('hsl.l');
   } while (
     isColorUsedInSidebar(randomColor, containerid) ||
-    isColorCloseToPredefinedColors(randomColor) //|| // Avoid colors close to predefined colors
-    //lightness <= lowerLightnessThreshold || // Avoid colors close to black
-    //lightness >= upperLightnessThreshold // Avoid colors close to white
+    isColorCloseToPredefinedColors(randomColor)
+    // || // Avoid colors close to predefined colors
+    // lightness <= lowerLightnessThreshold || // Avoid colors close to black
+    // lightness >= upperLightnessThreshold // Avoid colors close to white
   );
-  console.log(randomColor);
   return randomColor;
 };
