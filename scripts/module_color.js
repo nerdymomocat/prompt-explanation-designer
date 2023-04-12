@@ -19,8 +19,8 @@ const isColorCloseToPredefinedColors = (color) => {
 
 const generateRandomPastelColor = () => {
   const hue = Math.floor(Math.random() * 361);
-  const saturation = 30 + Math.floor(Math.random() * 31); // Saturation range: 30-60
-  const lightness = 70 + Math.floor(Math.random() * 21); // Lightness range: 70-90
+  const saturation = 25 + Math.floor(Math.random() * 71); 
+  const lightness = 85 + Math.floor(Math.random() * 11); 
   return chroma.hsl(hue, saturation, lightness).hex();
 };
 
