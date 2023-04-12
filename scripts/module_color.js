@@ -21,6 +21,7 @@ const generateRandomPastelColor = () => {
   const hue = Math.floor(Math.random() * 361);
   const saturation = 25 + Math.floor(Math.random() * 71); 
   const lightness = 85 + Math.floor(Math.random() * 11); 
+  console.log(chroma.hsl(hue, saturation, lightness).hex());
   return chroma.hsl(hue, saturation, lightness).hex();
 };
 
