@@ -28,7 +28,7 @@ const generateRandomColor = () => {
 function generatePastelColor() {
   const hue = Math.random() * 360; // Choose a random hue
   const saturation = 0.25 + Math.random() * 0.7; // Choose a random saturation between 25% and 95%
-  const lightness = 0.85 + Math.random() * 0.1; // Choose a random lightness between 85% and 95%
+  const lightness = 0.78 + Math.random() * 0.13; // Choose a random lightness between 85% and 95%
   const pastelColor = chroma.hsl(hue, saturation, lightness);
   console.log(pastelColor.hex());
   return pastelColor.hex();
