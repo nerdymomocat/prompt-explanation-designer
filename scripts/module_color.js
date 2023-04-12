@@ -25,6 +25,15 @@ const generateRandomColor = () => {
   return randomColor;
 };
 
+function generatePastelColor() {
+  const hue = Math.random() * 360; // Choose a random hue
+  const saturation = 0.25 + Math.random() * 0.7; // Choose a random saturation between 25% and 95%
+  const lightness = 0.85 + Math.random() * 0.1; // Choose a random lightness between 85% and 95%
+  const pastelColor = chroma.hsl(hue, saturation, lightness);
+  console.log(pastelColor.hex());
+  return pastelColor.hex();
+}
+
 const isColorUsedInSidebar = (color, containerid) => {
   const sidebarcontainer = document.querySelector("#" + containerid);
   const colorItems = sidebarcontainer.querySelectorAll('.sidebar .color-item');
@@ -45,15 +54,17 @@ const isColorUsedInSidebar = (color, containerid) => {
 // New helper function to get a unique random color not used in the sidebar
 export const getUniqueRandomColor = (containerid) => {
   let randomColor;
-  let lightness;
+  //let lightness;
   do {
-    randomColor = generateRandomColor();
-    lightness = chroma(randomColor).get('hsl.l');
+    randomColor = generatePastelColor();
+    console.log(randomColor);
+    //lightness = chroma(randomColor).get('hsl.l');
   } while (
     isColorUsedInSidebar(randomColor, containerid) ||
-    isColorCloseToPredefinedColors(randomColor) || // Avoid colors close to predefined colors
-    lightness <= lowerLightnessThreshold || // Avoid colors close to black
-    lightness >= upperLightnessThreshold // Avoid colors close to white
+    isColorCloseToPredefinedColors(randomColor)
+    // || // Avoid colors close to predefined colors
+    // lightness <= lowerLightnessThreshold || // Avoid colors close to black
+    // lightness >= upperLightnessThreshold // Avoid colors close to white
   );
   return randomColor;
 };
