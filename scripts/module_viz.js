@@ -295,6 +295,8 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
             .attr('y', currentY - 15)
             .attr('width', wordWidth + 6)
             .attr('height', lineHeight)
+            .attr('rx', 4)
+            .attr('ry', 4)
             .attr('fill', `#${color}`);
         }
 
