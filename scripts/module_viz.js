@@ -23,7 +23,7 @@ function scale_svgs(scalevals, num, visualizationid) {
   if (num === 2) {
     let scale1 = scalevals[0];
     let scale2 = scalevals[1];
-    console.log(scale1,scale2);
+    console.log(scale1, scale2);
     if (scale1 < 1 && scale2 < 1) {
       const minScale = Math.max(scale1, scale2);
       if (scale1 < minScale) {
@@ -42,7 +42,7 @@ function scale_svgs(scalevals, num, visualizationid) {
     let scale1 = scalevals[0];
     let scale2 = scalevals[1];
     let scale3 = scalevals[2];
-     console.log(scale1,scale2,scale3);
+    console.log(scale1, scale2, scale3);
     if (scale1 < 1 && scale2 < 1 && scale3 < 1) {
       const minScale = Math.max(scale1, scale2, scale3);
       if (scale1 < minScale) {
@@ -147,6 +147,23 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
   let newY1 = y + minHeight;
   let newY2 = y - minHeight;
   let newX = (x) - width / 2;
+
+  // Get all nodes with the class attribute "main-text-class"
+  const mainTextNodes = canvas.selectAll('.main-text-class');
+
+  // Calculate the bounding box of the selected nodes combined together
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  mainTextNodes.each(function() {
+    const bbox = this.getBBox();
+    minX = Math.min(minX, bbox.x);
+    minY = Math.min(minY, bbox.y);
+    maxX = Math.max(maxX, bbox.x + bbox.width);
+    maxY = Math.max(maxY, bbox.y + bbox.height);
+  });
+
+  // Update newY1 and newY2 based on the calculated bounding box
+  newY1 = (newY1 < (maxY + 5)) ? (y + maxY + 5) : newY1;
+  newY2 = (newY2 > (minY - 5)) ? (y - minY - 5) : newY2;
 
   const checkOverlap = (newY) => {
     let overlapCount = 0;
@@ -282,6 +299,7 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
           .attr('x', currentX)
           .attr('y', currentY)
           .text(word)
+          .attr('class', 'main-text-class')
           .style('pointer-events', 'none'); // Add this line
 
         // Calculate the middle word's x position
@@ -295,8 +313,6 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
             .attr('y', currentY - 15)
             .attr('width', wordWidth + 6)
             .attr('height', lineHeight)
-            .attr('rx', 4)
-            .attr('ry', 4)
             .attr('fill', `#${color}`);
         }
 
@@ -326,6 +342,8 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
     }
   });
 
+  console.log(annotationData);
+
 
   // Second pass: add the annotation lines, circles, and texts (outside the first pass loop)
   annotationData
@@ -344,6 +362,7 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
       const annotationText = annotationGroup.append('text')
         .attr('x', middleWordX - 6)
         .attr('y', currentY)
+        .attr('class', 'annotation-text-class')
         .style('fill', darkenColor(`#${color}`))
         .style('font-size', '14px')
         .style('pointer-events', 'none'); // Add this line
@@ -500,6 +519,51 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
         // No additional logic needed for lineEndHandle drag end
       }));
     });
+  // const data = [{
+  //   id: 1,
+  //   annotationLines: ["sss", "sd"],
+  //   color: "#ddedea",
+  //   currentY: 60,
+  //   middleWordX: 19.55963134765625
+  // }];
+
+  // // Define the annotation object
+  // const annotationx = d3.annotation()
+  //   .type(d3.annotationLabel)
+  //   .annotations(data.map(d => ({
+  //     note: {
+  //       label: `${d.annotationLines.join("<br>")}` // Use line breaks to separate text lines
+  //     },
+  //     color: d.color,
+  //     x: d.middleWordX,
+  //     y: d.currentY,
+  //     dy: -25, // Offset the label so it doesn't overlap the point
+  //     dx: -25,
+  //     subject: {
+  //       radius: 10, // Set the size of the circle around the point
+  //       radiusPadding: 5,
+  //     },
+  //     connector: {
+  //       type: "curve",
+  //       curve: d3.curveBasis,
+  //       end: "dot",
+  //       lineType: "horizontal",
+  //       style: {
+  //         stroke: d.color,
+  //         "stroke-width": 1,
+  //         "stroke-dasharray": "2 2",
+  //       }
+  //     }
+  //   })));
+
+
+
+  // // Call the annotation function to display the annotation
+  // plot.append("g")
+  //   .attr("class", "annotation-group")
+  //   .call(annotationx);
+
+  // annotationx.update();
 
 
   // Get the bounding box of the plot after rendering all the text elements
@@ -558,7 +622,7 @@ function addDownloadButton(svg, visualizationid) {
   const downloadButton = document.createElement("button");
   downloadButton.className = "download-svg-btn"; // Add the CSS class
   downloadButton.id = visualizationid + "-export-btn";
-  
+
 
   // Add the SVG download icon
   downloadButton.innerHTML = `
@@ -577,7 +641,7 @@ function addDownloadCombinedButton(visualizationid, subvistoadd, num = 2) {
   const downloadButton = document.createElement("button");
   downloadButton.className = "download-svg-combined-btn"; // Add the CSS class
   downloadButton.id = visualizationid + "-combined-export-btn";
-  let outheight = num*670;
+  let outheight = num * 670;
 
   // Add the SVG download icon
   if (num == 2) {
@@ -634,8 +698,8 @@ function downloadVisualization(svg) {
   canvas.width = outputWidth;
   canvas.height = outputHeight;
   const ctx = canvas.getContext("2d");
-//   ctx.fillStyle = "#fffcf5";
-// ctx.fillRect(0, 0, outputWidth, outputHeight);
+  //   ctx.fillStyle = "#fffcf5";
+  // ctx.fillRect(0, 0, outputWidth, outputHeight);
 
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -702,24 +766,24 @@ function downloadCombinedVisualizations(visualizationid) {
     const scaleup = outputWidth / clientWidth;
     const outputHeight = clientHeight * scaleup;
 
-//     const g = clonedSVG.querySelector("g");
-//     const gTransform = g.getAttribute("transform");
-//     const gScale = gTransform.match(/scale\(([^)]+)\)/);
-//     const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
-//     const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
+    //     const g = clonedSVG.querySelector("g");
+    //     const gTransform = g.getAttribute("transform");
+    //     const gScale = gTransform.match(/scale\(([^)]+)\)/);
+    //     const newGScale = gScale ? parseFloat(gScale[1]) * scaleup : scaleup;
+    //     const newGTransform = gTransform.replace(/scale\([^)]+\)/, `scale(${newGScale})`);
 
-//     // Update the translate values
-//     const gTranslate = gTransform.match(/translate\(([^)]+)\)/);
-//     if (gTranslate) {
-//       const [translateX, translateY] = gTranslate[1].split(',').map(parseFloat);
-//       const newTranslateX = (translateX + (clientWidth / 2)) * scaleup - (outputWidth / 2);
-// const newTranslateY = (translateY + (clientHeight / 2)) * scaleup - (outputHeight / 2);
+    //     // Update the translate values
+    //     const gTranslate = gTransform.match(/translate\(([^)]+)\)/);
+    //     if (gTranslate) {
+    //       const [translateX, translateY] = gTranslate[1].split(',').map(parseFloat);
+    //       const newTranslateX = (translateX + (clientWidth / 2)) * scaleup - (outputWidth / 2);
+    // const newTranslateY = (translateY + (clientHeight / 2)) * scaleup - (outputHeight / 2);
 
-//       const newGTranslate = `translate(${newTranslateX},${newTranslateY})`;
-//       g.setAttribute("transform", newGTransform.replace(gTranslate[0], newGTranslate));
-//     } else {
-//       g.setAttribute("transform", newGTransform);
-//     }
+    //       const newGTranslate = `translate(${newTranslateX},${newTranslateY})`;
+    //       g.setAttribute("transform", newGTransform.replace(gTranslate[0], newGTranslate));
+    //     } else {
+    //       g.setAttribute("transform", newGTransform);
+    //     }
 
     clonedSVG.setAttribute('width', outputWidth);
     clonedSVG.setAttribute('height', outputHeight);
