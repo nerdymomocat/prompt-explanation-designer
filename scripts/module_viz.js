@@ -72,6 +72,12 @@ export const tab_create_viz = (visualizationid, tabid) => {
   if (tabid === "tab2") {
     clearVisualization(visualizationid + '-1');
     let scale1 = create_viz(visualizationid + '-1', 'tb2-text-input', 'tb2-sidebar');
+    // svgToTikz('svg-'+visualizationid+'-1');
+    //generateTikzCode('tb2-text-input', 'tb2-sidebar');
+    // const svgCode = document.querySelector('#svg-'+visualizationid+'-1').innerHTML;
+    // const blob = new Blob([svgCode], { type: 'image/svg+xml' });
+    // saveAs(blob, 'yourSvgFile.svg');
+
   }
   else if (tabid === "tab3") {
     clearVisualization(visualizationid + '-1');
@@ -146,7 +152,7 @@ const findNonOverlappingRegion = (canvas, x, y, width, height, lineHeight, paddi
   const allTextNodes = canvas.selectAll('text').filter(function() { return this !== excludeElement; });
   let newY1 = y + minHeight;
   let newY2 = y - minHeight;
-  let newX = (x) - width / 2;
+  let newX = ((x) - width / 2) + padding;
 
   // Get all nodes with the class attribute "main-text-class"
   const mainTextNodes = canvas.selectAll('.main-text-class');
@@ -194,6 +200,7 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
   const sidebarDOM = document.querySelector('#' + sidebarid);
   const canvas = d3.select('#' + visualizationid)
     .append('svg')
+    .attr('id', 'svg-'+visualizationid)
     .attr('width', '100%')
     .attr('height', '100%')
     .attr('viewBox', '0 0 ' + width + ' ' + height)
@@ -213,8 +220,17 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
     const inputs = item.querySelectorAll('.color-description-input');
     const dropdowns = item.querySelectorAll('.description-dropdown');
     const annotationText = Array.from(inputs).map((input, index) => {
-      const prefix = dropdowns[index].value != "" ? dropdowns[index].value + ": " : "";
-      return `${prefix} ${input.value}`.trim();
+      // const prefix = dropdowns[index].value != "" ? dropdowns[index].value + ": " : "";
+      // return `${prefix} ${input.value}`.trim();
+      if (dropdowns[index].value !== "" && input.value !== "") {
+        return `${dropdowns[index].value}: ${input.value}`.trim();
+      } else if (dropdowns[index].value === "" && input.value !== "") {
+        return input.value.trim();
+      } else if (dropdowns[index].value !== "" && input.value === "") {
+        return dropdowns[index].value.trim();
+      } else {
+        return "";
+      }
     }).join('\n');
 
     annotations[color] = annotationText;
@@ -313,7 +329,10 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
             .attr('y', currentY - 15)
             .attr('width', wordWidth + 6)
             .attr('height', lineHeight)
-            .attr('fill', `#${color}`);
+            .attr('fill', `#${color}`)
+            .attr('rx', 4) // set x-axis radius to 5
+            .attr('ry', 4); // set y-axis radius to 5
+
         }
 
         if (isStrikethrough) {
@@ -360,7 +379,7 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
         .on('touchstart', function() { showDragHandles(d3.select(this)); });
 
       const annotationText = annotationGroup.append('text')
-        .attr('x', middleWordX - 6)
+        .attr('x', middleWordX - 0)
         .attr('y', currentY)
         .attr('class', 'annotation-text-class')
         .style('fill', darkenColor(`#${color}`))
@@ -370,7 +389,7 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
       annotationLines.forEach((line, index) => {
         annotationText.append('tspan')
           .text(line)
-          .attr('x', middleWordX - 6)
+          .attr('x', middleWordX - 0)
           .attr('dy', index === 0 ? 0 : lineHeight);
       });
       const padding = 5;
@@ -407,9 +426,11 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
         return currDist < prevDist ? curr : prev;
       });
 
+      const liney1 = currentY < closestCenter.y ? currentY + 5 : currentY > closestCenter.y ? currentY - 14 : currentY;
+
       const line = annotationGroup.append('line')
-        .attr('x1', middleWordX - 6)
-        .attr('y1', currentY)
+        .attr('x1', middleWordX - 0)
+        .attr('y1', liney1)
         .attr('x2', closestCenter.x)
         .attr('y2', closestCenter.y)
         .attr('stroke', darkenColor(`#${color}`))
@@ -500,8 +521,8 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
 
       const lineEndHandle = annotationGroup.append('circle')
         .attr('class', 'drag-handle draggable')
-        .attr('cx', middleWordX - 6)
-        .attr('cy', currentY)
+        .attr('cx', middleWordX - 0)
+        .attr('cy', liney1)
         .attr('r', handleRadius)
         .attr('fill', 'blue')
         .style('cursor', 'move')
@@ -811,41 +832,3 @@ function downloadCombinedVisualizations(visualizationid) {
     img.src = svgBlobURL;
   });
 }
-
-// function setupCombinedVizExportButton( containerSelector, desiredHeightFactor, elementsToHideSelectors) {
-
-//     // Function to show or hide elements
-//     const setElementsVisibility = (selectors, visibility) => {
-//       selectors.forEach((selector) => {
-//         const element = document.querySelector(selector);
-//         if (element) {
-//           element.style.visibility = visibility;
-//         }
-//       });
-//     };
-
-//     // Capture the container and show the image in the modal
-//           const container = document.querySelector(containerSelector);
-//       //console.log(container.getBoundingClientRect());
-//       const desiredWidth = 1200;
-//       const desiredHeight = 675 * desiredHeightFactor;
-//       const scaleFactor = Math.min(desiredWidth / container.offsetWidth, desiredHeight / container.offsetHeight);
-//       //console.log(container.offsetWidth, container.offsetHeight, scaleFactor);
-
-//       // Hide elements before capturing
-//       setElementsVisibility(elementsToHideSelectors, 'hidden');
-
-//       html2canvas(container, {
-//         scale: scaleFactor,
-//       }).then((canvas) => {
-//         const imageSrc = canvas.toDataURL('image/png');
-
-//         // Show elements again after capturing
-//         setElementsVisibility(elementsToHideSelectors, 'visible');
-
-//         showModal(imageSrc);
-//       });
-//   }
-
-
-//   setupCombinedVizExportButton('#tb3-visualization', 2, [['#tb3-hiddenTrigger','#tb3-visualization-combined-export-btn','#tb3-visualization-1-export-btn','#tb3-visualization-2-export-btn']]);
