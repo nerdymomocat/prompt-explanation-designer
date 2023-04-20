@@ -325,9 +325,9 @@ const create_viz = (visualizationid, textid, sidebarid, wraplim = 40, width = 60
 
         if (isHighlight) {
           const rect = plot.insert('rect', 'text')
-            .attr('x', currentX - 3)
+            .attr('x', currentX - 6)
             .attr('y', currentY - 15)
-            .attr('width', wordWidth + 6)
+            .attr('width', wordWidth + 12)
             .attr('height', lineHeight)
             .attr('fill', `#${color}`)
             .attr('rx', 4) // set x-axis radius to 5
